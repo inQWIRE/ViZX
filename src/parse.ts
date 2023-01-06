@@ -4,6 +4,9 @@ import * as ohmextras from 'ohm-js/extras';
 
 let grammarSource = `
 VyZX {
+  TopLevelTerm = BinOp<"∝">
+  | Term
+
   Term = TermNStack
   | BinOp<"⟷">
   | BinOp<"+">
@@ -27,10 +30,12 @@ VyZX {
   TermArgs = MultTermArgs
   | BaseOrBra
 
-  BaseTerm =  "⊃"
+  ZXBaseTerm =  "⊃"
   | "⊂"
   | "—"
   | "□"
+
+  BaseTerm = ZXBaseTerm
   | number
   | string
 
@@ -61,7 +66,9 @@ const rules = {
   TermComp: { type: 'Comp', l: 0, r: 2 },
   TermStack: { type: 'Stack', l: 0, r: 2 },
   ZXTerm: { type: 0, in: 1, out: 2, alpha: 3 },
-  BaseTerm: { type: 'Base', val: 0 },
+  ZXBaseTerm: { type: 'Base', val: 0 },
+  number: { type: 'number', val: 0 },
+  string: { type: 'string', val: 0 },
   BinOp: { type: 'BinOp', op: 1, l: 0, r: 2 }
 }
 const g = ohm.grammar(grammarSource);

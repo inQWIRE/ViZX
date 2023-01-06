@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log(response)
 			const ast = parse(response)
 			const panel = vscode.window.createWebviewPanel('VyZXViz', 'VyZX Viz', vscode.ViewColumn.One);
-			panel.webview.html = "<code>" + JSON.stringify(ast) + "</code>"
+			panel.webview.html = "<pre id=\"json\">" + JSON.stringify(ast) + "</pre>"
 			vscode.window.showInformationMessage('Hello World from VyZXViz!');
 		})
 	});
