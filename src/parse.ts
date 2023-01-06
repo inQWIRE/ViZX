@@ -13,7 +13,6 @@ VyZX {
   | BinOp<"-">
   | BinOp<"*">
   | BinOp<"/">
-  | BinOp<"/">
   | BinOp<"↕">
   | TermCast
   | TermBra
@@ -44,10 +43,13 @@ VyZX {
   string = (~("Z"|"X"))alnumWithGreek+ 
   number = digit+
 
-  ZXTerm = "Z" BaseOrBra BaseOrBra BaseOrBra
-  | "X" BaseOrBra BaseOrBra BaseOrBra
+
+  ZTerm = "Z" BaseOrBra BaseOrBra BaseOrBra
   | "(Z)" BaseOrBra BaseOrBra BaseOrBra
+
+  XTerm = "X" BaseOrBra BaseOrBra BaseOrBra
   | "(X)" BaseOrBra BaseOrBra BaseOrBra
+  ZXTerm = ZTerm | XTerm
 
   TermBra = "(" Term ")"
   BinOp<op> = Term op Term
@@ -58,14 +60,14 @@ VyZX {
 `
 const rules = {
   TermFn: { type: 'TermFn', fn: 0, args: 1 },
-  PropTerm: { type: 'PropTo', l: 0, r: 1 },
   MultTermArgs: { type: 'MultTermArgs', arg: 0, rem: 1 },
   TermArgs: { type: 'TermArgs', arg: 0 },
   TermCast: { type: 'Cast', in: 1, out: 3, exp: 5 },
   TermNStack: { type: 'nStack', n: 0, exp: 2 },
   TermComp: { type: 'Comp', l: 0, r: 2 },
   TermStack: { type: 'Stack', l: 0, r: 2 },
-  ZXTerm: { type: 0, in: 1, out: 2, alpha: 3 },
+  ZTerm: { type: 'Z', in: 1, out: 2, alpha: 3 },
+  XTerm: { type: 'X', in: 1, out: 2, alpha: 3 },
   ZXBaseTerm: { type: 'Base', val: 0 },
   number: { type: 'number', val: 0 },
   string: { type: 'string', val: 0 },
@@ -73,7 +75,6 @@ const rules = {
 }
 const g = ohm.grammar(grammarSource);
 
-// 'Z 1 2 (Zulip (pi / 2))'
 export function parse(expr: string): {} {
   const match = g.match(expr);
   if (match.failed()) {
@@ -86,4 +87,24 @@ export function parse(expr: string): {} {
   return ohmextras.toAST(match, rules);
 }
 
-
+export function isVyzxAst(ast: any): boolean {
+  const type: any = ast['type'];
+  const allowedTypes = ['Cast', 'nStack', 'TermFn', 'nStack', 'Comp', 'Stack', 'Base', 'X', 'Z', 'BinOp']
+  const allowedOps = ['∝', '⟷', '↕']
+  if (!(typeof type === 'string' || type instanceof String)) {
+    return false;
+  }
+  if (!allowedTypes.includes(type as string)) {
+    return false;
+  }
+  if (type === "BinOp") {
+    const op = ast['op'];
+    if (!(typeof op === 'string' || op instanceof String)) {
+      return false;
+    }
+    if (!allowedOps.includes(op as string)) {
+      return false;
+    }
+  }
+  return true;
+}
