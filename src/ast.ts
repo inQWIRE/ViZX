@@ -35,6 +35,8 @@ VyZX {
   | "${c.cup}"
   | "${c.wire}"
   | "${c.box}"
+  | "${c.swap}"
+  | "${c.empty}"
 
   BaseTerm = ZXBaseTerm
   | number

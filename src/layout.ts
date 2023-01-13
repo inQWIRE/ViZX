@@ -1,9 +1,9 @@
-import * as ast from './ast'
+import * as AST from './ast'
 import * as c from './consts'
 
 export class SizeASTNode {
-  node: ast.ASTNode
-  prettyPrint: boolean
+  node: AST.ASTNode
+  toPrettyPrint: boolean
   requiredWidth: number
   requiredHeight: number
   minWidth: number
@@ -11,13 +11,13 @@ export class SizeASTNode {
   x: number[]
   y: number[]
 
-  constructor(node: ast.ASTNode, prettyPrint: boolean, w: number, h: number) {
+  constructor(node: AST.ASTNode, prettyPrint: boolean, w: number, h: number) {
     this.node = node
     this.minHeight = h
     this.requiredHeight = h
     this.minWidth = w
     this.requiredWidth = w
-    this.prettyPrint = prettyPrint
+    this.toPrettyPrint = prettyPrint
     this.x = []
     this.y = []
   }
@@ -25,17 +25,21 @@ export class SizeASTNode {
 }
 
 export class Layout {
-  sizedMap: Map<ast.ASTNode, SizeASTNode>
-  constructor(rootNode: ast.ASTNode) {
-    this.sizedMap = new Map<ast.ASTNode, SizeASTNode>();
+  sizedMap: Map<AST.ASTNode, SizeASTNode>
+  rootNode: AST.ASTNode
+
+  constructor(rootNode: AST.ASTNode) {
+    this.rootNode = rootNode
+    this.sizedMap = new Map<AST.ASTNode, SizeASTNode>();
     this.makeSized(rootNode)
     this.buildRequiredSizes(rootNode)
     this.buildCoords(rootNode, 0, 0)
   }
-  private makeSized(ast: ast.ASTNode) {
+
+  private makeSized(ast: AST.ASTNode) {
     switch (ast.type) {
       case c.termBinOpType:
-        const binop = ast as ast.ASTBinOp
+        const binop = ast as AST.ASTBinOp
         if (!(binop.op === c.compOp || binop.op === c.stackOp)) {
           this.sizedMap.set(ast, new SizeASTNode(ast, true, 0, 0))
           break
@@ -69,13 +73,13 @@ export class Layout {
         this.sizedMap.set(ast, new SizeASTNode(ast, false, 100, 100))
         break
       case c.termNStackType:
-        const nStack = ast as ast.ASTNStack
+        const nStack = ast as AST.ASTNStack
         this.makeSized(nStack.exp)
         const se = this.sizedMap.get(nStack.exp)!
         this.sizedMap.set(ast, new SizeASTNode(ast, false, se.minWidth + c.widthStack + 2 * c.xpad, se.minHeight + 2 * c.ypad))
         break
       case c.termCastType:
-        const cast = ast as ast.ASTCast
+        const cast = ast as AST.ASTCast
         this.makeSized(cast.exp)
         const caseSe = this.sizedMap.get(cast.exp)!
         this.sizedMap.set(ast, new SizeASTNode(ast, false, caseSe.minWidth + 15 * 2 + c.xpad * 2, caseSe.minHeight + c.ypad * 4 + 15))
@@ -93,7 +97,7 @@ export class Layout {
     }
   }
 
-  private buildRequiredSizes(ast: ast.ASTNode): void {
+  private buildRequiredSizes(ast: AST.ASTNode): void {
     const sizedAstNode = this.sizedMap.get(ast)
     if (!sizedAstNode) {
       return
@@ -102,7 +106,7 @@ export class Layout {
     const heightDiff = sizedAstNode!.requiredHeight - sizedAstNode!.minHeight
     switch (ast.type) {
       case c.termBinOpType:
-        const binop = ast as ast.ASTBinOp
+        const binop = ast as AST.ASTBinOp
         // if left and right minSizes mismatch increase one size
         // if required size differes from minSize, figure out which one to resize recursively
 
@@ -123,26 +127,26 @@ export class Layout {
 
         if (binOpSized.requiredHeight != binOpSized.minHeight
           && binop.op == c.stackOp) {
-          lSized.requiredHeight += heightDiff / 2
-          rSized.requiredHeight += heightDiff / 2
+          lSized.requiredHeight += Math.ceil(heightDiff / 2)
+          rSized.requiredHeight += Math.floor(heightDiff / 2)
         } else if (binOpSized.requiredWidth != binOpSized.minWidth
           && binop.op === c.compOp) {
-          lSized.requiredWidth += widthDiff / 2
-          rSized.requiredWidth += widthDiff / 2
+          lSized.requiredWidth += Math.ceil(widthDiff / 2)
+          rSized.requiredWidth += Math.floor(widthDiff / 2)
         }
         this.buildRequiredSizes(binop.l)
         this.buildRequiredSizes(binop.r)
         return
-      case c.termCastType:
-        const nStack = ast as ast.ASTNStack
+      case c.termNStackType:
+        const nStack = ast as AST.ASTNStack
         let nStackNestedExp = this.sizedMap.get(nStack.exp)!
         nStackNestedExp.requiredHeight += heightDiff
         nStackNestedExp.requiredHeight += widthDiff
         this.sizedMap.set(nStack.exp, nStackNestedExp)
         this.buildRequiredSizes(nStack.exp)
         return
-      case c.termNStackType:
-        const cast = ast as ast.ASTCast
+      case c.termCastType:
+        const cast = ast as AST.ASTCast
         let castSizedNestedExp = this.sizedMap.get(cast.exp)!
         castSizedNestedExp.requiredHeight += heightDiff
         castSizedNestedExp.requiredHeight += widthDiff
@@ -151,14 +155,15 @@ export class Layout {
         return
     }
   }
-  private buildCoords(ast: ast.ASTNode, currx: number, curry: number): [number, number] {
+
+  private buildCoords(ast: AST.ASTNode, currx: number, curry: number): [number, number] {
     const sizedAstNode = this.sizedMap.get(ast)
     if (!sizedAstNode) {
       return [currx, curry]
     }
     switch (ast.type) {
       case c.termBinOpType:
-        const binop = ast as ast.ASTBinOp
+        const binop = ast as AST.ASTBinOp
         // if left and right minSizes mismatch increase one size
         // if required size differes from minSize, figure out which one to resize recursively
         if (!(binop.op === c.compOp || binop.op === c.stackOp)) {
@@ -175,16 +180,16 @@ export class Layout {
           const [xr, yr] = this.buildCoords(binop.r, currx, yl)
           sizedAstNode.x = [currx]
           sizedAstNode.x = [curry, yl]
-          return [xr, yr] 
+          return [xr, yr]
         }
-      case c.termCastType:
-        const nStack = ast as ast.ASTNStack
+      case c.termNStackType:
+        const nStack = ast as AST.ASTNStack
         this.buildCoords(nStack.exp, currx, curry)
         sizedAstNode.x = [currx]
         sizedAstNode.y = [curry]
         break
-      case c.termNStackType:
-        const cast = ast as ast.ASTCast
+      case c.termCastType:
+        const cast = ast as AST.ASTCast
         this.buildCoords(cast.exp, currx, curry)
         sizedAstNode.x = [currx]
         sizedAstNode.y = [currx]

@@ -9,6 +9,9 @@ export const cap = '⊂';
 export const cup = '⊃';
 export const wire = '—';
 export const box = '□';
+export const swap = '⨉';
+export const empty = '⦰';
+
 
 
 export const termFnType = 'Fn';
