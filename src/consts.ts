@@ -29,3 +29,5 @@ export const termBinOpType = 'BinOp';
 export const xpad = 10;
 export const ypad = 10;
 export const widthStack = 10;
+
+export const unicodeSubscriptOffset = 8272;

@@ -33,7 +33,7 @@ export class Layout {
     this.sizedMap = new Map<AST.ASTNode, SizeASTNode>();
     this.makeSized(rootNode)
     this.buildRequiredSizes(rootNode)
-    this.buildCoords(rootNode, 0, 0)
+    this.buildCoords(rootNode, 50, 50)
   }
 
   private makeSized(ast: AST.ASTNode) {

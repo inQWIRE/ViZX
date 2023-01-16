@@ -3,12 +3,16 @@ import * as AST from "./ast"
 import * as c from "./consts"
 import { assert } from "console"
 
-abstract class LoweredItem {
+
+type Result = string
+
+export abstract class LoweredItem {
   x: number[]
   y: number[]
   width: number
   height: number
   children: LoweredItem[]
+
   constructor(x: number[], y: number[], width: number, height: number, children: LoweredItem[]) {
     this.x = x;
     this.y = y;
@@ -16,6 +20,16 @@ abstract class LoweredItem {
     this.height = height;
     this.children = children;
   }
+
+  renderAll(): Result[] {
+    let res = [this.render()]
+    for (var i in this.children) {
+      res = res.concat(this.children[i].renderAll())
+    }
+    return res
+  }
+
+  protected abstract render(): Result
 }
 
 type BaseColor = 'red' | 'green' | 'white'
@@ -31,6 +45,8 @@ class BaseItem {
     this.nIn = nIn
     this.nOut = nOut
   }
+
+  render(): Result { }
 }
 
 class Base extends LoweredItem {
@@ -39,6 +55,8 @@ class Base extends LoweredItem {
     super([x], [y], width, height, []);
     this.baseItem = baseItem
   }
+
+  render(): Result { }
 }
 
 class Compose extends LoweredItem {
@@ -48,6 +66,7 @@ class Compose extends LoweredItem {
     super(x, y, width, height, children);
   }
 
+  render(): Result { }
 }
 class Stack extends LoweredItem {
   constructor(x: number[], y: number[], width: number, height: number, children: [LoweredItem, LoweredItem]) {
@@ -56,6 +75,7 @@ class Stack extends LoweredItem {
     super(x, y, width, height, children);
   }
 
+  render(): Result { }
 }
 
 class NStack extends LoweredItem {
@@ -64,6 +84,8 @@ class NStack extends LoweredItem {
     super([x], [y], width, height, [child]);
     this.n = n
   }
+
+  render(): Result { }
 }
 
 class CastItem {
@@ -73,6 +95,7 @@ class CastItem {
     this.nIn = nIn
     this.nOut = nOut
   }
+  render(): Result { }
 }
 
 class Cast extends LoweredItem {
@@ -81,12 +104,12 @@ class Cast extends LoweredItem {
     super([x], [y], width, height, [child]);
     this.castItem = castItem
   }
+  render(): Result { }
 }
 
 export function toLower(layout: Layout): LoweredItem {
   return nodeToLower(layout.rootNode, layout)
 }
-
 
 function nodeToLower(ast: AST.ASTNode, layout: Layout): LoweredItem {
   const sizedAstNode = layout.sizedMap.get(ast)

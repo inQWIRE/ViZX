@@ -1,14 +1,14 @@
+import * as c from "./consts";
+
 function isDigit(unicode: number) {
   return (unicode >= 48 && unicode <= 57);
 }
-
-const unicodeSubscriptOffset = 8272;
 
 function toSubscript(unicode: number): string {
   if (!isDigit(unicode)) {
     return String.fromCharCode(unicode)
   }
-  return String.fromCharCode(unicode + unicodeSubscriptOffset);
+  return String.fromCharCode(unicode + c.unicodeSubscriptOffset);
 }
 
 export function lastDigitsToSubscript(input: string): string { // TODO: Move to AST translation
