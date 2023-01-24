@@ -171,8 +171,9 @@ export function prettyPrint(ast: ASTNode): string {
       return `${prettyPrint(multArgs.arg)} ${prettyPrint(multArgs.rem)}`
     case c.termFnType:
       const fn = ast as ASTFn
-      return `${prettyPrint(fn.fn)} ${prettyPrint(fn.args)}`
+      return `${fn.fn} ${prettyPrint(fn.args)}`
   }
+  console.log(`Pretty printing of node ${ast.type} failed`)
   return "Invalid"
 }
 
@@ -194,7 +195,7 @@ export function parse(expr: string): ASTNode {
 
 export function isVyzxAst(ast: any): boolean {
   const type: any = ast['type'];
-  const allowedTypes = [c.termCastType, c.termNStackType, c.termFnType, c.termBaseType, c.termXType, c.termZType, c.termBinOpType]
+  const allowedTypes = [c.termCastType, c.termNStackType, c.termFnType, c.termBaseType, c.termXType, c.termZType, c.termBinOpType, c.stringType /* arb zx diag */]
   const allowedOps = [c.propTo, c.stackOp, c.compOp]
   if (!(typeof type === 'string' || type instanceof String)) {
     return false;

@@ -58,15 +58,13 @@ export class Layout {
           this.sizedMap.set(ast, new SizeASTNode(ast, false, newWidth, newHeight))
         }
         break
-      case c.stringType:
-        this.sizedMap.set(ast, new SizeASTNode(ast, true, 0, 0))
-        break
       case c.numberType:
         this.sizedMap.set(ast, new SizeASTNode(ast, true, 0, 0))
         break
       case c.termBaseType:
         this.sizedMap.set(ast, new SizeASTNode(ast, false, 100, 100))
         break
+      case c.stringType:
       case "Z":
       // fallthrough
       case "X":
@@ -118,21 +116,29 @@ export class Layout {
         const binOpSized = this.sizedMap.get(binop)!
 
         if (binop.op === c.compOp) {
-          lSized.requiredHeight = Math.max(rSized.minHeight, lSized.minHeight, binOpSized.requiredHeight)
+          lSized.requiredHeight = Math.max(rSized.minHeight, lSized.minHeight, binOpSized.requiredHeight - 2 * c.ypad)
           rSized.requiredHeight = lSized.requiredHeight
         } else {
-          lSized.requiredWidth = Math.max(rSized.minWidth, lSized.minWidth, binOpSized.requiredWidth)
+          lSized.requiredWidth = Math.max(rSized.minWidth, lSized.minWidth, binOpSized.requiredWidth - 2 * c.xpad)
           rSized.requiredWidth = lSized.requiredWidth
         }
 
-        if (binOpSized.requiredHeight != binOpSized.minHeight
-          && binop.op == c.stackOp) {
-          lSized.requiredHeight += Math.ceil(heightDiff / 2)
-          rSized.requiredHeight += Math.floor(heightDiff / 2)
-        } else if (binOpSized.requiredWidth != binOpSized.minWidth
-          && binop.op === c.compOp) {
-          lSized.requiredWidth += Math.ceil(widthDiff / 2)
-          rSized.requiredWidth += Math.floor(widthDiff / 2)
+        if (binOpSized.requiredHeight != binOpSized.minHeight) {
+          if (binop.op == c.compOp) {
+            lSized.requiredHeight += heightDiff
+            rSized.requiredHeight += heightDiff
+          } else {
+            lSized.requiredHeight += Math.ceil(heightDiff / 2)
+            rSized.requiredHeight += Math.floor(heightDiff / 2)
+          }
+        } else if (binOpSized.requiredWidth != binOpSized.minWidth) {
+          if (binop.op === c.compOp) {
+            lSized.requiredWidth += Math.ceil(widthDiff / 2)
+            rSized.requiredWidth += Math.floor(widthDiff / 2)
+          } else {
+            lSized.requiredWidth += widthDiff
+            rSized.requiredWidth += widthDiff
+          }
         }
         this.buildRequiredSizes(binop.l)
         this.buildRequiredSizes(binop.r)
@@ -142,7 +148,7 @@ export class Layout {
         let nStackNestedExp = this.sizedMap.get(nStack.exp)!
         nStackNestedExp.requiredHeight += heightDiff
         nStackNestedExp.requiredHeight += widthDiff
-        this.sizedMap.set(nStack.exp, nStackNestedExp)
+        // this.sizedMap.set(nStack.exp, nStackNestedExp)
         this.buildRequiredSizes(nStack.exp)
         return
       case c.termCastType:
@@ -150,7 +156,7 @@ export class Layout {
         let castSizedNestedExp = this.sizedMap.get(cast.exp)!
         castSizedNestedExp.requiredHeight += heightDiff
         castSizedNestedExp.requiredHeight += widthDiff
-        this.sizedMap.set(cast.exp, castSizedNestedExp)
+        // this.sizedMap.set(cast.exp, castSizedNestedExp)
         this.buildRequiredSizes(cast.exp)
         return
     }
@@ -173,13 +179,13 @@ export class Layout {
           const [xl, _] = this.buildCoords(binop.l, currx, curry)
           const [xr, yr] = this.buildCoords(binop.r, xl, curry)
           sizedAstNode.x = [currx, xl]
-          sizedAstNode.x = [curry]
+          sizedAstNode.y = [curry]
           return [xr, yr]
         } else {
           const [_, yl] = this.buildCoords(binop.l, currx, curry)
           const [xr, yr] = this.buildCoords(binop.r, currx, yl)
           sizedAstNode.x = [currx]
-          sizedAstNode.x = [curry, yl]
+          sizedAstNode.y = [curry, yl]
           return [xr, yr]
         }
       case c.termNStackType:
@@ -194,6 +200,7 @@ export class Layout {
         sizedAstNode.x = [currx]
         sizedAstNode.y = [currx]
         break
+      case c.stringType:
       case c.termZType:
       // fallthrough 
       case c.termXType:

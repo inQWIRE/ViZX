@@ -29,6 +29,14 @@ export abstract class LoweredItem {
     return res
   }
 
+  getOffsetX(): number[] {
+    return this.x.map(x => x_offset + x)
+  }
+
+  getOffsetY(): number[] {
+    return this.y.map(y => y_offset + y)
+  }
+
   protected abstract render(): Result
 }
 
@@ -45,9 +53,10 @@ class BaseItem {
     this.nIn = nIn
     this.nOut = nOut
   }
-
-  render(): Result { }
 }
+
+const x_offset = 100
+const y_offset = 100
 
 class Base extends LoweredItem {
   baseItem: BaseItem
@@ -56,7 +65,9 @@ class Base extends LoweredItem {
     this.baseItem = baseItem
   }
 
-  render(): Result { }
+  render(): Result {
+    return `createZXNode({ color: '${this.baseItem.color}', rotation: '${this.baseItem.rotation}', nIn: '${this.baseItem.nIn}', nOut: '${this.baseItem.nOut}' }, ${this.getOffsetX()[0]}, ${this.getOffsetY()[0]}, ${this.width}, ${this.height})`
+  }
 }
 
 class Compose extends LoweredItem {
@@ -66,7 +77,7 @@ class Compose extends LoweredItem {
     super(x, y, width, height, children);
   }
 
-  render(): Result { }
+  render(): Result { return `createCompose(${this.getOffsetX()[0]}, ${this.getOffsetY()[0]}, ${this.getOffsetY()[1]}, ${this.children[0].width}, ${this.children[1].width}, ${this.children[0].height})` }
 }
 class Stack extends LoweredItem {
   constructor(x: number[], y: number[], width: number, height: number, children: [LoweredItem, LoweredItem]) {
@@ -75,7 +86,7 @@ class Stack extends LoweredItem {
     super(x, y, width, height, children);
   }
 
-  render(): Result { }
+  render(): Result { return `createStack(${this.getOffsetX()[0]}, ${this.getOffsetY()[0]}, ${this.getOffsetY()[1]}, ${this.children[0].width}, ${this.children[0].height}, ${this.children[1].height})` }
 }
 
 class NStack extends LoweredItem {
@@ -85,7 +96,7 @@ class NStack extends LoweredItem {
     this.n = n
   }
 
-  render(): Result { }
+  render(): Result { return `createNStackArb(${this.n}, ${this.getOffsetX()[0]}, ${this.getOffsetY()[0]}, ${this.children[0].width}, ${this.children[0].height})` }
 }
 
 class CastItem {
@@ -95,7 +106,7 @@ class CastItem {
     this.nIn = nIn
     this.nOut = nOut
   }
-  render(): Result { }
+
 }
 
 class Cast extends LoweredItem {
@@ -104,7 +115,7 @@ class Cast extends LoweredItem {
     super([x], [y], width, height, [child]);
     this.castItem = castItem
   }
-  render(): Result { }
+  render(): Result { return `createCast(${this.castItem.nIn}, ${this.castItem.nOut}, ${this.getOffsetX()[0]}, ${this.getOffsetY()[0]}, ${this.children[0].width}, ${this.children[0].height})` }
 }
 
 export function toLower(layout: Layout): LoweredItem {
@@ -158,6 +169,10 @@ function nodeToLower(ast: AST.ASTNode, layout: Layout): LoweredItem {
       const [baseIn, baseOut] = baseToIO(baseTerm.val)
       const baseItem = new BaseItem('white', baseTerm.val, `${baseIn}`, `${baseOut}`)
       return new Base(sizedAstNode.x[0], sizedAstNode.y[0], sizedAstNode.requiredHeight, sizedAstNode.requiredHeight, baseItem);
+    case c.stringType:
+      const arbDiagVal = AST.prettyPrint(ast)
+      const arbDiagItem = new BaseItem('white', arbDiagVal, '', '')
+      return new Base(sizedAstNode.x[0], sizedAstNode.y[0], sizedAstNode.requiredHeight, sizedAstNode.requiredHeight, arbDiagItem);
   }
   throw new Error(`Cannot lower ast type ${ast.type}`)
 }
