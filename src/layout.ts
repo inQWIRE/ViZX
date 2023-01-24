@@ -3,7 +3,6 @@ import * as c from './consts'
 
 export class SizeASTNode {
   node: AST.ASTNode
-  toPrettyPrint: boolean
   requiredWidth: number
   requiredHeight: number
   minWidth: number
@@ -11,13 +10,12 @@ export class SizeASTNode {
   x: number[]
   y: number[]
 
-  constructor(node: AST.ASTNode, prettyPrint: boolean, w: number, h: number) {
+  constructor(node: AST.ASTNode, w: number, h: number) {
     this.node = node
     this.minHeight = h
     this.requiredHeight = h
     this.minWidth = w
     this.requiredWidth = w
-    this.toPrettyPrint = prettyPrint
     this.x = []
     this.y = []
   }
@@ -41,7 +39,7 @@ export class Layout {
       case c.termBinOpType:
         const binop = ast as AST.ASTBinOp
         if (!(binop.op === c.compOp || binop.op === c.stackOp)) {
-          this.sizedMap.set(ast, new SizeASTNode(ast, true, 0, 0))
+          this.sizedMap.set(ast, new SizeASTNode(ast, 0, 0))
           break
         }
         this.makeSized(binop.l)
@@ -51,46 +49,45 @@ export class Layout {
         if (binop.op === c.compOp) {
           const newWidth = sl.minWidth + sr.minWidth + 4 * c.xpad
           const newHeight = Math.max(sl.minHeight, sr.minHeight) + 2 * c.ypad
-          this.sizedMap.set(ast, new SizeASTNode(ast, false, newWidth, newHeight))
+          this.sizedMap.set(ast, new SizeASTNode(ast, newWidth, newHeight))
         } else if (binop.op === c.stackOp) {
           const newWidth = Math.max(sl.minWidth, sr.minWidth) + 2 * c.xpad
           const newHeight = sl.minHeight + sr.minHeight + 4 * c.ypad
-          this.sizedMap.set(ast, new SizeASTNode(ast, false, newWidth, newHeight))
+          this.sizedMap.set(ast, new SizeASTNode(ast, newWidth, newHeight))
         }
         break
       case c.numberType:
-        this.sizedMap.set(ast, new SizeASTNode(ast, true, 0, 0))
+        this.sizedMap.set(ast, new SizeASTNode(ast, 0, 0))
         break
       case c.termBaseType:
-        this.sizedMap.set(ast, new SizeASTNode(ast, false, 100, 100))
+        this.sizedMap.set(ast, new SizeASTNode(ast, 100, 100))
         break
       case c.stringType:
       case "Z":
       // fallthrough
       case "X":
-        this.sizedMap.set(ast, new SizeASTNode(ast, false, 100, 100))
+        this.sizedMap.set(ast, new SizeASTNode(ast, 100, 100))
+        break
+      case c.termFnType:
+        const fn = ast as AST.ASTFn
+        const fnWidth = Math.ceil(fn.fn.length / 4) * 100
+        this.sizedMap.set(ast, new SizeASTNode(ast, fnWidth, 100))
         break
       case c.termNStackType:
         const nStack = ast as AST.ASTNStack
         this.makeSized(nStack.exp)
         const se = this.sizedMap.get(nStack.exp)!
-        this.sizedMap.set(ast, new SizeASTNode(ast, false, se.minWidth + c.widthStack + 2 * c.xpad, se.minHeight + 2 * c.ypad))
+        this.sizedMap.set(ast, new SizeASTNode(ast, se.minWidth + c.widthStack + 2 * c.xpad, se.minHeight + 2 * c.ypad))
         break
       case c.termCastType:
         const cast = ast as AST.ASTCast
         this.makeSized(cast.exp)
         const caseSe = this.sizedMap.get(cast.exp)!
-        this.sizedMap.set(ast, new SizeASTNode(ast, false, caseSe.minWidth + 15 * 2 + c.xpad * 2, caseSe.minHeight + c.ypad * 4 + 15))
+        this.sizedMap.set(ast, new SizeASTNode(ast, caseSe.minWidth + 15 * 2 + c.xpad * 2, caseSe.minHeight + c.ypad * 4 + 15))
         break
-      case c.termArgsType: // Ignoring functions for now
-        // return makeSized((ast as ASTArgs).arg)
+      case c.termArgsType:
         break
       case c.multTermArgsType:
-        // const multArgs = ast as ASTMultArgs
-        break
-      case c.termFnType:
-        // const fn = ast as ASTFn
-        this.sizedMap.set(ast, new SizeASTNode(ast, true, 0, 0))
         break
     }
   }
@@ -167,6 +164,7 @@ export class Layout {
     if (!sizedAstNode) {
       return [currx, curry]
     }
+
     switch (ast.type) {
       case c.termBinOpType:
         const binop = ast as AST.ASTBinOp
@@ -177,16 +175,18 @@ export class Layout {
         }
         if (binop.op === c.compOp) {
           const [xl, _] = this.buildCoords(binop.l, currx, curry)
-          const [xr, yr] = this.buildCoords(binop.r, xl, curry)
+          const [xr, yr] = this.buildCoords(binop.r, xl + 2 * c.xpad, curry)
           sizedAstNode.x = [currx, xl]
           sizedAstNode.y = [curry]
-          return [xr, yr]
+          console.log(`Placing ${JSON.stringify(sizedAstNode, rep)} at (${[currx, xl]}, ${curry})`)
+          return [xr + 4 * c.xpad, yr]
         } else {
-          const [_, yl] = this.buildCoords(binop.l, currx, curry)
-          const [xr, yr] = this.buildCoords(binop.r, currx, yl)
+          const [_, yl] = this.buildCoords(binop.l, currx, curry + c.ypad)
+          const [xr, yr] = this.buildCoords(binop.r, currx, yl + c.ypad)
           sizedAstNode.x = [currx]
-          sizedAstNode.y = [curry, yl]
-          return [xr, yr]
+          sizedAstNode.y = [curry + c.ypad, yl + c.ypad]
+          console.log(`Placing ${JSON.stringify(sizedAstNode, rep)} at (${[currx]}, ${[curry, yl]})`)
+          return [xr, yr + 4 * c.ypad]
         }
       case c.termNStackType:
         const nStack = ast as AST.ASTNStack
@@ -201,6 +201,7 @@ export class Layout {
         sizedAstNode.y = [currx]
         break
       case c.stringType:
+      case c.termFnType:
       case c.termZType:
       // fallthrough 
       case c.termXType:
@@ -210,7 +211,13 @@ export class Layout {
         sizedAstNode.y = [curry]
         break
     }
+    console.log(`Placing ${JSON.stringify(sizedAstNode, rep)} at (${currx}, ${curry})`)
     return [currx + sizedAstNode.requiredWidth, curry + sizedAstNode.requiredHeight]
   }
 
+
+}
+function rep(key: any, v: any): any {
+  if (key === "l" || key === "r") { return undefined }
+  return v
 }

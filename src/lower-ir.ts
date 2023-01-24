@@ -30,11 +30,11 @@ export abstract class LoweredItem {
   }
 
   getOffsetX(): number[] {
-    return this.x.map(x => x_offset + x)
+    return this.x.map(x => c.x_offset + x)
   }
 
   getOffsetY(): number[] {
-    return this.y.map(y => y_offset + y)
+    return this.y.map(y => c.y_offset + y)
   }
 
   protected abstract render(): Result
@@ -55,8 +55,7 @@ class BaseItem {
   }
 }
 
-const x_offset = 100
-const y_offset = 100
+
 
 class Base extends LoweredItem {
   baseItem: BaseItem
@@ -170,6 +169,7 @@ function nodeToLower(ast: AST.ASTNode, layout: Layout): LoweredItem {
       const baseItem = new BaseItem('white', baseTerm.val, `${baseIn}`, `${baseOut}`)
       return new Base(sizedAstNode.x[0], sizedAstNode.y[0], sizedAstNode.requiredHeight, sizedAstNode.requiredHeight, baseItem);
     case c.stringType:
+    case c.termFnType:
       const arbDiagVal = AST.prettyPrint(ast)
       const arbDiagItem = new BaseItem('white', arbDiagVal, '', '')
       return new Base(sizedAstNode.x[0], sizedAstNode.y[0], sizedAstNode.requiredHeight, sizedAstNode.requiredHeight, arbDiagItem);

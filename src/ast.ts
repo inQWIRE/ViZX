@@ -136,7 +136,7 @@ export interface ASTMultArgs extends ASTNode {
 
 export interface ASTFn extends ASTNode {
   type: "Fn"
-  fn: ASTNode
+  fn: string
   args: ASTNode
 }
 
@@ -183,19 +183,19 @@ const g = ohm.grammar(grammarSource);
 export function parse(expr: string): ASTNode {
   const match = g.match(expr);
   if (match.failed()) {
-    console.log("Failed to parse")
-    console.log(match.message)
-    match.getInterval
+    throw new Error(`Failed to parse: ${match.message}`)
   }
-
-  console.log("AST for \"" + expr + "\"");
-
   return <ASTNode>ohmextras.toAST(match, rules);
+}
+
+export function isPropTo(ast : any) : boolean {
+  return ast['type'] === c.propTo
 }
 
 export function isVyzxAst(ast: any): boolean {
   const type: any = ast['type'];
-  const allowedTypes = [c.termCastType, c.termNStackType, c.termFnType, c.termBaseType, c.termXType, c.termZType, c.termBinOpType, c.stringType /* arb zx diag */]
+  const allowedTypes = [c.termCastType, c.termNStackType, c.termFnType, c.termBaseType, c.termXType, c.termZType, c.termBinOpType, 
+  c.stringType, c.termFnType /* arb zx diag */]
   const allowedOps = [c.propTo, c.stackOp, c.compOp]
   if (!(typeof type === 'string' || type instanceof String)) {
     return false;

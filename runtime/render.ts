@@ -212,6 +212,7 @@ function render() {
   for (let command in commands) {
     eval(command)
   }
+
 }
 
 function resize() {
@@ -222,7 +223,7 @@ function resize() {
 
 function clear() {
   commands = []
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 window.onresize = resize;
@@ -230,14 +231,14 @@ resize();
 
 
 function handleMessage(this: Window, msg: MessageEvent<any>) {
-  const command = msg.data.command as string
+  const command = (msg.data.command as string).trim()
   if (command.startsWith("create")) {
     commands.push(command)
     eval(command)
-  } else if (command === 'clear') {
+  } else if (command.startsWith("clear")) {
     clear()
   } else {
-    console.log(`Recieved invalid commannd "${command}"`)
+    this.window.postMessage(`Recieved invalid commannd "${command}"`)
   }
 }
 

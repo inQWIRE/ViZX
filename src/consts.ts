@@ -3,7 +3,7 @@ export const minOp = '-';
 export const mulOp = '*';
 export const divOp = '/';
 export const compOp = '⟷';
-export const stackOp = '↕';
+export const stackOp = '^'//'↕';
 export const propTo = '∝';
 export const cap = '⊂';
 export const cup = '⊃';
@@ -29,5 +29,8 @@ export const termBinOpType = 'BinOp';
 export const xpad = 10;
 export const ypad = 10;
 export const widthStack = 10;
+export const x_offset = 0
+export const y_offset = 0
+
 
 export const unicodeSubscriptOffset = 8272;
