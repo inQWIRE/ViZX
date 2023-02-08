@@ -3,17 +3,9 @@ import { rule, alt, tok, seq, lrec_sc, apply, kmid, expectEOF, expectSingleResul
 
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
 
-// TODO add propto?? idk how that's supposed to even be displayed tbh
-// TODO ADD CAST
+// TODO add propto
 import * as ast from './ast';
 import * as lex from './lexer';
-
-// export interface Token<T> {
-//     readonly kind: T;
-//     readonly text: string;
-//     readonly pos: TokenPosition;
-//     readonly next: Token<T> | undefined;
-// }
 
 type Token = psec.Token<lex.TokenKind>;
 
@@ -64,13 +56,12 @@ function applyNumFunc(args: [Token, ast.Num[]]) : ast.Num {
 }
 
 // numbers
-// TODO rename probably lmao
-const NUM = rule<lex.TokenKind, ast.Num>();
-const NUMBA = rule<lex.TokenKind, ast.Num>();
+const NUMBASETERM = rule<lex.TokenKind, ast.Num>();
+const NUMMIDTERM = rule<lex.TokenKind, ast.Num>();
 const NUMBER = rule<lex.TokenKind, ast.Num>();
 
 
-NUM.setPattern(
+NUMBASETERM.setPattern(
     alt(
         apply(
             tok(lex.TokenKind.Nat), 
@@ -81,7 +72,7 @@ NUM.setPattern(
                 alt(
                     tok(lex.TokenKind.Add),
                     tok(lex.TokenKind.Sub)),
-                NUM
+                NUMBASETERM
                 ),
             applySign
         ),
@@ -117,23 +108,23 @@ NUM.setPattern(
     )
 );
 
-NUMBA.setPattern(
-    lrec_sc(NUM,
+NUMMIDTERM.setPattern(
+    lrec_sc(NUMBASETERM,
         seq(
             alt(
                 tok(lex.TokenKind.Mul), 
                 tok(lex.TokenKind.Div)), 
-            NUM
+            NUMBASETERM
             ), 
         applyBinOp)
 );
 
 NUMBER.setPattern(
-    lrec_sc( NUMBA,
+    lrec_sc( NUMMIDTERM,
         seq( 
             alt(tok(lex.TokenKind.Add), 
                 tok(lex.TokenKind.Sub)), 
-            NUMBA
+            NUMMIDTERM
             ), 
         applyBinOp
     )

@@ -3,7 +3,6 @@ export interface ASTNode {
   }
 
 // TODO see if there is some way of initializing the interfaces? just so the kinds are pre-populated
-// todo add cast
 
 export enum ZXConst {
     Swap,
@@ -22,7 +21,7 @@ export enum MTransform {
 }
 
 // numbers are just strings because we don't want to actually evaluate them and we want "1 + 2 * 3" to be a valid number
-// but we still have the ast for a specific expression, it's just that the kind of the ast is a number. i might regret this we shall see
+// but we still have the ast for a specific expression, it's just that the kind of the ast is a number.
 export interface Num {
     kind: string,
     val: string
@@ -38,13 +37,14 @@ export interface Number extends Num {
     sign?: '+' | '-',
     val: string
 }
+
+// variables are also just numbers
 export interface Var extends Num {
     kind: 'var',
     val: string
 }
 
 export interface ArithOp extends Num {
-    // should this be a distinct kind like 'op' or something
     kind: 'num',
     val: '+' | '-' | '*' | '/',
     left: Num,
@@ -96,4 +96,3 @@ export interface NumFunc extends Num {
     args: [Num]
 }
 
-// functions on arbitrary variables + just adding variables in general ?? TODO

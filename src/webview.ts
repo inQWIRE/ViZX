@@ -17,6 +17,7 @@ function getNonce(): string {
 export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): string {
   const basePath = context.extensionUri.fsPath;
   const nonce = getNonce();
+  // currently non functional
   const scriptUri = panel.webview.asWebviewUri(
     Uri.file(path.join(basePath, "runtime", "render.js"))
   );
@@ -24,7 +25,6 @@ export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): s
     Uri.file(path.join(basePath, "runtime", "index.css"))
   );
 
-//   TODO ask about nonce
   const html = `<!DOCTYPE html>
   <html>
   <head>

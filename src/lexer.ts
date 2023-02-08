@@ -42,7 +42,6 @@ export enum TokenKind {
 };
 
 // longest parse, ties broken by array index
-// using the cursed syntax because i don't think you can format literals to have variables
 export const lexer = buildLexer([
     [true, /^\d+/g, TokenKind.Nat],
     [true, /^[Z]\s/g, TokenKind.ZToken],
