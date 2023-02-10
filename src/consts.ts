@@ -2,6 +2,8 @@ export const addOp = '+';
 export const subOp = '-';
 export const mulOp = '*';
 export const divOp = '/';
+export const rootOp = '√';
+export const expOp = '^';
 
 export const nStackOp = '⇑';
 export const compOp = '⟷';

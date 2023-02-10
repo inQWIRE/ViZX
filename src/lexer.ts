@@ -4,6 +4,10 @@ import * as c from './consts';
 export enum TokenKind {
     Nat,
     Str,
+    NWire,
+    Succ,
+    R0,
+    R1,
 
     ZToken,
     XToken,
@@ -12,6 +16,8 @@ export enum TokenKind {
     Sub,
     Mul,
     Div,
+    Root,
+    Exp,
 
     Swap,
     Empty,
@@ -42,21 +48,31 @@ export enum TokenKind {
 };
 
 // longest parse, ties broken by array index
+
+// — ↕ (Z) n (S (S m)) α
 export const lexer = buildLexer([
     [true, /^\d+/g, TokenKind.Nat],
-    [true, /^[Z]\s/g, TokenKind.ZToken],
-    [true, /^[X]\s/g, TokenKind.XToken],
+    [true, /^[Z]/g, TokenKind.ZToken],
+    [true, /^[X]/g, TokenKind.XToken],
+    [true, /^R0/g, TokenKind.R0],
+    [true, /^R1/g, TokenKind.R1],
+    [true, /^nWire/g, TokenKind.NWire],
 
     [true, /^\$/g, TokenKind.Cast$],
-    [true, /^:::/g, TokenKind.Cast3Colon],    
+    [true, /^:::/g, TokenKind.Cast3Colon],
+    [true, /^S\s/g, TokenKind.Succ],
+    [true, /^\(/g, TokenKind.LParen],
+    [true, /^\)/g, TokenKind.RParen],
 
-    [true, /^[A-Za-zΑ-Ωα-ω]+/g, TokenKind.Str],
+    [true, /^[A-WYa-zΑ-Ωα-ω][A-Za-zΑ-Ωα-ω0-9]*/g, TokenKind.Str],
     [true, /^\,/g, TokenKind.Comma],
 
     [true, new RegExp(`\^[${c.addOp}]`, 'g'), TokenKind.Add],
     [true, new RegExp(`\^[${c.subOp}]`, 'g'), TokenKind.Sub],
     [true, new RegExp(`\^[${c.mulOp}]`, 'g'), TokenKind.Mul],
     [true, new RegExp(`\^[${c.divOp}]`, 'g'), TokenKind.Div],
+    [true, new RegExp(`\^[${c.rootOp}]`, 'g'), TokenKind.Root],
+    [true, new RegExp(`\^[\\${c.expOp}]`, 'g'), TokenKind.Exp],
 
     [true, new RegExp(`\^[${c.swap}]`, 'g'), TokenKind.Swap],
     [true, new RegExp(`\^[${c.empty}]`, 'g'), TokenKind.Empty],
@@ -77,8 +93,6 @@ export const lexer = buildLexer([
 
     [true, new RegExp(`\^[${c.propTo}]`, 'g'), TokenKind.PropTo],
 
-    [true, /^\(/g, TokenKind.LParen],
-    [true, /^\)/g, TokenKind.RParen],
     [false, /^\s+/g, TokenKind.Space],
 ]);
 

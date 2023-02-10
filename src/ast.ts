@@ -27,26 +27,25 @@ export interface Num {
     val: string
 }
 
-export interface Str {
-    kind: string,
+export interface RealNum extends Num {
+    kind: 'realnum',
     val: string
 }
 
 export interface Number extends Num {
     kind: 'num',
-    sign?: '+' | '-',
     val: string
 }
 
 // variables are also just numbers
-export interface Var extends Num {
-    kind: 'var',
+export interface NumVar extends Num {
+    kind: 'numvar',
     val: string
 }
 
 export interface ArithOp extends Num {
     kind: 'num',
-    val: '+' | '-' | '*' | '/',
+    val: '+' | '-' | '*' | '/' | '^',
     left: Num,
     right: Num
 }
@@ -61,7 +60,7 @@ export interface ASTSpider extends ASTNode {
     val: 'Z' | 'X',
     in: Num,
     out: Num,
-    alpha: Num //TODO CHANGE
+    alpha: Num 
     transform?: MTransform
 }
 
@@ -89,10 +88,37 @@ export interface ASTCast extends ASTNode {
     n: Num,
     node: ASTNode
 }
-// TODO add
 export interface NumFunc extends Num {
-    kind: 'func',
+    kind: 'numfunc',
     fname: string,
-    args: [Num]
+    args: [Num],
+    val: string
 }
 
+export interface Func extends ASTNode {
+    kind: 'func',
+    fname: string,
+    args: [Num | ASTNode],
+    val: string
+}
+
+export interface Var extends ASTNode {
+    kind: 'var',
+    val: string
+}
+
+export interface PropTo extends ASTNode {
+    kind: 'propto',
+    l: ASTNode,
+    r: ASTNode
+}
+
+export interface NWire extends ASTNode {
+    kind: 'nwire',
+    n: Num
+}
+
+export interface Real01 extends Num {
+    kind: 'real01',
+    n: 'R0' | 'R1'
+}
