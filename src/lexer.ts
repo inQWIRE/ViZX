@@ -30,6 +30,7 @@ export enum TokenKind {
     Conjugate,
     Adjoint,
     ColorSwap,
+    Flip,
 
     Stack,
     NStack,
@@ -85,9 +86,11 @@ export const lexer = buildLexer([
     [true, new RegExp(`\^[${c.conjugateTransform}]`, 'g'), TokenKind.Conjugate],
     [true, new RegExp(`\^[${c.adjointTransform}]`, 'g'), TokenKind.Adjoint],
     [true, new RegExp(`\^[${c.colorswapTransform}]`, 'g'), TokenKind.ColorSwap],
+    [true, new RegExp(`\^[${c.flipTransform}]`, 'g'), TokenKind.Flip],
 
     [true,new RegExp(`\^[${c.stackOp}]`, 'g'), TokenKind.Stack],
     [true, new RegExp(`\^[${c.nStackOp}]`, 'g'), TokenKind.NStack],
+    // TODO differentiate nstack, nstack1
     [true, new RegExp(`\^[${c.nStack1Op}]`, 'g'), TokenKind.NStack1],
     [true, new RegExp(`\^[${c.compOp}]`, 'g'), TokenKind.Compose],
 

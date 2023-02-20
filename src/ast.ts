@@ -1,5 +1,7 @@
 export interface ASTNode {
-    kind: string
+    kind: string,
+    hor_len?: number,
+    ver_len?: number
   }
 
 // TODO see if there is some way of initializing the interfaces? just so the kinds are pre-populated
@@ -17,7 +19,8 @@ export enum MTransform {
     Transpose,
     Adjoint,
     Conjugate,
-    ColorSwap
+    ColorSwap,
+    Flip
 }
 
 // numbers are just strings because we don't want to actually evaluate them and we want "1 + 2 * 3" to be a valid number
@@ -82,6 +85,12 @@ export interface ASTNStack extends ASTNode {
     node: ASTNode
 }
 
+export interface ASTNStack1 extends ASTNode {
+    kind: 'nstack1',
+    n: Num,
+    node: ASTNode
+}
+
 export interface ASTCast extends ASTNode {
     kind: 'cast',
     m: Num,
@@ -95,25 +104,25 @@ export interface NumFunc extends Num {
     val: string
 }
 
-export interface Func extends ASTNode {
+export interface ASTFunc extends ASTNode {
     kind: 'func',
     fname: string,
     args: [Num | ASTNode],
     val: string
 }
 
-export interface Var extends ASTNode {
+export interface ASTVar extends ASTNode {
     kind: 'var',
     val: string
 }
 
-export interface PropTo extends ASTNode {
+export interface ASTPropTo extends ASTNode {
     kind: 'propto',
     l: ASTNode,
     r: ASTNode
 }
 
-export interface NWire extends ASTNode {
+export interface ASTNWire extends ASTNode {
     kind: 'nwire',
     n: Num
 }

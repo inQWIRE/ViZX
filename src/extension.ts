@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as parser from './parser';
+import * as sizer from './sizes';
 import * as ast from './ast';
 import { getCanvasHtml } from './webview';
 // this method is called when your extension is activated
@@ -26,12 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
 			// vscode.window.showInformationMessage(`info: ${expr}`);
 			try {
 				parsed = parser.parseAST(expr);
+				sizer.addSizes(parsed);
+
 		   } catch (e) {
 			   vscode.window.showErrorMessage(`Error rendering your VyZX expression (${expr}): ${e}`);
 			   return;
 		   }
 		   const panel = vscode.window.createWebviewPanel('VyZXViz', `VyZX Viz: ${expr}`, vscode.ViewColumn.One, options);
 		   panel.webview.html = getCanvasHtml(panel, context);
+		//    console.log(panel.webview.html);
 		   panel.webview.onDidReceiveMessage(msg => console.log(msg));
 	}).then(undefined, err => {
 		console.error('Error in extension.activate, ', err);

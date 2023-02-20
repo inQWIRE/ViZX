@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ES2019",
+        "sourceMap": true,
+        "lib": [
+            "ES2019",
+            "dom"
+        ],
+        "noUnusedLocals": true,
+        "module": "commonjs"
+    }
+}

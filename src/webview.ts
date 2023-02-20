@@ -16,6 +16,7 @@ function getNonce(): string {
 
 export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): string {
   const basePath = context.extensionUri.fsPath;
+  console.log(`base path: ${basePath}`);
   const nonce = getNonce();
   // currently non functional
   const scriptUri = panel.webview.asWebviewUri(
@@ -32,12 +33,14 @@ export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): s
       <title>ZX</title>
       <link rel="stylesheet" href="${cssUri}">
       <script>var exports = {};</script>
-      <script defer type="text/javascript" nonce="${nonce}" src="${scriptUri}"></script>
+      <script defer type="text/javascript" src="${scriptUri}""></script>
   </head>
   <body>
-      <canvas></canvas>
+      <canvas id="canvas"></canvas>
   </body>
   </html>
 `;
   return html;
 }
+
+//       <script defer type="text/javascript" nonce="${nonce} src="${scriptUri}""></script>

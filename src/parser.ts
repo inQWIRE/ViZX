@@ -2,11 +2,7 @@ import * as psec from 'typescript-parsec';
 import { rule, alt, tok, seq, lrec_sc, apply, kmid, expectEOF, expectSingleResult, kright, kleft, opt_sc, rep_sc } from 'typescript-parsec';
 
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
-
-// nwire
-// functions that take i at least one diagram should render a diagram
-// cast within cast
-// — ↕ (Z) n (S (S m)) α ⟷ (⊃ ↕ nWire S m) ⟷ (nWire 0 ↕ ((Z) 1 2 0 ↕ nWire m))
+// TODO some sort of bug with parentheses? For some reason won't parse of form "ZXNODE ⟷|↕ (ZXNODE ⟷|↕ ZXNODE)"" but will parse without parens
 
 import * as ast from './ast';
 import * as lex from './lexer';
@@ -227,16 +223,16 @@ function applyRealNum(value: [Token | undefined, ast.Num]): ast.Num {
 }
 
 function applyVar(val: Token): ast.ASTNode {
-    return { kind: 'var', val: val.text} as ast.Var;
+    return { kind: 'var', val: val.text} as ast.ASTVar;
 }
 
 function applyFunc(args: [Token, (ast.Num|ast.ASTNode), (ast.Num|ast.ASTNode)[]]) : ast.ASTNode {
     args[2].unshift(args[1]);
-    return { kind: 'func', fname: args[0].text, args: args[2], val: `${args[0].text}(${args[2].join(', ')})`} as ast.Func;
+    return { kind: 'func', fname: args[0].text, args: args[2], val: `${args[0].text}(${args[2].join(', ')})`} as ast.ASTFunc;
 }
 
 function applyNWire(arg: ast.Num) : ast.ASTNode {
-    return { kind: 'nwire', n: arg } as ast.NWire;
+    return { kind: 'nwire', n: arg } as ast.ASTNWire;
 }
 
 ZXBASETERM.setPattern(
@@ -287,7 +283,10 @@ ZXBASETERM.setPattern(
         apply(
             seq(
                 opt_sc(
-                    tok(lex.TokenKind.ColorSwap)
+                    alt(
+                        tok(lex.TokenKind.ColorSwap),
+                        tok(lex.TokenKind.Flip)
+                    )
                 ),
                 seq(
                     alt(
@@ -352,6 +351,9 @@ function addTransform(pre: Token | undefined, spider: ast.ASTSpider, post: Token
         if (pre.kind === lex.TokenKind.ColorSwap) {
             spider.transform = ast.MTransform.ColorSwap;
         }
+        if (pre.kind === lex.TokenKind.Flip) {
+            spider.transform = ast.MTransform.Flip;
+        }
     }
     if (post !== undefined) {
         if (post.kind === lex.TokenKind.Adjoint) {
@@ -406,6 +408,9 @@ function applyNStack(args: [ast.Num, Token, ast.ASTNode]): ast.ASTNode {
         default: {
             throw new Error(`Unknown nstack???: ${args[1].kind}`);
         }
+        case lex.TokenKind.NStack1: {
+            return { kind: 'nstack1', n: args[0], node: args[2] } as ast.ASTNStack1;
+        }
     };
 }
 
@@ -417,7 +422,10 @@ ZXNSTACK.setPattern(
     apply(
         seq(
             NUMBER,
-            tok(lex.TokenKind.NStack),
+            alt(
+                tok(lex.TokenKind.NStack),
+                tok(lex.TokenKind.NStack1)
+            ),
             ZXSTACKCOMPOSE
         ),
         applyNStack
@@ -465,7 +473,7 @@ ZXPROPTO.setPattern(
 );
 
 function applyPropTo( args: [ast.ASTNode, Token, ast.ASTNode]) : ast.ASTNode {
-    return { kind: 'propto', l: args[0], r: args[2] } as ast.PropTo;
+    return { kind: 'propto', l: args[0], r: args[2] } as ast.ASTPropTo;
 }
 
 ASTNODE.setPattern(

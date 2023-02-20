@@ -22,3 +22,4 @@ export const transposeTransform = '⊤';
 export const conjugateTransform = '⊼';
 export const adjointTransform = '†';
 export const colorswapTransform = '⊙';
+export const flipTransform = '⥍';
