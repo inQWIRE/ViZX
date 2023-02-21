@@ -487,7 +487,6 @@ ASTNODE.setPattern(
 
 export function parseAST(expr: string) : ast.ASTNode {
     lex.lexerPrettyPrinter(expr);
-    // console.log((ASTNODE.parse(lex.lexer.parse(expr))));
     let parsed = expectSingleResult(expectEOF(ASTNODE.parse(lex.lexer.parse(expr))));
     console.log(parsed);
     return parsed;

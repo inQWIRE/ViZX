@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 		   panel.webview.html = getCanvasHtml(panel, context);
 		   panel.webview.onDidReceiveMessage(msg => console.log(msg));
 		   panel.webview.postMessage({ command: JSON.stringify(node) });
-		   console.log(`message posted: ${JSON.stringify(node)}`);
+		//    console.log(`message posted: ${JSON.stringify(node)}`);
 	}).then(undefined, err => {
 		console.error('Error in extension.activate, ', err);
 	 });

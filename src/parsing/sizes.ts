@@ -29,7 +29,7 @@ export function addSizes(node: ast.ASTNode) : ast.ASTNode {
                 throw new Error(`Could not size children of ${node} as stack node: horizontal len`);
             }
             if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
-                node.ver_len = sleft.ver_len + sright.ver_len;
+                node.ver_len = sleft.ver_len + sright.ver_len + 4*PAD_SIZE;
             }
             else {
                 throw new Error(`Could not size children of ${node} as stack node: vertical len`);
@@ -41,13 +41,13 @@ export function addSizes(node: ast.ASTNode) : ast.ASTNode {
             let sleft = addSizes(node_.left);
             let sright = addSizes(node_.right);
             if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
-                node.ver_len = Math.max(sleft.ver_len, sright.ver_len);
+                node.ver_len = Math.max(sleft.ver_len, sright.ver_len) + 2*PAD_SIZE;
             }
             else {
                 throw new Error(`Could not size children of ${node} as compose node: horizontal len`);
             }
             if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-                node.hor_len = sleft.hor_len + sright.hor_len;
+                node.hor_len = sleft.hor_len + sright.hor_len + 4*PAD_SIZE;
             }
             else {
                 throw new Error(`Could not size children of ${node} as compose node: vertical len`);
@@ -129,7 +129,5 @@ export function addSizes(node: ast.ASTNode) : ast.ASTNode {
             throw new Error(`Unknown kind: ${node.kind}`);
         }
     };
-    // console.log("sized node: ");
-    // console.log(node);
     return node;
 }

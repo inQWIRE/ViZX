@@ -16,7 +16,6 @@ function getNonce(): string {
 
 export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): string {
   const basePath = context.extensionUri.fsPath;
-  // console.log(`base path: ${basePath}`);
   const nonce = getNonce();
   const scriptUri = panel.webview.asWebviewUri(
     Uri.file(path.join(basePath, "out", "render.js"))

@@ -1,6 +1,6 @@
 import * as ast from '../parsing/ast';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, TEXT_PAD_SIZE, cap, cup, box, wire, swap, empty } from '../constants/consts';
-import { findCenter, findLeftCenter, findRightCenter } from '../parsing/coords';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, TEXT_PAD_SIZE, cap, cup, box, wire, swap, empty, PAD_SIZE } from '../constants/consts';
+import { findCenter, findLeftCenter, findRightCenter, findBottomCenter, findTopCenter } from '../parsing/coords';
 
 const canvas = document.querySelector('canvas')!;
 const ctx = canvas.getContext('2d')!;
@@ -14,8 +14,46 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 canvas_format();
 
+function drawStackNode(node: ast.ASTNode) {
+    let stack = <ast.ASTStack>node;
+    ctx.strokeStyle = black;
+    ctx.setLineDash([10,10]);
+    ctx.beginPath();
+    ctx.moveTo(node.boundary!.tl.x, node.boundary!.tl.y);
+    ctx.lineTo(node.boundary!.tr.x, node.boundary!.tr.y);
+    ctx.lineTo(node.boundary!.br.x, node.boundary!.br.y);
+    ctx.lineTo(node.boundary!.bl.x, node.boundary!.bl.y);
+    ctx.closePath();
+    let y = node.boundary!.tl.y + stack.left.ver_len! + (2 * PAD_SIZE);
+    ctx.moveTo(findLeftCenter(node.boundary!).x, y);
+    ctx.lineTo(findRightCenter(node.boundary!).x, y);
+    ctx.stroke();
+    draw(stack.left);
+    draw(stack.right);
+}
+
+
+function drawComposeNode(node: ast.ASTNode) {
+    let compose = <ast.ASTCompose>node;
+    ctx.strokeStyle = black;
+    ctx.setLineDash([10,10]);
+    ctx.beginPath();
+    ctx.moveTo(node.boundary!.tl.x, node.boundary!.tl.y);
+    ctx.lineTo(node.boundary!.tr.x, node.boundary!.tr.y);
+    ctx.lineTo(node.boundary!.br.x, node.boundary!.br.y);
+    ctx.lineTo(node.boundary!.bl.x, node.boundary!.bl.y);
+    ctx.closePath();
+    let x = node.boundary!.tl.x + compose.left.hor_len! + (2 * PAD_SIZE);
+    ctx.moveTo(x, findTopCenter(node.boundary!).y);
+    ctx.lineTo(x, findBottomCenter(node.boundary!).y);
+    ctx.stroke();
+    draw(compose.left);
+    draw(compose.right);
+}
+
 function drawBaseNode(node: ast.ASTNode) {
     ctx.fillStyle = white;
+    ctx.setLineDash([]);
     ctx.strokeStyle = black;
     let inputs: string;
     let outputs: string;
@@ -121,17 +159,36 @@ function text_format(loc: string) {
     }
 }
 
+function draw(node: ast.ASTNode) {
+    switch (node.kind) {
+        case 'spider': {
+            drawBaseNode(node);
+            break;
+        }
+        case 'const': {
+            drawBaseNode(node);
+            break;
+        }
+        case 'stack': {
+            drawStackNode(node);
+            break;
+        }
+        case 'compose': {
+            drawComposeNode(node);
+            break;
+        }
+        default: {
+            throw new Error("unknown kind in render");
+        }
+    }
+ 
+}
+
 function render(this: Window, msg: MessageEvent<any>) {
     canvas_format();
     let command = msg.data.command;
-    // ctx.fillStyle = white;
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // console.log("in render");
     let node: ast.ASTNode = JSON.parse(command);
-    console.log(`node kind: ${node.kind}`);
-    drawBaseNode(node);
-    // ctx.fillStyle = red;
-    // ctx.fillText(msg.data.command,50,50);
+    draw(node);
   }
 
 function canvas_format() {
@@ -141,4 +198,6 @@ function canvas_format() {
 }
 
 window.addEventListener('message', render);
+
+// esbuild auto reload
 new EventSource('/esbuild').addEventListener('change', () => location.reload());
