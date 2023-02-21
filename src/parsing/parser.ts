@@ -384,7 +384,7 @@ ZXSTACKCOMPOSE.setPattern(
 );
 
 function applyStackCompose(l: ast.ASTNode, args: [Token, ast.ASTNode]): ast.ASTNode {
-    console.log('calling applyStackCompose');
+    // console.log('calling applyStackCompose');
     switch(args[0].kind) {
         case lex.TokenKind.Compose: {
             return { kind: 'compose', left: l, right: args[1] } as ast.ASTCompose;
@@ -487,7 +487,7 @@ ASTNODE.setPattern(
 
 export function parseAST(expr: string) : ast.ASTNode {
     lex.lexerPrettyPrinter(expr);
-    console.log((ASTNODE.parse(lex.lexer.parse(expr))));
+    // console.log((ASTNODE.parse(lex.lexer.parse(expr))));
     let parsed = expectSingleResult(expectEOF(ASTNODE.parse(lex.lexer.parse(expr))));
     console.log(parsed);
     return parsed;

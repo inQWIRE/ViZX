@@ -1,5 +1,5 @@
 import { buildLexer } from 'typescript-parsec';
-import * as c from './consts';
+import * as c from '../constants/consts';
 
 export enum TokenKind {
     Nat,

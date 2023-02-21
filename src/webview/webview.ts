@@ -16,14 +16,13 @@ function getNonce(): string {
 
 export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): string {
   const basePath = context.extensionUri.fsPath;
-  console.log(`base path: ${basePath}`);
+  // console.log(`base path: ${basePath}`);
   const nonce = getNonce();
-  // currently non functional
   const scriptUri = panel.webview.asWebviewUri(
-    Uri.file(path.join(basePath, "runtime", "render.js"))
+    Uri.file(path.join(basePath, "out", "render.js"))
   );
   const cssUri = panel.webview.asWebviewUri(
-    Uri.file(path.join(basePath, "runtime", "index.css"))
+    Uri.file(path.join(basePath, "src", "runtime", "index.css"))
   );
 
   const html = `<!DOCTYPE html>
@@ -33,8 +32,7 @@ export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): s
       <title>ZX</title>
       <link rel="stylesheet" href="${cssUri}">
       <script>var exports = {};</script>
-      <script defer type="text/javascript" src="${scriptUri}""></script>
-  </head>
+      <script defer type="text/javascript" nonce="${nonce}" src="${scriptUri}""></script>  </head>
   <body>
       <canvas id="canvas"></canvas>
   </body>
@@ -42,5 +40,3 @@ export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): s
 `;
   return html;
 }
-
-//       <script defer type="text/javascript" nonce="${nonce} src="${scriptUri}""></script>

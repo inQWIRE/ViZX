@@ -1,8 +1,5 @@
 import * as ast from './ast';
-
-const BASE_SIZE = 1;
-const PROPTO_SIZE = 0.2;
-
+import { BASE_SIZE, PAD_SIZE, PROPTO_SIZE } from '../constants/consts';
 export function addSizes(node: ast.ASTNode) : ast.ASTNode {
     switch (node.kind) {
         case 'const': {
@@ -26,9 +23,7 @@ export function addSizes(node: ast.ASTNode) : ast.ASTNode {
             let sright = addSizes(node_.right);
             if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
                 // TODO
-                node.hor_len = Math.max(sleft.hor_len, sright.hor_len);
-                sleft.hor_len = Math.max(sleft.hor_len, sright.hor_len);
-                sright.hor_len = Math.max(sleft.hor_len, sright.hor_len);
+                node.hor_len = Math.max(sleft.hor_len, sright.hor_len) + 2*PAD_SIZE;
             }
             else {
                 throw new Error(`Could not size children of ${node} as stack node: horizontal len`);
@@ -134,7 +129,7 @@ export function addSizes(node: ast.ASTNode) : ast.ASTNode {
             throw new Error(`Unknown kind: ${node.kind}`);
         }
     };
-    console.log("sized node: ");
-    console.log(node);
+    // console.log("sized node: ");
+    // console.log(node);
     return node;
 }

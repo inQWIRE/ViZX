@@ -1,7 +1,9 @@
+import { quad } from '../constants/types';
 export interface ASTNode {
     kind: string,
     hor_len?: number,
-    ver_len?: number
+    ver_len?: number,
+    boundary?: quad
   }
 
 // TODO see if there is some way of initializing the interfaces? just so the kinds are pre-populated
