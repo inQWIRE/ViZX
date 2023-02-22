@@ -1,5 +1,5 @@
 import * as ast from '../parsing/ast';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, TEXT_PAD_SIZE, cap, cup, box, wire, swap, empty, PAD_SIZE } from '../constants/consts';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, TEXT_PAD_SIZE, cap, cup, box, wire, swap, empty, PAD_SIZE, stackOp, compOp } from '../constants/consts';
 import { findCenter, findLeftCenter, findRightCenter, findBottomCenter, findTopCenter } from '../parsing/coords';
 
 const canvas = document.querySelector('canvas')!;
@@ -16,6 +16,8 @@ canvas_format();
 
 function drawStackNode(node: ast.ASTNode) {
     let stack = <ast.ASTStack>node;
+    draw(stack.left);
+    draw(stack.right);
     ctx.strokeStyle = black;
     ctx.setLineDash([10,10]);
     ctx.beginPath();
@@ -24,31 +26,35 @@ function drawStackNode(node: ast.ASTNode) {
     ctx.lineTo(node.boundary!.br.x, node.boundary!.br.y);
     ctx.lineTo(node.boundary!.bl.x, node.boundary!.bl.y);
     ctx.closePath();
-    let y = node.boundary!.tl.y + stack.left.ver_len! + (2 * PAD_SIZE);
-    ctx.moveTo(findLeftCenter(node.boundary!).x, y);
-    ctx.lineTo(findRightCenter(node.boundary!).x, y);
     ctx.stroke();
-    draw(stack.left);
-    draw(stack.right);
+    let x = findCenter(node.boundary!).x;
+    let y = node.boundary!.tl.y + stack.left.ver_len! + (2 * PAD_SIZE);
+    text_format('stack_compose');
+    ctx.fillText(stackOp, x, y);
+    // ctx.moveTo(findLeftCenter(node.boundary!).x, y);
+    // ctx.lineTo(findRightCenter(node.boundary!).x, y);
 }
 
 
 function drawComposeNode(node: ast.ASTNode) {
     let compose = <ast.ASTCompose>node;
+    draw(compose.left);
+    draw(compose.right);
     ctx.strokeStyle = black;
-    ctx.setLineDash([10,10]);
+    ctx.setLineDash([3,3]);
     ctx.beginPath();
     ctx.moveTo(node.boundary!.tl.x, node.boundary!.tl.y);
     ctx.lineTo(node.boundary!.tr.x, node.boundary!.tr.y);
     ctx.lineTo(node.boundary!.br.x, node.boundary!.br.y);
     ctx.lineTo(node.boundary!.bl.x, node.boundary!.bl.y);
     ctx.closePath();
-    let x = node.boundary!.tl.x + compose.left.hor_len! + (2 * PAD_SIZE);
-    ctx.moveTo(x, findTopCenter(node.boundary!).y);
-    ctx.lineTo(x, findBottomCenter(node.boundary!).y);
     ctx.stroke();
-    draw(compose.left);
-    draw(compose.right);
+    let x = node.boundary!.tl.x + compose.left.hor_len! + (2 * PAD_SIZE);
+    let y = findCenter(node.boundary!).y;
+    text_format('stack_compose');
+    ctx.fillText(compOp, x, y);
+    // ctx.moveTo(x, findTopCenter(node.boundary!).y);
+    // ctx.lineTo(x, findBottomCenter(node.boundary!).y);
 }
 
 function drawBaseNode(node: ast.ASTNode) {
@@ -155,6 +161,14 @@ function text_format(loc: string) {
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = black;
+            break;
+        }
+        case 'stack_compose': {
+            ctx.font = "15px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "blue";
+            break;
         }
     }
 }

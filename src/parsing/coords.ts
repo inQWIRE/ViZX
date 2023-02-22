@@ -23,7 +23,6 @@ export function findBottomCenter (q: quad) : coord {
     } as coord;
 }
 
-
 export function findLeftCenter (q: quad) : coord {
     return {
         x: q.tl.x,

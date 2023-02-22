@@ -377,7 +377,7 @@ ZXSTACKCOMPOSE.setPattern(
                 tok(lex.TokenKind.Stack),
                 tok(lex.TokenKind.Compose)
                 ),
-            ZXBASETERM,
+            ASTNODE,
             ),
         applyStackCompose
     )

@@ -22,7 +22,6 @@ export function addSizes(node: ast.ASTNode) : ast.ASTNode {
             let sleft = addSizes(node_.left);
             let sright = addSizes(node_.right);
             if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-                // TODO
                 node.hor_len = Math.max(sleft.hor_len, sright.hor_len) + 2*PAD_SIZE;
             }
             else {
