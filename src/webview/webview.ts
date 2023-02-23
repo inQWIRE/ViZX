@@ -1,20 +1,20 @@
-import { WebviewPanel, Uri, ExtensionContext } from 'vscode';
-import * as path from 'path';
-
+import { WebviewPanel, Uri, ExtensionContext } from "vscode";
+import * as path from "path";
 
 function getNonce(): string {
   let text = "";
   const possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < 32; i++) {
-    text += possible.charAt(
-      Math.floor(Math.random() * possible.length)
-    );
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
 }
 
-export function getCanvasHtml(panel: WebviewPanel, context: ExtensionContext): string {
+export function getCanvasHtml(
+  panel: WebviewPanel,
+  context: ExtensionContext
+): string {
   const basePath = context.extensionUri.fsPath;
   const nonce = getNonce();
   const scriptUri = panel.webview.asWebviewUri(
