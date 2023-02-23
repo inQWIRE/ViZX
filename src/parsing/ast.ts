@@ -30,6 +30,7 @@ export enum MTransform {
 export interface Num {
   kind: string;
   val: string;
+  expr: string;
 }
 
 export interface RealNum extends Num {
@@ -105,7 +106,6 @@ export interface NumFunc extends Num {
   kind: "numfunc";
   fname: string;
   args: [Num];
-  val: string;
 }
 
 export interface ASTFunc extends ASTNode {

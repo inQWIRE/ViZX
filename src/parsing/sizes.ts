@@ -1,5 +1,10 @@
 import * as ast from "./ast";
-import { BASE_SIZE, PAD_SIZE, PROPTO_SIZE } from "../constants/consts";
+import {
+  BASE_SIZE,
+  CAST_SIZE,
+  PAD_SIZE,
+  PROPTO_SIZE,
+} from "../constants/consts";
 export function addSizes(node: ast.ASTNode): ast.ASTNode {
   switch (node.kind) {
     case "const": {
@@ -90,8 +95,8 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         inner_node.hor_len !== undefined
       ) {
         // TODO if pad
-        node.ver_len = inner_node.ver_len;
-        node.hor_len = inner_node.hor_len;
+        node.ver_len = inner_node.ver_len + 2 * PAD_SIZE;
+        node.hor_len = inner_node.hor_len + 2 * CAST_SIZE;
       }
       break;
     }

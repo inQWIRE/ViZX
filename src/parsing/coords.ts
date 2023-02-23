@@ -1,5 +1,5 @@
 import * as ast from "./ast";
-import { PAD_SIZE } from "../constants/consts";
+import { PAD_SIZE, CAST_SIZE } from "../constants/consts";
 import { quad, coord } from "../constants/types";
 
 export function findCenter(q: quad): coord {
@@ -78,9 +78,6 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
         node.hor_len!,
         node.ver_len!
       );
-      // console.log("hor_len: ", node.hor_len, "ver_len: ", node.ver_len);
-      // console.log("center = ", findCenter(boundary), node.hor_len!, node.ver_len!);
-      // console.log("boundary =" , node.boundary);
       return node;
     }
     case "var": {
@@ -91,7 +88,6 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       );
       return node;
     }
-
     case "stack": {
       let node_ = <ast.ASTStack>node;
       let l_ver = node_.left.ver_len!;
@@ -317,7 +313,23 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       break;
     }
     case "cast": {
-      break;
+      let node_ = <ast.ASTCast>node;
+      node_.boundary = makeAtCenter(
+        findCenter(boundary),
+        node.hor_len!,
+        node.ver_len!
+      );
+      let bound: quad = JSON.parse(JSON.stringify(boundary));
+      bound.tl.x += CAST_SIZE;
+      bound.tl.y += PAD_SIZE;
+      bound.tr.x -= CAST_SIZE;
+      bound.tr.y += PAD_SIZE;
+      bound.bl.x += CAST_SIZE;
+      bound.bl.y -= PAD_SIZE;
+      bound.br.x -= CAST_SIZE;
+      bound.br.y -= PAD_SIZE;
+      node_.node = addCoords(node_.node, bound);
+      return node_;
     }
     case "function": {
       break;

@@ -24,29 +24,59 @@ import * as lex from "./lexer";
 type Token = psec.Token<lex.TokenKind>;
 
 function applyNumber(value: Token): ast.Num {
-  return { val: value.text, kind: "num" } as ast.Number;
+  return { val: value.text, kind: "num", expr: value.text } as ast.Number;
 }
 
 function applyNumVar(value: Token): ast.Num {
-  return { val: value.text, kind: "numvar" } as ast.NumVar;
+  return { val: value.text, kind: "numvar", expr: value.text } as ast.NumVar;
 }
 
 function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
   switch (snd[0].kind) {
     case lex.TokenKind.Add: {
-      return { val: "+", left: fst, right: snd[1], kind: "num" } as ast.ArithOp;
+      return {
+        val: "+",
+        left: fst,
+        right: snd[1],
+        kind: "num",
+        expr: fst.expr + " + " + snd[1].expr,
+      } as ast.ArithOp;
     }
     case lex.TokenKind.Sub: {
-      return { val: "-", left: fst, right: snd[1], kind: "num" } as ast.ArithOp;
+      return {
+        val: "-",
+        left: fst,
+        right: snd[1],
+        kind: "num",
+        expr: fst.expr + " - " + snd[1].expr,
+      } as ast.ArithOp;
     }
     case lex.TokenKind.Mul: {
-      return { val: "*", left: fst, right: snd[1], kind: "num" } as ast.ArithOp;
+      return {
+        val: "*",
+        left: fst,
+        right: snd[1],
+        kind: "num",
+        expr: fst.expr + " * " + snd[1].expr,
+      } as ast.ArithOp;
     }
     case lex.TokenKind.Div: {
-      return { val: "/", left: fst, right: snd[1], kind: "num" } as ast.ArithOp;
+      return {
+        val: "/",
+        left: fst,
+        right: snd[1],
+        kind: "num",
+        expr: fst.expr + " / " + snd[1].expr,
+      } as ast.ArithOp;
     }
     case lex.TokenKind.Exp: {
-      return { val: "^", left: fst, right: snd[1], kind: "num" } as ast.ArithOp;
+      return {
+        val: "^",
+        left: fst,
+        right: snd[1],
+        kind: "num",
+        expr: fst.expr + " ^ " + snd[1].expr,
+      } as ast.ArithOp;
     }
     default: {
       throw new Error(`Unknown binary operator: ${snd[0].text}`);
@@ -60,21 +90,21 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
     kind: "numfunc",
     fname: args[0].text,
     args: args[2],
-    val: `${args[0].text}(${args[2].join(", ")})`,
+    expr: `${args[0].text}(${args[2].join(", ")})`,
   } as ast.NumFunc;
 }
 
 function applyNumberSucc(value: [Token, ast.Num]): ast.Num {
-  return { val: value[1] + "+ 1", kind: "num" } as ast.Number;
+  return { expr: value[1].expr + "+ 1", kind: "num" } as ast.Number;
 }
 
 function applyRConst(val: Token): ast.Num {
   switch (val.kind) {
     case lex.TokenKind.R0: {
-      return { kind: "real01", n: "R0" } as ast.Real01;
+      return { kind: "real01", n: "R0", expr: "R0" } as ast.Real01;
     }
     case lex.TokenKind.R1: {
-      return { kind: "real01", n: "R1" } as ast.Real01;
+      return { kind: "real01", n: "R1", expr: "R0" } as ast.Real01;
     }
     default: {
       throw new Error(`Unknown real: ${val.text}`);
@@ -184,16 +214,25 @@ REALNUMBER.setPattern(
 function applyRealNum(value: [Token | undefined, ast.Num]): ast.Num {
   if (value[0] !== undefined) {
     switch (value[0].kind) {
-      case lex.TokenKind.Add: {
+      case lex.TokenKind.Root: {
         return {
-          val: value[0].text + value[1].val,
+          val: value[0].text + value[1].expr,
           kind: "realnum",
+          expr: value[0].text + value[1].expr,
         } as ast.RealNum;
       }
       case lex.TokenKind.Sub: {
         return {
           val: value[0].text + value[1].val,
           kind: "realnum",
+          expr: value[0].text + value[1].val,
+        } as ast.RealNum;
+      }
+      case lex.TokenKind.Div: {
+        return {
+          val: value[0].text + value[1].val,
+          kind: "realnum",
+          expr: value[0].text + value[1].val,
         } as ast.RealNum;
       }
       default: {
@@ -201,7 +240,11 @@ function applyRealNum(value: [Token | undefined, ast.Num]): ast.Num {
       }
     }
   }
-  return { val: value[1].val, kind: "realnum" } as ast.RealNum;
+  return {
+    val: value[1].val,
+    kind: "realnum",
+    expr: value[1].val,
+  } as ast.RealNum;
 }
 
 function applyVar(val: Token): ast.ASTNode {
@@ -374,9 +417,6 @@ function applyStackCompose(
   }
 }
 
-// EEEW!!!
-// TODO: IMPROVE THIS SMH
-// TODO: Figure out how I wrote this ugly code?
 function applyNStack(args: [ast.Num, Token, ast.ASTNode]): ast.ASTNode {
   switch (args[1].kind) {
     case lex.TokenKind.NStack: {

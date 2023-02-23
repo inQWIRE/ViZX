@@ -65,7 +65,7 @@ export const lexer = buildLexer([
   [true, /^\(/g, TokenKind.LParen],
   [true, /^\)/g, TokenKind.RParen],
 
-  [true, /^[A-WYa-zΑ-Ωα-ω][A-Za-zΑ-Ωα-ω0-9]*/g, TokenKind.Str],
+  [true, /^[A-WYa-zΑ-Ωα-ω][A-Za-zΑ-Ωα-ω0-9']*/g, TokenKind.Str],
   [true, /^\,/g, TokenKind.Comma],
 
   [true, new RegExp(`\^[${c.addOp}]`, "g"), TokenKind.Add],
