@@ -88,6 +88,14 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       );
       return node;
     }
+    case "nwire": {
+      node.boundary = makeAtCenter(
+        findCenter(boundary),
+        node.hor_len!,
+        node.ver_len!
+      );
+      return node;
+    }
     case "stack": {
       let node_ = <ast.ASTStack>node;
       let l_ver = node_.left.ver_len!;

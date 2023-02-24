@@ -40,6 +40,30 @@ const green = "#A4FFA4";
 // canvas.height = CANVAS_HEIGHT;
 // canvas_format();
 
+function drawNWireNode(node: ast.ASTNode) {
+  let nwire = <ast.ASTNWire>node;
+  drawBoundary(node.boundary!);
+  let center = findCenter(node.boundary!);
+  text_format("nwire", nwire.n.expr.length);
+  ctx.fillText(nwire.n.expr, center.x, center.y);
+  ctx.setLineDash([]);
+  ctx.strokeStyle = black;
+  ctx.moveTo(node.boundary!.tl.x + PAD_SIZE, node.boundary!.tl.y + PAD_SIZE);
+  ctx.lineTo(node.boundary!.tr.x - PAD_SIZE, node.boundary!.tr.y + PAD_SIZE);
+  ctx.moveTo(node.boundary!.bl.x + PAD_SIZE, node.boundary!.bl.y - PAD_SIZE);
+  ctx.lineTo(node.boundary!.br.x - PAD_SIZE, node.boundary!.br.y - PAD_SIZE);
+  ctx.stroke();
+  text_format("nwire_dots", 1);
+  ctx.fillText(".", center.x, center.y + 1.5 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 1.5 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 2 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 2 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 2.5 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 2.5 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 3 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 3 * TEXT_PAD_SIZE);
+}
+
 function drawStackNode(node: ast.ASTNode) {
   let stack = <ast.ASTStack>node;
   draw(stack.left);
@@ -253,6 +277,20 @@ function text_format(loc: string, chars: number) {
       ctx.fillStyle = "white";
       break;
     }
+    case "nwire": {
+      ctx.font = "15px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      break;
+    }
+    case "nwire_dots": {
+      ctx.font = "15px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "black";
+      break;
+    }
   }
 }
 
@@ -287,6 +325,10 @@ function draw(node: ast.ASTNode) {
     }
     case "cast": {
       drawCastNode(node);
+      break;
+    }
+    case "nwire": {
+      drawNWireNode(node);
       break;
     }
     default: {

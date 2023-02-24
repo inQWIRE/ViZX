@@ -129,11 +129,10 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       break;
     }
     case "nwire": {
-      let node_ = <ast.ASTNWire>node;
       let snode: ast.ASTConst = { kind: "const", val: ast.ZXConst.Wire };
       snode = <ast.ASTConst>addSizes(snode);
       if (snode.ver_len !== undefined && snode.hor_len !== undefined) {
-        node.ver_len = snode.ver_len * parseInt(node_.n.val);
+        node.ver_len = snode.ver_len;
         node.hor_len = snode.hor_len;
       } else {
         throw new Error(`Could not size node ${node} as nwire node`);
