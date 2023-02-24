@@ -16,6 +16,7 @@ import {
   stackOp,
   compOp,
   boundary,
+  setCanvasWidthHeight,
 } from "../constants/consts";
 import {
   findCenter,
@@ -25,6 +26,7 @@ import {
   findTopCenter,
 } from "../parsing/coords";
 import { quad } from "../constants/types";
+import { determineCanvasWidthHeight } from "../parsing/sizes";
 
 const canvas = document.querySelector("canvas")!;
 const ctx = canvas.getContext("2d")!;
@@ -34,9 +36,9 @@ const black = "#000000";
 const red = "#FFA4A4";
 const green = "#A4FFA4";
 // just for testing
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
-canvas_format();
+// canvas.width = CANVAS_WIDTH;
+// canvas.height = CANVAS_HEIGHT;
+// canvas_format();
 
 function drawStackNode(node: ast.ASTNode) {
   let stack = <ast.ASTStack>node;
@@ -295,13 +297,17 @@ function draw(node: ast.ASTNode) {
 }
 
 function render(this: Window, msg: MessageEvent<any>) {
-  canvas_format();
   let command = msg.data.command;
   let node: ast.ASTNode = JSON.parse(command);
+  setCanvasWidthHeight(determineCanvasWidthHeight(node));
+  canvas_format();
   draw(node);
 }
 
 function canvas_format() {
+  console.log("setting width, height in render: ", CANVAS_WIDTH, CANVAS_HEIGHT);
+  canvas.width = CANVAS_WIDTH;
+  canvas.height = CANVAS_HEIGHT;
   ctx.fillStyle = white;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = black;

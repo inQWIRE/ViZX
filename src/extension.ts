@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import * as parser from "./parsing/parser";
 import * as sizer from "./parsing/sizes";
 import * as coord from "./parsing/coords";
-import { boundary } from "./constants/consts";
+import { boundary, setCanvasWidthHeight } from "./constants/consts";
 import * as ast from "./parsing/ast";
 import { getCanvasHtml } from "./webview/webview";
 // this method is called when your extension is activated
@@ -27,6 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
         try {
           node = parser.parseAST(expr);
           node = sizer.addSizes(node);
+          const size = sizer.determineCanvasWidthHeight(node);
+          setCanvasWidthHeight(size);
           node = coord.addCoords(node, boundary);
           console.log(node);
         } catch (e) {

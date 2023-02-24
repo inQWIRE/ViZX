@@ -30,14 +30,42 @@ export const PAD_SIZE = 0.1 * SCALE;
 export const PROPTO_SIZE = 0.2 * SCALE;
 export const CAST_SIZE = 0.3 * SCALE;
 export const TEXT_PAD_SIZE = 0.1 * SCALE;
-export const CANVAS_WIDTH = 500;
-export const CANVAS_HEIGHT = 500;
+
+export let CANVAS_WIDTH = 500;
+export let CANVAS_HEIGHT = 500;
+
+export function setCanvasWidthHeight(wh: [number, number]) {
+  console.log("setting width n height: ", wh);
+  CANVAS_WIDTH = wh[0];
+  CANVAS_HEIGHT = wh[1];
+  boundary = {
+    tl: {
+      x: 0,
+      y: 0,
+    },
+    tr: {
+      x: CANVAS_WIDTH,
+      y: 0,
+    },
+    bl: {
+      x: 0,
+      y: CANVAS_HEIGHT,
+    },
+    br: {
+      x: CANVAS_WIDTH,
+      y: CANVAS_HEIGHT,
+    },
+  };
+}
+
+export const ver_pad = 100;
+export const hor_pad = 100;
 
 export const stack_dash: [number, number] = [10, 10];
 export const compose_dash: [number, number] = [6, 6];
 export const cast_dash: [number, number] = [3, 3];
 
-export const boundary = {
+export let boundary = {
   tl: {
     x: 0,
     y: 0,

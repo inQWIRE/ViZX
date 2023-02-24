@@ -4,6 +4,8 @@ import {
   CAST_SIZE,
   PAD_SIZE,
   PROPTO_SIZE,
+  hor_pad,
+  ver_pad,
 } from "../constants/consts";
 export function addSizes(node: ast.ASTNode): ast.ASTNode {
   switch (node.kind) {
@@ -143,4 +145,14 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     }
   }
   return node;
+}
+
+export function determineCanvasWidthHeight(
+  node: ast.ASTNode
+): [number, number] {
+  const max_width = node.hor_len!;
+  const max_height = node.ver_len!;
+  let ver = 100 - (max_height % 100) + max_height + 2 * hor_pad;
+  let hor = 100 - (max_width % 100) + max_width + 2 * ver_pad;
+  return [hor, ver];
 }
