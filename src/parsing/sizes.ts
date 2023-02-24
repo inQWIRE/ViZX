@@ -112,7 +112,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let sleft = addSizes(node_.l);
       let sright = addSizes(node_.r);
       if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
-        node.ver_len = Math.max(sleft.ver_len, sright.ver_len);
+        node.ver_len = Math.max(sleft.ver_len, sright.ver_len) + 2 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as propto node: horizontal len`
@@ -120,7 +120,8 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
         // add space between TODO
-        node.hor_len = sleft.hor_len + sright.hor_len + PROPTO_SIZE;
+        node.hor_len =
+          sleft.hor_len + sright.hor_len + PROPTO_SIZE + 4 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as propto node: vertical len`

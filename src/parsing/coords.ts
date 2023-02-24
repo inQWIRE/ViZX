@@ -343,6 +343,54 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       break;
     }
     case "propto": {
+      let node_ = <ast.ASTPropTo>node;
+      let l_hor = node_.l.hor_len!;
+      let r_hor = node_.r.hor_len!;
+      node_.boundary = makeAtCenter(
+        findCenter(boundary),
+        node.hor_len!,
+        node.ver_len!
+      );
+      let l_bound = {
+        tl: {
+          x: node_.boundary.tl.x + PAD_SIZE,
+          y: node_.boundary.tl.y + PAD_SIZE,
+        },
+        tr: {
+          x: node_.boundary.tl.x + l_hor + PAD_SIZE,
+          y: node_.boundary.tl.y + PAD_SIZE,
+        },
+        bl: {
+          x: node_.boundary.bl.x + PAD_SIZE,
+          y: node_.boundary.bl.y - PAD_SIZE,
+        },
+        br: {
+          x: node_.boundary.tl.x + l_hor + PAD_SIZE,
+          y: node_.boundary.bl.y - PAD_SIZE,
+        },
+      } as quad;
+      // console.log("l_bound: ", l_bound);
+      let r_bound = {
+        tl: {
+          x: node_.boundary.tr.x - r_hor - PAD_SIZE,
+          y: node_.boundary.tr.y + PAD_SIZE,
+        },
+        tr: {
+          x: node_.boundary.tr.x - PAD_SIZE,
+          y: node_.boundary.tr.y + PAD_SIZE,
+        },
+        bl: {
+          x: node_.boundary.br.x - r_hor - PAD_SIZE,
+          y: node_.boundary.bl.y - PAD_SIZE,
+        },
+        br: {
+          x: node_.boundary.br.x - PAD_SIZE,
+          y: node_.boundary.br.y - PAD_SIZE,
+        },
+      } as quad;
+      node_.l = addCoords(node_.l, l_bound);
+      node_.r = addCoords(node_.r, r_bound);
+      return node_;
       break;
     }
     default: {

@@ -13,10 +13,11 @@ import {
   swap,
   empty,
   PAD_SIZE,
-  stackOp,
-  compOp,
-  boundary,
   setCanvasWidthHeight,
+  boundary,
+  propTo,
+  propto_dash,
+  PROPTO_SIZE,
 } from "../constants/consts";
 import {
   findCenter,
@@ -39,6 +40,20 @@ const green = "#A4FFA4";
 // canvas.width = CANVAS_WIDTH;
 // canvas.height = CANVAS_HEIGHT;
 // canvas_format();
+
+// TODO ADD DASH and center symbol
+function drawPropToNode(node: ast.ASTNode) {
+  let propto = <ast.ASTPropTo>node;
+  drawBoundary(node.boundary!, propto_dash);
+  draw(propto.l);
+  draw(propto.r);
+  text_format("propto", 1);
+  ctx.fillText(
+    propTo,
+    propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE,
+    findCenter(boundary).y
+  );
+}
 
 function drawNWireNode(node: ast.ASTNode) {
   let nwire = <ast.ASTNWire>node;
@@ -229,7 +244,7 @@ function drawBaseNode(node: ast.ASTNode) {
 function text_format(loc: string, chars: number) {
   switch (loc) {
     case "spider_in_out": {
-      ctx.font = "15px Arial";
+      ctx.font = "10px Arial";
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
       ctx.fillStyle = black;
@@ -291,6 +306,13 @@ function text_format(loc: string, chars: number) {
       ctx.fillStyle = "black";
       break;
     }
+    case "propto": {
+      ctx.font = "30px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      break;
+    }
   }
 }
 
@@ -329,6 +351,10 @@ function draw(node: ast.ASTNode) {
     }
     case "nwire": {
       drawNWireNode(node);
+      break;
+    }
+    case "propto": {
+      drawPropToNode(node);
       break;
     }
     default: {

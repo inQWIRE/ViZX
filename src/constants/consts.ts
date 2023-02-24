@@ -64,6 +64,7 @@ export const hor_pad = 100;
 export const stack_dash: [number, number] = [10, 10];
 export const compose_dash: [number, number] = [6, 6];
 export const cast_dash: [number, number] = [3, 3];
+export const propto_dash: [number, number] = [1, 1];
 
 export let boundary = {
   tl: {
