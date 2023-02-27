@@ -2,7 +2,7 @@ import { buildLexer } from "typescript-parsec";
 import * as c from "../constants/consts";
 
 export enum TokenKind {
-  Nat,
+  NumberToken,
   Str,
   NWire,
   Succ,
@@ -52,7 +52,7 @@ export enum TokenKind {
 
 // — ↕ (Z) n (S (S m)) α
 export const lexer = buildLexer([
-  [true, /^\d+/g, TokenKind.Nat],
+  [true, /^\d+/g, TokenKind.NumberToken],
   [true, /^[Z]/g, TokenKind.ZToken],
   [true, /^[X]/g, TokenKind.XToken],
   [true, /^R0/g, TokenKind.R0],

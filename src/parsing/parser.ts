@@ -14,6 +14,7 @@ import {
   opt_sc,
   rep_sc,
 } from "typescript-parsec";
+import { diff } from 'deep-object-diff';
 
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
 // TODO some sort of bug with parentheses? For some reason won't parse of form "ZXNODE ⟷|↕ (ZXNODE ⟷|↕ ZXNODE)"" but will parse without parens
@@ -95,7 +96,7 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
 }
 
 function applyNumberSucc(value: [Token, ast.Num]): ast.Num {
-  return { expr: value[1].expr + "+ 1", kind: "num" } as ast.Number;
+  return { expr: value[1].expr + "+1", kind: "num" } as ast.Number;
 }
 
 function applyRConst(val: Token): ast.Num {
@@ -119,10 +120,16 @@ const NUMMID2TERM = rule<lex.TokenKind, ast.Num>();
 const NUMBER = rule<lex.TokenKind, ast.Num>();
 const REALNUMBER = rule<lex.TokenKind, ast.Num>();
 
+//  base num =
+// | Nat
+// | S Number
+// | ( Number )
+// | fname ?( Number+ ?)
+// | numvar
 NUMBASETERM.setPattern(
   alt(
     apply(seq(tok(lex.TokenKind.Succ), NUMBER), applyNumberSucc),
-    apply(tok(lex.TokenKind.Nat), applyNumber),
+    apply(tok(lex.TokenKind.NumberToken), applyNumber),
     kmid(tok(lex.TokenKind.LParen), NUMBER, tok(lex.TokenKind.RParen)),
     apply(
       seq(
@@ -154,7 +161,7 @@ NUMMID2TERM.setPattern(
 );
 
 NUMBER.setPattern(
-  lrec_sc(NUMMID2TERM, seq(tok(lex.TokenKind.Exp), NUMMIDTERM), applyBinOp)
+  lrec_sc(NUMMID2TERM, seq(tok(lex.TokenKind.Exp), NUMMID2TERM), applyBinOp)
 );
 
 // ZXConsts
@@ -267,6 +274,12 @@ function applyNWire(arg: ast.Num): ast.ASTNode {
   return { kind: "nwire", n: arg } as ast.ASTNWire;
 }
 
+// ZX basw term = 
+// | const [box, cup, cap, empty, wire swap]
+// | var
+// | fname ?( num/astnode ?, + ?)
+// | nwire number
+// | cswap? flip?
 ZXBASETERM.setPattern(
   alt(
     apply(
@@ -298,15 +311,37 @@ ZXBASETERM.setPattern(
         opt_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip))),
         seq(
           alt(
-            kmid(
-              opt_sc(tok(lex.TokenKind.LParen)),
               tok(lex.TokenKind.XToken),
-              opt_sc(tok(lex.TokenKind.RParen))
+              tok(lex.TokenKind.ZToken),
+          ),
+          NUMBER,
+          NUMBER,
+          REALNUMBER
+        ),
+        opt_sc(
+          alt(
+            tok(lex.TokenKind.Adjoint),
+            tok(lex.TokenKind.Conjugate),
+            tok(lex.TokenKind.Transpose)
+          )
+        )
+      ),
+      applySpider
+    ),
+    apply(
+      seq(
+        opt_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip))),
+        seq(
+          alt(
+            kmid(
+              tok(lex.TokenKind.LParen),
+              tok(lex.TokenKind.XToken),
+              tok(lex.TokenKind.RParen)
             ),
             kmid(
-              opt_sc(tok(lex.TokenKind.LParen)),
+              tok(lex.TokenKind.LParen),
               tok(lex.TokenKind.ZToken),
-              opt_sc(tok(lex.TokenKind.RParen))
+              tok(lex.TokenKind.RParen)
             )
           ),
           NUMBER,
@@ -393,7 +428,7 @@ function addTransform(
 ZXSTACKCOMPOSE.setPattern(
   lrec_sc(
     ZXBASETERM,
-    seq(alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)), ASTNODE),
+    seq(alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)), ZXBASETERM),
     applyStackCompose
   )
 );
@@ -451,7 +486,7 @@ ZXNSTACK.setPattern(
     seq(
       NUMBER,
       alt(tok(lex.TokenKind.NStack), tok(lex.TokenKind.NStack1)),
-      ZXSTACKCOMPOSE
+      alt(ZXSTACKCOMPOSE, ZXNSTACK)
     ),
     applyNStack
   )
@@ -486,8 +521,57 @@ function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
 ASTNODE.setPattern(alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST, ZXPROPTO));
 
 export function parseAST(expr: string): ast.ASTNode {
-  let parsed = expectSingleResult(
-    expectEOF(ASTNODE.parse(lex.lexer.parse(expr)))
-  );
-  return parsed;
+  let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
+  return expectSingleResult(parsed);
+}
+
+export function parserPrettyPrinter(node: ast.ASTNode) {
+  switch (node.kind) {
+    case 'const': {
+      let node_ = <ast.ASTConst>node;
+      console.log("( ", node_.val.toString(), " )");
+      break;
+    }
+    case 'spider': {
+      let node_ = <ast.ASTSpider>node;
+      console.log("( ", node_.val, node_.in.val, node_.out.val, node_.alpha.val, " )");
+      break;
+    }
+    case 'stack': {
+      let node_ = <ast.ASTStack>node;
+      console.log("( Stack ");
+      console.log("{");
+      parserPrettyPrinter(node_.left);
+      console.log("}");
+      console.log("{");
+      parserPrettyPrinter(node_.right);
+      console.log("}");
+      console.log(" )");
+      break;
+    }
+    case 'compose': {
+      let node_ = <ast.ASTCompose>node;
+      console.log("( Compose ");
+      console.log("{");
+      parserPrettyPrinter(node_.left);
+      console.log("}");
+      console.log("{");
+      parserPrettyPrinter(node_.right);
+      console.log("}");
+      console.log(" )");
+      break;
+    }
+    case 'propto': {
+      let node_ = <ast.ASTPropTo>node;
+      console.log("( PropTo ");
+      console.log("{");
+      parserPrettyPrinter(node_.l);
+      console.log("}");
+      console.log("{");
+      parserPrettyPrinter(node_.r);
+      console.log("}");
+      console.log(")");
+      break;
+    }
+  }
 }
