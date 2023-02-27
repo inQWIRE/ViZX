@@ -173,30 +173,65 @@ const ZXCAST = rule<lex.TokenKind, ast.ASTNode>();
 const ZXPROPTO = rule<lex.TokenKind, ast.ASTNode>();
 const ASTNODE = rule<lex.TokenKind, ast.ASTNode>();
 
-function applyConst(value: Token): ast.ASTNode {
-  switch (value.kind) {
+function applyConst(
+  args: [Token[] | undefined, Token, Token[] | undefined]
+): ast.ASTNode {
+  let zxconst: ast.ASTConst;
+  switch (args[1].kind) {
     case lex.TokenKind.Box: {
-      return { kind: "const", val: ast.ZXConst.Box } as ast.ASTConst;
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.Box,
+        transform: [],
+      } as ast.ASTConst;
+      break;
     }
     case lex.TokenKind.Cap: {
-      return { kind: "const", val: ast.ZXConst.Cap } as ast.ASTConst;
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.Cap,
+        transform: [],
+      } as ast.ASTConst;
+      break;
     }
     case lex.TokenKind.Cup: {
-      return { kind: "const", val: ast.ZXConst.Cup } as ast.ASTConst;
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.Cup,
+        transform: [],
+      } as ast.ASTConst;
+      break;
     }
     case lex.TokenKind.Empty: {
-      return { kind: "const", val: ast.ZXConst.Empty } as ast.ASTConst;
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.Empty,
+        transform: [],
+      } as ast.ASTConst;
+      break;
     }
     case lex.TokenKind.Wire: {
-      return { kind: "const", val: ast.ZXConst.Wire } as ast.ASTConst;
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.Wire,
+        transform: [],
+      } as ast.ASTConst;
+      break;
     }
     case lex.TokenKind.Swap: {
-      return { kind: "const", val: ast.ZXConst.Swap } as ast.ASTConst;
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.Swap,
+        transform: [],
+      } as ast.ASTConst;
+      break;
     }
     default: {
-      throw new Error(`Unknown const: ${value.kind}`);
+      throw new Error(`Unknown const: ${args[1].kind}`);
     }
   }
+  zxconst = <ast.ASTConst>addTransforms(args[0], zxconst, args[2]);
+  return zxconst;
 }
 
 REALNUMBER.setPattern(
@@ -283,13 +318,27 @@ function applyNWire(arg: ast.Num): ast.ASTNode {
 ZXBASETERM.setPattern(
   alt(
     apply(
-      alt(
-        tok(lex.TokenKind.Box),
-        tok(lex.TokenKind.Cup),
-        tok(lex.TokenKind.Cap),
-        tok(lex.TokenKind.Empty),
-        tok(lex.TokenKind.Wire),
-        tok(lex.TokenKind.Swap)
+      seq(
+        opt_sc(
+          rep_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip)))
+        ),
+        alt(
+          tok(lex.TokenKind.Box),
+          tok(lex.TokenKind.Cup),
+          tok(lex.TokenKind.Cap),
+          tok(lex.TokenKind.Empty),
+          tok(lex.TokenKind.Wire),
+          tok(lex.TokenKind.Swap)
+        ),
+        opt_sc(
+          rep_sc(
+            alt(
+              tok(lex.TokenKind.Adjoint),
+              tok(lex.TokenKind.Conjugate),
+              tok(lex.TokenKind.Transpose)
+            )
+          )
+        )
       ),
       applyConst
     ),
@@ -308,7 +357,9 @@ ZXBASETERM.setPattern(
     apply(kright(tok(lex.TokenKind.NWire), NUMBER), applyNWire),
     apply(
       seq(
-        opt_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip))),
+        opt_sc(
+          rep_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip)))
+        ),
         seq(
           alt(tok(lex.TokenKind.XToken), tok(lex.TokenKind.ZToken)),
           NUMBER,
@@ -316,10 +367,12 @@ ZXBASETERM.setPattern(
           REALNUMBER
         ),
         opt_sc(
-          alt(
-            tok(lex.TokenKind.Adjoint),
-            tok(lex.TokenKind.Conjugate),
-            tok(lex.TokenKind.Transpose)
+          rep_sc(
+            alt(
+              tok(lex.TokenKind.Adjoint),
+              tok(lex.TokenKind.Conjugate),
+              tok(lex.TokenKind.Transpose)
+            )
           )
         )
       ),
@@ -327,7 +380,9 @@ ZXBASETERM.setPattern(
     ),
     apply(
       seq(
-        opt_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip))),
+        opt_sc(
+          rep_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip)))
+        ),
         seq(
           alt(
             kmid(
@@ -346,10 +401,12 @@ ZXBASETERM.setPattern(
           REALNUMBER
         ),
         opt_sc(
-          alt(
-            tok(lex.TokenKind.Adjoint),
-            tok(lex.TokenKind.Conjugate),
-            tok(lex.TokenKind.Transpose)
+          rep_sc(
+            alt(
+              tok(lex.TokenKind.Adjoint),
+              tok(lex.TokenKind.Conjugate),
+              tok(lex.TokenKind.Transpose)
+            )
           )
         )
       ),
@@ -361,9 +418,9 @@ ZXBASETERM.setPattern(
 
 function applySpider(
   args: [
-    Token | undefined,
+    Token[] | undefined,
     [Token, ast.Num, ast.Num, ast.Num],
-    Token | undefined
+    Token[] | undefined
   ]
 ): ast.ASTNode {
   let spider: ast.ASTSpider;
@@ -375,8 +432,9 @@ function applySpider(
         in: args[1][1],
         out: args[1][2],
         alpha: args[1][3],
+        transform: [],
       };
-      spider = addTransform(args[0], spider, args[2]);
+      spider = <ast.ASTSpider>addTransforms(args[0], spider, args[2]);
       break;
     }
     case lex.TokenKind.ZToken: {
@@ -386,8 +444,9 @@ function applySpider(
         in: args[1][1],
         out: args[1][2],
         alpha: args[1][3],
+        transform: [],
       };
-      spider = addTransform(args[0], spider, args[2]);
+      spider = <ast.ASTSpider>addTransforms(args[0], spider, args[2]);
       break;
     }
     default: {
@@ -398,25 +457,29 @@ function applySpider(
   return spider;
 }
 
-function addTransform(
-  pre: Token | undefined,
-  spider: ast.ASTSpider,
-  post: Token | undefined
-): ast.ASTSpider {
+function addTransforms(
+  pre: Token[] | undefined,
+  spider: ast.ASTSpider | ast.ASTConst,
+  post: Token[] | undefined
+): ast.ASTNode {
   if (pre !== undefined) {
-    if (pre.kind === lex.TokenKind.ColorSwap) {
-      spider.transform = ast.MTransform.ColorSwap;
-    } else if (pre.kind === lex.TokenKind.Flip) {
-      spider.transform = ast.MTransform.Flip;
+    for (let pre_ind of pre) {
+      if (pre_ind.kind === lex.TokenKind.ColorSwap) {
+        spider.transform.push(ast.MTransform.ColorSwap);
+      } else if (pre_ind.kind === lex.TokenKind.Flip) {
+        spider.transform.push(ast.MTransform.Flip);
+      }
     }
   }
   if (post !== undefined) {
-    if (post.kind === lex.TokenKind.Adjoint) {
-      spider.transform = ast.MTransform.Adjoint;
-    } else if (post.kind === lex.TokenKind.Conjugate) {
-      spider.transform = ast.MTransform.Conjugate;
-    } else if (post.kind === lex.TokenKind.Transpose) {
-      spider.transform = ast.MTransform.Transpose;
+    for (let post_ind of post) {
+      if (post_ind.kind === lex.TokenKind.Adjoint) {
+        spider.transform.push(ast.MTransform.Adjoint);
+      } else if (post_ind.kind === lex.TokenKind.Conjugate) {
+        spider.transform.push(ast.MTransform.Conjugate);
+      } else if (post_ind.kind === lex.TokenKind.Transpose) {
+        spider.transform.push(ast.MTransform.Transpose);
+      }
     }
   }
   return spider;
@@ -522,6 +585,7 @@ export function parseAST(expr: string): ast.ASTNode {
   return expectSingleResult(parsed);
 }
 
+// this is not a very good pretty printer
 export function parserPrettyPrinter(node: ast.ASTNode) {
   switch (node.kind) {
     case "const": {
