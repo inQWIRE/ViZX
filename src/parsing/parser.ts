@@ -14,7 +14,7 @@ import {
   opt_sc,
   rep_sc,
 } from "typescript-parsec";
-import { diff } from 'deep-object-diff';
+import { diff } from "deep-object-diff";
 
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
 // TODO some sort of bug with parentheses? For some reason won't parse of form "ZXNODE ⟷|↕ (ZXNODE ⟷|↕ ZXNODE)"" but will parse without parens
@@ -274,7 +274,7 @@ function applyNWire(arg: ast.Num): ast.ASTNode {
   return { kind: "nwire", n: arg } as ast.ASTNWire;
 }
 
-// ZX basw term = 
+// ZX basw term =
 // | const [box, cup, cap, empty, wire swap]
 // | var
 // | fname ?( num/astnode ?, + ?)
@@ -310,10 +310,7 @@ ZXBASETERM.setPattern(
       seq(
         opt_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip))),
         seq(
-          alt(
-              tok(lex.TokenKind.XToken),
-              tok(lex.TokenKind.ZToken),
-          ),
+          alt(tok(lex.TokenKind.XToken), tok(lex.TokenKind.ZToken)),
           NUMBER,
           NUMBER,
           REALNUMBER
@@ -527,17 +524,24 @@ export function parseAST(expr: string): ast.ASTNode {
 
 export function parserPrettyPrinter(node: ast.ASTNode) {
   switch (node.kind) {
-    case 'const': {
+    case "const": {
       let node_ = <ast.ASTConst>node;
       console.log("( ", node_.val.toString(), " )");
       break;
     }
-    case 'spider': {
+    case "spider": {
       let node_ = <ast.ASTSpider>node;
-      console.log("( ", node_.val, node_.in.val, node_.out.val, node_.alpha.val, " )");
+      console.log(
+        "( ",
+        node_.val,
+        node_.in.val,
+        node_.out.val,
+        node_.alpha.val,
+        " )"
+      );
       break;
     }
-    case 'stack': {
+    case "stack": {
       let node_ = <ast.ASTStack>node;
       console.log("( Stack ");
       console.log("{");
@@ -549,7 +553,7 @@ export function parserPrettyPrinter(node: ast.ASTNode) {
       console.log(" )");
       break;
     }
-    case 'compose': {
+    case "compose": {
       let node_ = <ast.ASTCompose>node;
       console.log("( Compose ");
       console.log("{");
@@ -561,7 +565,7 @@ export function parserPrettyPrinter(node: ast.ASTNode) {
       console.log(" )");
       break;
     }
-    case 'propto': {
+    case "propto": {
       let node_ = <ast.ASTPropTo>node;
       console.log("( PropTo ");
       console.log("{");
