@@ -30,6 +30,7 @@ export const PAD_SIZE = 0.1 * SCALE;
 export const PROPTO_SIZE = 0.2 * SCALE;
 export const CAST_SIZE = 0.3 * SCALE;
 export const TEXT_PAD_SIZE = 0.1 * SCALE;
+export const TRANSFORM_SIZE = 0.4 * SCALE;
 
 export let CANVAS_WIDTH = 500;
 export let CANVAS_HEIGHT = 500;

@@ -18,6 +18,10 @@ import {
   propTo,
   propto_dash,
   PROPTO_SIZE,
+  colorswapTransform,
+  adjointTransform,
+  conjugateTransform,
+  transposeTransform,
 } from "../constants/consts";
 import {
   findCenter,
@@ -41,7 +45,50 @@ const green = "#A4FFA4";
 // canvas.height = CANVAS_HEIGHT;
 // canvas_format();
 
-// TODO ADD DASH and center symbol
+function drawTransformNode(node: ast.ASTNode) {
+  let transform = <ast.ASTTransform>node;
+  drawBoundary(node.boundary!);
+  draw(transform.node);
+  text_format("transform", 1);
+  switch (transform.transform) {
+    case ast.MTransform.ColorSwap: {
+      ctx.fillText(
+        colorswapTransform,
+        transform.boundary!.tl.x + TEXT_PAD_SIZE,
+        findCenter(boundary).y
+      );
+      break;
+    }
+    case ast.MTransform.Adjoint: {
+      ctx.fillText(
+        adjointTransform,
+        transform.boundary!.tr.x - TEXT_PAD_SIZE,
+        findCenter(boundary).y
+      );
+      break;
+    }
+    case ast.MTransform.Conjugate: {
+      ctx.fillText(
+        conjugateTransform,
+        transform.boundary!.tr.x - TEXT_PAD_SIZE,
+        findCenter(boundary).y
+      );
+      break;
+    }
+    case ast.MTransform.Transpose: {
+      ctx.fillText(
+        transposeTransform,
+        transform.boundary!.tr.x - TEXT_PAD_SIZE,
+        findCenter(boundary).y
+      );
+      break;
+    }
+    default: {
+      throw new Error(`could not match transform type ${transform}`);
+    }
+  }
+}
+
 function drawPropToNode(node: ast.ASTNode) {
   let propto = <ast.ASTPropTo>node;
   drawBoundary(node.boundary!, propto_dash);
@@ -313,6 +360,20 @@ function text_format(loc: string, chars: number) {
       ctx.fillStyle = "black";
       break;
     }
+    case "transform": {
+      ctx.font = "15px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      break;
+    }
+    default: {
+      ctx.font = "15px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      break;
+    }
   }
 }
 
@@ -355,6 +416,10 @@ function draw(node: ast.ASTNode) {
     }
     case "propto": {
       drawPropToNode(node);
+      break;
+    }
+    case "transform": {
+      drawTransformNode(node);
       break;
     }
     default: {

@@ -13,6 +13,7 @@ import {
   kleft,
   opt_sc,
   rep_sc,
+  rep,
 } from "typescript-parsec";
 import { diff } from "deep-object-diff";
 
@@ -105,7 +106,7 @@ function applyRConst(val: Token): ast.Num {
       return { kind: "real01", n: "R0", expr: "R0" } as ast.Real01;
     }
     case lex.TokenKind.R1: {
-      return { kind: "real01", n: "R1", expr: "R0" } as ast.Real01;
+      return { kind: "real01", n: "R1", expr: "R1" } as ast.Real01;
     }
     default: {
       throw new Error(`Unknown real: ${val.text}`);
@@ -171,18 +172,17 @@ const ZXSTACKCOMPOSE = rule<lex.TokenKind, ast.ASTNode>();
 const ZXNSTACK = rule<lex.TokenKind, ast.ASTNode>();
 const ZXCAST = rule<lex.TokenKind, ast.ASTNode>();
 const ZXPROPTO = rule<lex.TokenKind, ast.ASTNode>();
+const ZXTRANSFORML10 = rule<lex.TokenKind, ast.ASTNode>();
+const ZXTRANSFORML0 = rule<lex.TokenKind, ast.ASTNode>();
 const ASTNODE = rule<lex.TokenKind, ast.ASTNode>();
 
-function applyConst(
-  args: [Token[] | undefined, Token, Token[] | undefined]
-): ast.ASTNode {
+function applyConst(args: Token): ast.ASTNode {
   let zxconst: ast.ASTConst;
-  switch (args[1].kind) {
+  switch (args.kind) {
     case lex.TokenKind.Box: {
       zxconst = {
         kind: "const",
         val: ast.ZXConst.Box,
-        transform: [],
       } as ast.ASTConst;
       break;
     }
@@ -190,7 +190,6 @@ function applyConst(
       zxconst = {
         kind: "const",
         val: ast.ZXConst.Cap,
-        transform: [],
       } as ast.ASTConst;
       break;
     }
@@ -198,7 +197,6 @@ function applyConst(
       zxconst = {
         kind: "const",
         val: ast.ZXConst.Cup,
-        transform: [],
       } as ast.ASTConst;
       break;
     }
@@ -206,7 +204,6 @@ function applyConst(
       zxconst = {
         kind: "const",
         val: ast.ZXConst.Empty,
-        transform: [],
       } as ast.ASTConst;
       break;
     }
@@ -214,7 +211,6 @@ function applyConst(
       zxconst = {
         kind: "const",
         val: ast.ZXConst.Wire,
-        transform: [],
       } as ast.ASTConst;
       break;
     }
@@ -222,15 +218,13 @@ function applyConst(
       zxconst = {
         kind: "const",
         val: ast.ZXConst.Swap,
-        transform: [],
       } as ast.ASTConst;
       break;
     }
     default: {
-      throw new Error(`Unknown const: ${args[1].kind}`);
+      throw new Error(`Unknown const: ${args.kind}`);
     }
   }
-  zxconst = <ast.ASTConst>addTransforms(args[0], zxconst, args[2]);
   return zxconst;
 }
 
@@ -297,11 +291,12 @@ function applyFunc(
   args: [Token, ast.Num | ast.ASTNode, (ast.Num | ast.ASTNode)[]]
 ): ast.ASTNode {
   args[2].unshift(args[1]);
+  const new_args = <[ast.Num | ast.ASTNode]>args[2];
   return {
     kind: "func",
     fname: args[0].text,
-    args: args[2],
-    val: `${args[0].text}(${args[2].join(", ")})`,
+    args: new_args,
+    val: `${args[0].text}(${new_args.join(", ")})`,
   } as ast.ASTFunc;
 }
 
@@ -309,7 +304,7 @@ function applyNWire(arg: ast.Num): ast.ASTNode {
   return { kind: "nwire", n: arg } as ast.ASTNWire;
 }
 
-// ZX basw term =
+// ZX base term =
 // | const [box, cup, cap, empty, wire swap]
 // | var
 // | fname ?( num/astnode ?, + ?)
@@ -318,27 +313,13 @@ function applyNWire(arg: ast.Num): ast.ASTNode {
 ZXBASETERM.setPattern(
   alt(
     apply(
-      seq(
-        opt_sc(
-          rep_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip)))
-        ),
-        alt(
-          tok(lex.TokenKind.Box),
-          tok(lex.TokenKind.Cup),
-          tok(lex.TokenKind.Cap),
-          tok(lex.TokenKind.Empty),
-          tok(lex.TokenKind.Wire),
-          tok(lex.TokenKind.Swap)
-        ),
-        opt_sc(
-          rep_sc(
-            alt(
-              tok(lex.TokenKind.Adjoint),
-              tok(lex.TokenKind.Conjugate),
-              tok(lex.TokenKind.Transpose)
-            )
-          )
-        )
+      alt(
+        tok(lex.TokenKind.Box),
+        tok(lex.TokenKind.Cup),
+        tok(lex.TokenKind.Cap),
+        tok(lex.TokenKind.Empty),
+        tok(lex.TokenKind.Wire),
+        tok(lex.TokenKind.Swap)
       ),
       applyConst
     ),
@@ -357,58 +338,30 @@ ZXBASETERM.setPattern(
     apply(kright(tok(lex.TokenKind.NWire), NUMBER), applyNWire),
     apply(
       seq(
-        opt_sc(
-          rep_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip)))
-        ),
-        seq(
-          alt(tok(lex.TokenKind.XToken), tok(lex.TokenKind.ZToken)),
-          NUMBER,
-          NUMBER,
-          REALNUMBER
-        ),
-        opt_sc(
-          rep_sc(
-            alt(
-              tok(lex.TokenKind.Adjoint),
-              tok(lex.TokenKind.Conjugate),
-              tok(lex.TokenKind.Transpose)
-            )
-          )
-        )
+        alt(tok(lex.TokenKind.XToken), tok(lex.TokenKind.ZToken)),
+        NUMBER,
+        NUMBER,
+        REALNUMBER
       ),
       applySpider
     ),
     apply(
       seq(
-        opt_sc(
-          rep_sc(alt(tok(lex.TokenKind.ColorSwap), tok(lex.TokenKind.Flip)))
-        ),
-        seq(
-          alt(
-            kmid(
-              tok(lex.TokenKind.LParen),
-              tok(lex.TokenKind.XToken),
-              tok(lex.TokenKind.RParen)
-            ),
-            kmid(
-              tok(lex.TokenKind.LParen),
-              tok(lex.TokenKind.ZToken),
-              tok(lex.TokenKind.RParen)
-            )
+        alt(
+          kmid(
+            tok(lex.TokenKind.LParen),
+            tok(lex.TokenKind.XToken),
+            tok(lex.TokenKind.RParen)
           ),
-          NUMBER,
-          NUMBER,
-          REALNUMBER
-        ),
-        opt_sc(
-          rep_sc(
-            alt(
-              tok(lex.TokenKind.Adjoint),
-              tok(lex.TokenKind.Conjugate),
-              tok(lex.TokenKind.Transpose)
-            )
+          kmid(
+            tok(lex.TokenKind.LParen),
+            tok(lex.TokenKind.ZToken),
+            tok(lex.TokenKind.RParen)
           )
-        )
+        ),
+        NUMBER,
+        NUMBER,
+        REALNUMBER
       ),
       applySpider
     ),
@@ -416,72 +369,36 @@ ZXBASETERM.setPattern(
   )
 );
 
-function applySpider(
-  args: [
-    Token[] | undefined,
-    [Token, ast.Num, ast.Num, ast.Num],
-    Token[] | undefined
-  ]
-): ast.ASTNode {
+function applySpider(args: [Token, ast.Num, ast.Num, ast.Num]): ast.ASTNode {
+  // console.log("applyspider");
   let spider: ast.ASTSpider;
-  switch (args[1][0].kind) {
+  switch (args[0].kind) {
     case lex.TokenKind.XToken: {
       spider = {
         kind: "spider",
         val: "X",
-        in: args[1][1],
-        out: args[1][2],
-        alpha: args[1][3],
-        transform: [],
+        in: args[1],
+        out: args[2],
+        alpha: args[3],
       };
-      spider = <ast.ASTSpider>addTransforms(args[0], spider, args[2]);
       break;
     }
     case lex.TokenKind.ZToken: {
       spider = {
         kind: "spider",
         val: "Z",
-        in: args[1][1],
-        out: args[1][2],
-        alpha: args[1][3],
-        transform: [],
+        in: args[1],
+        out: args[2],
+        alpha: args[3],
       };
-      spider = <ast.ASTSpider>addTransforms(args[0], spider, args[2]);
       break;
     }
     default: {
       console.log("nooo spider type?");
-      throw new Error(`Unknown spider: ${args[1][0].kind}`);
+      throw new Error(`Unknown spider: ${args[0].kind}`);
     }
   }
-  return spider;
-}
-
-function addTransforms(
-  pre: Token[] | undefined,
-  spider: ast.ASTSpider | ast.ASTConst,
-  post: Token[] | undefined
-): ast.ASTNode {
-  if (pre !== undefined) {
-    for (let pre_ind of pre) {
-      if (pre_ind.kind === lex.TokenKind.ColorSwap) {
-        spider.transform.push(ast.MTransform.ColorSwap);
-      } else if (pre_ind.kind === lex.TokenKind.Flip) {
-        spider.transform.push(ast.MTransform.Flip);
-      }
-    }
-  }
-  if (post !== undefined) {
-    for (let post_ind of post) {
-      if (post_ind.kind === lex.TokenKind.Adjoint) {
-        spider.transform.push(ast.MTransform.Adjoint);
-      } else if (post_ind.kind === lex.TokenKind.Conjugate) {
-        spider.transform.push(ast.MTransform.Conjugate);
-      } else if (post_ind.kind === lex.TokenKind.Transpose) {
-        spider.transform.push(ast.MTransform.Transpose);
-      }
-    }
-  }
+  // console.log("returning in applyspider");
   return spider;
 }
 
@@ -574,14 +491,72 @@ ZXPROPTO.setPattern(
   )
 );
 
+// todo add conjugate
+ZXTRANSFORML10.setPattern(
+  apply(
+    seq(
+      rep_sc(tok(lex.TokenKind.ColorSwap)),
+      lrec_sc(
+        alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST, ZXPROPTO),
+        tok(lex.TokenKind.Conjugate),
+        applyTransformPost
+      )
+    ),
+    applyTransformPre
+  )
+);
+
+function applyTransformPre(args: [Token[], ast.ASTNode]): ast.ASTNode {
+  let cur_node = args[1];
+  for (let i of args[0]) {
+    cur_node = nestColorSwap(cur_node);
+  }
+  return cur_node;
+}
+
+function nestColorSwap(node: ast.ASTNode): ast.ASTTransform {
+  return {
+    kind: "transform",
+    transform: ast.MTransform.ColorSwap,
+    node: node,
+  } as ast.ASTTransform;
+}
+
+ZXTRANSFORML0.setPattern(
+  lrec_sc(
+    ZXTRANSFORML10,
+    alt(tok(lex.TokenKind.Adjoint), tok(lex.TokenKind.Transpose)),
+    applyTransformPost
+  )
+);
+
+function applyTransformPost(node: ast.ASTNode, transform: Token): ast.ASTNode {
+  let t;
+  if (transform.kind === lex.TokenKind.Transpose) {
+    t = ast.MTransform.Transpose;
+  } else if (transform.kind === lex.TokenKind.Conjugate) {
+    t = ast.MTransform.Conjugate;
+  } else if (transform.kind === lex.TokenKind.Adjoint) {
+    t = ast.MTransform.Adjoint;
+  } else {
+    throw new Error(`unknown kind ${transform.kind} in applyTransformPost`);
+  }
+  return {
+    kind: "transform",
+    transform: t,
+    node: node,
+  } as ast.ASTTransform;
+}
+
 function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
   return { kind: "propto", l: args[0], r: args[2] } as ast.ASTPropTo;
 }
 
-ASTNODE.setPattern(alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST, ZXPROPTO));
+ASTNODE.setPattern(ZXTRANSFORML0);
 
 export function parseAST(expr: string): ast.ASTNode {
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
+  console.log(parsed);
   return expectSingleResult(parsed);
 }
 

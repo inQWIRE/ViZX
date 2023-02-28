@@ -59,7 +59,6 @@ export interface ArithOp extends Num {
 export interface ASTConst extends ASTNode {
   kind: "const";
   val: ZXConst;
-  transform: MTransform[];
 }
 
 export interface ASTSpider extends ASTNode {
@@ -68,7 +67,6 @@ export interface ASTSpider extends ASTNode {
   in: Num;
   out: Num;
   alpha: Num;
-  transform: MTransform[];
 }
 
 export interface ASTStack extends ASTNode {
@@ -132,6 +130,11 @@ export interface ASTNWire extends ASTNode {
   n: Num;
 }
 
+export interface ASTTransform extends ASTNode {
+  kind: "transform";
+  transform: MTransform;
+  node: ASTNode;
+}
 export interface Real01 extends Num {
   kind: "real01";
   n: "R0" | "R1";

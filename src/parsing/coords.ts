@@ -1,5 +1,5 @@
 import * as ast from "./ast";
-import { PAD_SIZE, CAST_SIZE } from "../constants/consts";
+import { PAD_SIZE, CAST_SIZE, TRANSFORM_SIZE } from "../constants/consts";
 import { quad, coord } from "../constants/types";
 
 export function findCenter(q: quad): coord {
@@ -64,6 +64,25 @@ export function makeAtCenter(
 
 export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
   switch (node.kind) {
+    case "transform": {
+      let node_ = <ast.ASTTransform>node;
+      node_.boundary = makeAtCenter(
+        findCenter(boundary),
+        node.hor_len!,
+        node.ver_len!
+      );
+      let bound: quad = JSON.parse(JSON.stringify(boundary));
+      bound.tl.x += TRANSFORM_SIZE;
+      bound.tl.y += TRANSFORM_SIZE;
+      bound.tr.x -= TRANSFORM_SIZE;
+      bound.tr.y += TRANSFORM_SIZE;
+      bound.bl.x += TRANSFORM_SIZE;
+      bound.bl.y -= TRANSFORM_SIZE;
+      bound.br.x -= TRANSFORM_SIZE;
+      bound.br.y -= TRANSFORM_SIZE;
+      node_.node = addCoords(node_.node, bound);
+      return node_;
+    }
     case "const": {
       node.boundary = makeAtCenter(
         findCenter(boundary),
