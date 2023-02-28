@@ -1,8 +1,7 @@
 import * as ast from "./ast";
 import {
-  PAD_SIZE,
   CAST_SIZE,
-  TRANSFORM_SIZE,
+  PAD_SIZE,
   number_kinds,
   FUNC_ARG_SIZE,
 } from "../constants/consts";
@@ -78,14 +77,14 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
         node.ver_len!
       );
       let bound: quad = JSON.parse(JSON.stringify(boundary));
-      bound.tl.x += TRANSFORM_SIZE;
-      bound.tl.y += TRANSFORM_SIZE;
-      bound.tr.x -= TRANSFORM_SIZE;
-      bound.tr.y += TRANSFORM_SIZE;
-      bound.bl.x += TRANSFORM_SIZE;
-      bound.bl.y -= TRANSFORM_SIZE;
-      bound.br.x -= TRANSFORM_SIZE;
-      bound.br.y -= TRANSFORM_SIZE;
+      bound.tl.x += PAD_SIZE + FUNC_ARG_SIZE;
+      bound.tl.y += PAD_SIZE;
+      bound.tr.x -= PAD_SIZE;
+      bound.tr.y += PAD_SIZE;
+      bound.bl.x += PAD_SIZE + FUNC_ARG_SIZE;
+      bound.bl.y -= PAD_SIZE;
+      bound.br.x -= PAD_SIZE;
+      bound.br.y -= PAD_SIZE;
       node_.node = addCoords(node_.node, bound);
       return node_;
     }

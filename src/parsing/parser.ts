@@ -326,12 +326,9 @@ ZXBASETERM.setPattern(
     apply(tok(lex.TokenKind.Str), applyVar),
     apply(
       seq(
-        kleft(tok(lex.TokenKind.Str), opt_sc(tok(lex.TokenKind.LParen))),
+        tok(lex.TokenKind.Str),
         alt(NUMBER, ASTNODE),
-        kleft(
-          rep_sc(kleft(alt(NUMBER, ASTNODE), opt_sc(tok(lex.TokenKind.Comma)))),
-          opt_sc(tok(lex.TokenKind.RParen))
-        )
+        rep_sc(alt(NUMBER, ASTNODE))
       ),
       applyFunc
     ),

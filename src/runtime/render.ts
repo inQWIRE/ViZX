@@ -92,40 +92,32 @@ function drawFunctionNode(node: ast.ASTNode) {
 
 function drawTransformNode(node: ast.ASTNode) {
   let transform = <ast.ASTTransform>node;
-  drawFuncBoundary(node.boundary!);
+  let label_bound = JSON.parse(JSON.stringify(transform.boundary!));
+  label_bound.tr.x = label_bound.tl.x + FUNC_ARG_SIZE;
+  label_bound.br.x = label_bound.bl.x + FUNC_ARG_SIZE;
+  drawBoundary(label_bound, function_dash);
+  let bound = JSON.parse(JSON.stringify(transform.boundary!));
+  bound.tl.x += FUNC_ARG_SIZE;
+  bound.bl.x += FUNC_ARG_SIZE;
+  drawFuncBoundary(bound);
   draw(transform.node);
   text_format("transform", 1);
+  let cent = findCenter(label_bound);
   switch (transform.transform) {
     case ast.MTransform.ColorSwap: {
-      ctx.fillText(
-        colorswapTransform,
-        transform.boundary!.tl.x + TEXT_PAD_SIZE,
-        findCenter(boundary).y
-      );
+      ctx.fillText(colorswapTransform, cent.x, cent.y);
       break;
     }
     case ast.MTransform.Adjoint: {
-      ctx.fillText(
-        adjointTransform,
-        transform.boundary!.tr.x - TEXT_PAD_SIZE,
-        findCenter(boundary).y
-      );
+      ctx.fillText(adjointTransform, cent.x, cent.y);
       break;
     }
     case ast.MTransform.Conjugate: {
-      ctx.fillText(
-        conjugateTransform,
-        transform.boundary!.tr.x - TEXT_PAD_SIZE,
-        findCenter(boundary).y
-      );
+      ctx.fillText(conjugateTransform, cent.x, cent.y);
       break;
     }
     case ast.MTransform.Transpose: {
-      ctx.fillText(
-        transposeTransform,
-        transform.boundary!.tr.x - TEXT_PAD_SIZE,
-        findCenter(boundary).y
-      );
+      ctx.fillText(transposeTransform, cent.x, cent.y);
       break;
     }
     default: {

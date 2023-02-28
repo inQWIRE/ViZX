@@ -6,7 +6,6 @@ import {
   PROPTO_SIZE,
   hor_pad,
   ver_pad,
-  TRANSFORM_SIZE,
   number_kinds,
   FUNC_ARG_SIZE,
 } from "../constants/consts";
@@ -18,8 +17,8 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let node_ = <ast.ASTTransform>node;
       let snode = addSizes(node_.node);
       if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
-        node.hor_len += snode.hor_len + TRANSFORM_SIZE;
-        node.ver_len += snode.ver_len + TRANSFORM_SIZE;
+        node.hor_len += snode.hor_len + PAD_SIZE + FUNC_ARG_SIZE;
+        node.ver_len += snode.ver_len + PAD_SIZE;
       }
       break;
     }

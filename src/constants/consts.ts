@@ -30,7 +30,6 @@ export const PAD_SIZE = 0.1 * SCALE;
 export const PROPTO_SIZE = 0.2 * SCALE;
 export const CAST_SIZE = 0.3 * SCALE;
 export const TEXT_PAD_SIZE = 0.1 * SCALE;
-export const TRANSFORM_SIZE = 0.4 * SCALE;
 export const FUNC_ARG_SIZE = 0.4 * SCALE;
 
 export const number_kinds = ["realnum", "num", "numvar", "numfunc", "real01"];
