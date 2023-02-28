@@ -557,7 +557,7 @@ export function parseAST(expr: string): ast.ASTNode {
   return expectSingleResult(parsed);
 }
 
-// this is not a very good pretty printer
+// this is not a very good pretty printer todo improve maybe
 export function parserPrettyPrinter(node: ast.ASTNode) {
   switch (node.kind) {
     case "const": {

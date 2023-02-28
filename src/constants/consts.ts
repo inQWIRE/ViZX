@@ -34,6 +34,7 @@ export const FUNC_ARG_SIZE = 0.4 * SCALE;
 
 export const number_kinds = ["realnum", "num", "numvar", "numfunc", "real01"];
 
+// yeah yeah not really a constant whatever
 export let CANVAS_WIDTH = 500;
 export let CANVAS_HEIGHT = 500;
 
