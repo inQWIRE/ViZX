@@ -31,6 +31,9 @@ export const PROPTO_SIZE = 0.2 * SCALE;
 export const CAST_SIZE = 0.3 * SCALE;
 export const TEXT_PAD_SIZE = 0.1 * SCALE;
 export const TRANSFORM_SIZE = 0.4 * SCALE;
+export const FUNC_ARG_SIZE = 0.4 * SCALE;
+
+export const number_kinds = ["realnum", "num", "numvar", "numfunc", "real01"];
 
 export let CANVAS_WIDTH = 500;
 export let CANVAS_HEIGHT = 500;
@@ -66,6 +69,7 @@ export const stack_dash: [number, number] = [10, 10];
 export const compose_dash: [number, number] = [6, 6];
 export const cast_dash: [number, number] = [3, 3];
 export const propto_dash: [number, number] = [1, 1];
+export const function_dash: [number, number] = [3, 15];
 
 export let boundary = {
   tl: {

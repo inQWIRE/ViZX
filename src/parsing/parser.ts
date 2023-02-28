@@ -293,7 +293,7 @@ function applyFunc(
   args[2].unshift(args[1]);
   const new_args = <[ast.Num | ast.ASTNode]>args[2];
   return {
-    kind: "func",
+    kind: "function",
     fname: args[0].text,
     args: new_args,
     val: `${args[0].text}(${new_args.join(", ")})`,

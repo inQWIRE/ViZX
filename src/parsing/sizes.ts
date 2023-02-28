@@ -7,6 +7,8 @@ import {
   hor_pad,
   ver_pad,
   TRANSFORM_SIZE,
+  number_kinds,
+  FUNC_ARG_SIZE,
 } from "../constants/consts";
 export function addSizes(node: ast.ASTNode): ast.ASTNode {
   node.hor_len = 0;
@@ -114,9 +116,25 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       break;
     }
-    case "func": {
+    case "function": {
       // TODO
       let node_ = <ast.ASTFunc>node;
+      for (let arg of node_.args) {
+        if (number_kinds.includes(arg.kind)) {
+          node.hor_len += FUNC_ARG_SIZE;
+        } else {
+          let arg_ = <ast.ASTNode>arg;
+          arg_ = addSizes(arg_);
+          if (arg_.ver_len !== undefined && arg_.hor_len !== undefined) {
+            node.ver_len += arg_.ver_len;
+            node.hor_len += arg_.hor_len;
+          } else {
+            throw new Error(`could not size arg ${arg_} while sizing function`);
+          }
+        }
+      }
+      node.hor_len += (node_.args.length + 1) * PAD_SIZE + FUNC_ARG_SIZE;
+      node.ver_len += 2 * PAD_SIZE;
       break;
     }
     case "propto": {

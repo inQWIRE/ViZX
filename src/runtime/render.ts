@@ -22,6 +22,9 @@ import {
   adjointTransform,
   conjugateTransform,
   transposeTransform,
+  function_dash,
+  number_kinds,
+  FUNC_ARG_SIZE,
 } from "../constants/consts";
 import {
   findCenter,
@@ -45,9 +48,51 @@ const green = "#A4FFA4";
 // canvas.height = CANVAS_HEIGHT;
 // canvas_format();
 
+function drawFunctionNode(node: ast.ASTNode) {
+  let func = <ast.ASTFunc>node;
+  let bound = node.boundary!;
+  let f_bound = JSON.parse(JSON.stringify(bound));
+  bound.tl.x += FUNC_ARG_SIZE;
+  bound.bl.x += FUNC_ARG_SIZE;
+  drawFuncBoundary(bound);
+  f_bound.tr.x = f_bound.tl.x + FUNC_ARG_SIZE;
+  f_bound.br.x = f_bound.bl.x + FUNC_ARG_SIZE;
+  drawBoundary(f_bound, function_dash);
+  text_format("function", func.fname.length);
+  let cent = findCenter(f_bound);
+  ctx.fillText(func.fname, cent.x, cent.y);
+  bound.tl.y += PAD_SIZE;
+  bound.tr.y += PAD_SIZE;
+  bound.bl.y += PAD_SIZE;
+  bound.br.y -= PAD_SIZE;
+  for (let arg of func.args) {
+    bound.tl.x += PAD_SIZE;
+    bound.bl.x += PAD_SIZE;
+    if (number_kinds.includes(arg.kind)) {
+      let arg_ = <ast.Num>arg;
+      bound.tr.x = bound.tl.x + FUNC_ARG_SIZE;
+      bound.br.x = bound.bl.x + FUNC_ARG_SIZE;
+      text_format("function", arg_.expr.length);
+      let cent = findCenter(bound);
+      ctx.fillText(arg_.expr, cent.x, cent.y);
+      bound.tl.x = bound.tr.x;
+      bound.bl.x = bound.br.x;
+    } else {
+      let arg_ = <ast.ASTNode>arg;
+      bound.tr.x = bound.tl.x + arg_.hor_len!;
+      bound.br.x = bound.bl.x + arg_.ver_len!;
+      draw(arg_);
+      bound.tl.x = bound.tr.x;
+      bound.bl.x = bound.br.x;
+    }
+    bound.tl.x += PAD_SIZE;
+    bound.bl.x += PAD_SIZE;
+  }
+}
+
 function drawTransformNode(node: ast.ASTNode) {
   let transform = <ast.ASTTransform>node;
-  drawBoundary(node.boundary!);
+  drawFuncBoundary(node.boundary!);
   draw(transform.node);
   text_format("transform", 1);
   switch (transform.transform) {
@@ -162,6 +207,25 @@ function drawBoundary(boundary: quad, dash?: [number, number]) {
   ctx.lineTo(boundary.br.x, boundary.br.y);
   ctx.lineTo(boundary.bl.x, boundary.bl.y);
   ctx.closePath();
+  ctx.stroke();
+  return;
+}
+
+function drawFuncBoundary(boundary: quad) {
+  ctx.setLineDash([]);
+  ctx.strokeStyle = black;
+  ctx.beginPath();
+  ctx.moveTo(boundary.tl.x + PAD_SIZE, boundary.tl.y);
+  ctx.lineTo(boundary.tl.x, boundary.tl.y);
+  ctx.lineTo(boundary.bl.x, boundary.bl.y);
+  ctx.lineTo(boundary.bl.x + PAD_SIZE, boundary.bl.y);
+  ctx.stroke();
+
+  ctx.strokeStyle = black;
+  ctx.moveTo(boundary.tr.x - PAD_SIZE, boundary.tr.y);
+  ctx.lineTo(boundary.tr.x, boundary.tr.y);
+  ctx.lineTo(boundary.br.x, boundary.br.y);
+  ctx.lineTo(boundary.br.x - PAD_SIZE, boundary.br.y);
   ctx.stroke();
   return;
 }
@@ -367,6 +431,13 @@ function text_format(loc: string, chars: number) {
       ctx.fillStyle = "black";
       break;
     }
+    case "function": {
+      ctx.font = "15px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      break;
+    }
     default: {
       ctx.font = "15px Arial";
       ctx.textAlign = "center";
@@ -420,6 +491,10 @@ function draw(node: ast.ASTNode) {
     }
     case "transform": {
       drawTransformNode(node);
+      break;
+    }
+    case "function": {
+      drawFunctionNode(node);
       break;
     }
     default: {

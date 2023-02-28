@@ -1,5 +1,11 @@
 import * as ast from "./ast";
-import { PAD_SIZE, CAST_SIZE, TRANSFORM_SIZE } from "../constants/consts";
+import {
+  PAD_SIZE,
+  CAST_SIZE,
+  TRANSFORM_SIZE,
+  number_kinds,
+  FUNC_ARG_SIZE,
+} from "../constants/consts";
 import { quad, coord } from "../constants/types";
 
 export function findCenter(q: quad): coord {
@@ -336,9 +342,6 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       }
       return node_;
     }
-    case "nwire": {
-      break;
-    }
     case "cast": {
       let node_ = <ast.ASTCast>node;
       node_.boundary = makeAtCenter(
@@ -359,7 +362,38 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       return node_;
     }
     case "function": {
-      break;
+      let node_ = <ast.ASTFunc>node;
+      node_.boundary = makeAtCenter(
+        findCenter(boundary),
+        node.hor_len!,
+        node.ver_len!
+      );
+      let bound: quad = JSON.parse(JSON.stringify(node_.boundary));
+      let in_bound = bound;
+      in_bound.tl.y += FUNC_ARG_SIZE + PAD_SIZE;
+      in_bound.tr.y += PAD_SIZE;
+      in_bound.bl.y -= FUNC_ARG_SIZE + PAD_SIZE;
+      in_bound.br.y -= PAD_SIZE;
+      in_bound.tl.x += FUNC_ARG_SIZE;
+      in_bound.bl.x += FUNC_ARG_SIZE;
+      for (let arg of node_.args) {
+        in_bound.tl.x += PAD_SIZE;
+        in_bound.bl.x += PAD_SIZE;
+        if (number_kinds.includes(arg.kind)) {
+          in_bound.tr.x = in_bound.tl.x + FUNC_ARG_SIZE;
+          in_bound.br.x = in_bound.bl.x + FUNC_ARG_SIZE;
+        } else {
+          let arg_ = <ast.ASTNode>arg;
+          in_bound.tr.x = in_bound.tl.x + arg_.hor_len!;
+          in_bound.br.x = in_bound.bl.x + arg_.hor_len!;
+          arg = addCoords(arg_, in_bound);
+        }
+        in_bound.tl.x = in_bound.tr.x;
+        in_bound.bl.x = in_bound.br.x;
+        in_bound.tl.x += PAD_SIZE;
+        in_bound.bl.x += PAD_SIZE;
+      }
+      return node_;
     }
     case "propto": {
       let node_ = <ast.ASTPropTo>node;
@@ -410,7 +444,6 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       node_.l = addCoords(node_.l, l_bound);
       node_.r = addCoords(node_.r, r_bound);
       return node_;
-      break;
     }
     default: {
       throw new Error(`unidentifiable node ${node} in addCoords`);

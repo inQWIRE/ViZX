@@ -108,7 +108,7 @@ export interface NumFunc extends Num {
 }
 
 export interface ASTFunc extends ASTNode {
-  kind: "func";
+  kind: "function";
   fname: string;
   args: [Num | ASTNode];
   val: string;
