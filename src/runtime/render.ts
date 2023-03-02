@@ -25,6 +25,8 @@ import {
   function_dash,
   number_kinds,
   FUNC_ARG_SIZE,
+  nStackOp,
+  nStack1Op,
 } from "../constants/consts";
 import {
   findCenter,
@@ -128,7 +130,7 @@ function drawTransformNode(node: ast.ASTNode) {
 
 function drawPropToNode(node: ast.ASTNode) {
   let propto = <ast.ASTPropTo>node;
-  drawBoundary(node.boundary!, propto_dash);
+  // drawBoundary(node.boundary!, propto_dash);
   draw(propto.l);
   draw(propto.r);
   text_format("propto", 1);
@@ -172,18 +174,34 @@ function drawStackNode(node: ast.ASTNode) {
 
 function drawNStackNode(node: ast.ASTNode) {
   let nstack = <ast.ASTNStack>node;
-  for (var inner of nstack.nodes) {
-    draw(inner);
-  }
-  drawBoundary(node.boundary!, stack_dash);
+  draw(nstack.node);
+  let label_bound = JSON.parse(JSON.stringify(nstack.boundary!));
+  label_bound.tr.x = label_bound.tl.x + FUNC_ARG_SIZE;
+  label_bound.br.x = label_bound.bl.x + FUNC_ARG_SIZE;
+  drawBoundary(label_bound, function_dash);
+  let bound = JSON.parse(JSON.stringify(nstack.boundary!));
+  bound.tl.x += FUNC_ARG_SIZE;
+  bound.bl.x += FUNC_ARG_SIZE;
+  drawFuncBoundary(bound);
+  text_format("nstack", nstack.n.expr.length);
+  let cent = findCenter(label_bound);
+  ctx.fillText(nstack.n.expr.concat(nStackOp), cent.x, cent.y);
 }
 
 function drawNStack1Node(node: ast.ASTNode) {
   let nstack = <ast.ASTNStack>node;
-  for (var inner of nstack.nodes) {
-    draw(inner);
-  }
-  drawBoundary(node.boundary!, stack_dash);
+  draw(nstack.node);
+  let label_bound = JSON.parse(JSON.stringify(nstack.boundary!));
+  label_bound.tr.x = label_bound.tl.x + FUNC_ARG_SIZE;
+  label_bound.br.x = label_bound.bl.x + FUNC_ARG_SIZE;
+  drawBoundary(label_bound, function_dash);
+  let bound = JSON.parse(JSON.stringify(nstack.boundary!));
+  bound.tl.x += FUNC_ARG_SIZE;
+  bound.bl.x += FUNC_ARG_SIZE;
+  drawFuncBoundary(bound);
+  text_format("nstack", nstack.n.expr.length);
+  let cent = findCenter(label_bound);
+  ctx.fillText(nstack.n.expr.concat(nStack1Op), cent.x, cent.y);
 }
 
 function drawBoundary(boundary: quad, dash?: [number, number]) {
@@ -410,7 +428,7 @@ function text_format(loc: string, chars: number) {
       break;
     }
     case "propto": {
-      ctx.font = "30px Arial";
+      ctx.font = "50px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "black";
@@ -418,6 +436,13 @@ function text_format(loc: string, chars: number) {
     }
     case "transform": {
       ctx.font = "15px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "black";
+      break;
+    }
+    case "nstack": {
+      ctx.font = "20px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "black";

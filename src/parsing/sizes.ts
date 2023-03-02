@@ -18,8 +18,8 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let node_ = <ast.ASTTransform>node;
       let snode = addSizes(node_.node);
       if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
-        node.hor_len += snode.hor_len + PAD_SIZE + FUNC_ARG_SIZE;
-        node.ver_len += snode.ver_len + PAD_SIZE;
+        node.hor_len += snode.hor_len + 2 * PAD_SIZE + FUNC_ARG_SIZE;
+        node.ver_len += snode.ver_len + 2 * PAD_SIZE;
       }
       break;
     }
@@ -80,12 +80,13 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     }
     case "nstack": {
       let node_ = <ast.ASTNStack>node;
-      node_.nodes = node_.nodes.map((x) => addSizes(x));
-      let snode = node_.nodes[0];
-      if (snode.ver_len !== undefined && snode.hor_len !== undefined) {
-        node.ver_len +=
-          PAD_SIZE + (snode.ver_len + PAD_SIZE) * parseInt(node_.n.val);
-        node.hor_len += snode.hor_len + 2 * PAD_SIZE;
+      node_.node = addSizes(node_.node);
+      if (
+        node_.node.ver_len !== undefined &&
+        node_.node.hor_len !== undefined
+      ) {
+        node.ver_len += 2 * PAD_SIZE + node_.node.ver_len;
+        node.hor_len += node_.node.hor_len + 2 * PAD_SIZE + FUNC_ARG_SIZE;
       } else {
         throw new Error(`Could not size node ${node} as nstack node`);
       }
@@ -93,11 +94,14 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     }
     case "nstack1": {
       let node_ = <ast.ASTNStack1>node;
-      node_.nodes = node_.nodes.map((x) => addSizes(x));
-      let snode = node_.nodes[0];
-      if (snode.ver_len !== undefined && snode.hor_len !== undefined) {
-        node.ver_len += snode.ver_len * parseInt(node_.n.val);
-        node.hor_len += snode.hor_len;
+      node_.node = addSizes(node_.node);
+      if (
+        node_.node.ver_len !== undefined &&
+        node_.node.hor_len !== undefined
+      ) {
+        node.ver_len += node_.node.ver_len + 2 * PAD_SIZE;
+        node.hor_len += node_.node.hor_len;
+        +2 * PAD_SIZE + FUNC_ARG_SIZE;
       } else {
         throw new Error(`Could not size node ${node} as nstack1 node`);
       }

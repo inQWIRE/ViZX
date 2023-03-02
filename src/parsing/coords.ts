@@ -227,8 +227,8 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
     case "nstack": {
       let node_ = <ast.ASTNStack>node;
       let n = parseInt(node_.n.val);
-      let stack_nodes = node_.nodes;
-      let n_ver = stack_nodes[0].ver_len!;
+      let stack_node = node_.node;
+      let n_ver = stack_node.ver_len!;
       // console.log("n_ver: ", n_ver);
       node_.boundary = makeAtCenter(
         findCenter(boundary),
@@ -240,7 +240,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       bound = JSON.parse(
         JSON.stringify({
           tl: {
-            x: bound.tl.x + PAD_SIZE,
+            x: bound.tl.x + PAD_SIZE + FUNC_ARG_SIZE,
             y: bound.tl.y + PAD_SIZE,
           },
           tr: {
@@ -248,7 +248,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
             y: bound.tr.y + PAD_SIZE,
           },
           bl: {
-            x: bound.bl.x + PAD_SIZE,
+            x: bound.bl.x + PAD_SIZE + FUNC_ARG_SIZE,
             y: bound.tl.y + PAD_SIZE + n_ver,
           },
           br: {
@@ -257,39 +257,14 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
           },
         })
       );
-      for (let i = 0; i < n; i++) {
-        stack_nodes[i] = JSON.parse(
-          JSON.stringify(addCoords(stack_nodes[i], bound))
-        );
-        bound = JSON.parse(
-          JSON.stringify({
-            tl: {
-              x: bound.tl.x,
-              y: bound.bl.y + PAD_SIZE,
-            },
-            tr: {
-              x: bound.tr.x,
-              y: bound.br.y + PAD_SIZE,
-            },
-            bl: {
-              x: bound.tl.x,
-              y: bound.bl.y + n_ver + PAD_SIZE,
-            },
-            br: {
-              x: bound.tr.x,
-              y: bound.br.y + n_ver + PAD_SIZE,
-            },
-          })
-        );
-      }
-      node_.nodes = JSON.parse(JSON.stringify(stack_nodes));
+      stack_node = addCoords(stack_node, bound);
       return node_;
     }
     case "nstack1": {
       let node_ = <ast.ASTNStack1>node;
       let n = parseInt(node_.n.val);
-      let stack_nodes = node_.nodes;
-      let n_ver = stack_nodes[0].ver_len!;
+      let stack_node = node_.node;
+      let n_ver = stack_node.ver_len!;
       node_.boundary = makeAtCenter(
         findCenter(boundary),
         node.hor_len!,
@@ -299,7 +274,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       bound = JSON.parse(
         JSON.stringify({
           tl: {
-            x: bound.tl.x + PAD_SIZE,
+            x: bound.tl.x + PAD_SIZE + FUNC_ARG_SIZE,
             y: bound.tl.y + PAD_SIZE,
           },
           tr: {
@@ -307,7 +282,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
             y: bound.tr.y + PAD_SIZE,
           },
           bl: {
-            x: bound.tl.x + PAD_SIZE,
+            x: bound.tl.x + PAD_SIZE + FUNC_ARG_SIZE,
             y: bound.tl.y + PAD_SIZE + n_ver,
           },
           br: {
@@ -316,29 +291,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
           },
         })
       );
-      for (let i = 0; i < n; i++) {
-        stack_nodes[i] = addCoords(stack_nodes[i], bound);
-        bound = JSON.parse(
-          JSON.stringify({
-            tl: {
-              x: bound.tl.x,
-              y: bound.bl.y + 2 * PAD_SIZE,
-            },
-            tr: {
-              x: bound.tr.x,
-              y: bound.br.y + 2 * PAD_SIZE,
-            },
-            bl: {
-              x: bound.tl.x,
-              y: bound.bl.y + n_ver + PAD_SIZE,
-            },
-            br: {
-              x: bound.tr.x,
-              y: bound.br.y + n_ver + PAD_SIZE,
-            },
-          })
-        );
-      }
+      stack_node = addCoords(stack_node, bound);
       return node_;
     }
     case "cast": {

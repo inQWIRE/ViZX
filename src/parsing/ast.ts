@@ -85,14 +85,14 @@ export interface ASTNStack extends ASTNode {
   kind: "nstack";
   n: Num;
   // stores n copies of node for simplicity
-  nodes: ASTNode[];
+  node: ASTNode;
 }
 
 export interface ASTNStack1 extends ASTNode {
   kind: "nstack1";
   n: Num;
   // stores n copies of node for simplicity
-  nodes: ASTNode[];
+  node: ASTNode;
 }
 
 export interface ASTCast extends ASTNode {

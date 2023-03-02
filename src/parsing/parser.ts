@@ -22,6 +22,7 @@ import { diff } from "deep-object-diff";
 
 import * as ast from "./ast";
 import * as lex from "./lexer";
+import { lexerPrettyPrinter } from "./lexer";
 
 type Token = psec.Token<lex.TokenKind>;
 
@@ -41,7 +42,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr + " + " + snd[1].expr,
+        expr: fst.expr.concat(" + ").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Sub: {
@@ -50,7 +51,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr + " - " + snd[1].expr,
+        expr: fst.expr.concat(" - ").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Mul: {
@@ -59,7 +60,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr + " * " + snd[1].expr,
+        expr: fst.expr.concat(" * ").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Div: {
@@ -68,7 +69,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr + " / " + snd[1].expr,
+        expr: fst.expr.concat(" / ").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Exp: {
@@ -77,7 +78,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr + " ^ " + snd[1].expr,
+        expr: fst.expr.concat(" ^ ").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     default: {
@@ -92,12 +93,13 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
     kind: "numfunc",
     fname: args[0].text,
     args: args[2],
-    expr: `${args[0].text}(${args[2].join(", ")})`,
+    val: args[0].text,
+    expr: args[0].text.concat(" ").concat(args[2].map((x) => x.expr).join(" ")),
   } as ast.NumFunc;
 }
 
 function applyNumberSucc(value: [Token, ast.Num]): ast.Num {
-  return { expr: value[1].expr + "+1", kind: "num" } as ast.Number;
+  return { expr: value[1].expr.concat("+1"), kind: "num" } as ast.Number;
 }
 
 function applyRConst(val: Token): ast.Num {
@@ -116,10 +118,12 @@ function applyRConst(val: Token): ast.Num {
 
 // numbers
 const NUMBASETERM = rule<lex.TokenKind, ast.Num>();
+const NUMFUNCTERM = rule<lex.TokenKind, ast.Num>();
 const NUMMIDTERM = rule<lex.TokenKind, ast.Num>();
 const NUMMID2TERM = rule<lex.TokenKind, ast.Num>();
 const NUMBER = rule<lex.TokenKind, ast.Num>();
 const REALNUMBER = rule<lex.TokenKind, ast.Num>();
+const REALNUMBER2 = rule<lex.TokenKind, ast.Num>();
 
 //  base num =
 // | Nat
@@ -127,27 +131,31 @@ const REALNUMBER = rule<lex.TokenKind, ast.Num>();
 // | ( Number )
 // | fname ?( Number+ ?)
 // | numvar
+
 NUMBASETERM.setPattern(
   alt(
     apply(seq(tok(lex.TokenKind.Succ), NUMBER), applyNumberSucc),
     apply(tok(lex.TokenKind.NumberToken), applyNumber),
     kmid(tok(lex.TokenKind.LParen), NUMBER, tok(lex.TokenKind.RParen)),
-    apply(
-      seq(
-        kleft(tok(lex.TokenKind.Str), opt_sc(tok(lex.TokenKind.LParen))),
-        // hack so functions have at least one parameter
-        NUMBER,
-        kleft(rep_sc(NUMBER), opt_sc(tok(lex.TokenKind.RParen)))
-      ),
-      applyNumFunc
-    ),
     apply(tok(lex.TokenKind.Str), applyNumVar)
+  )
+);
+
+NUMFUNCTERM.setPattern(
+  apply(
+    seq(
+      tok(lex.TokenKind.Str),
+      // hack so functions have at least one parameter
+      NUMBASETERM,
+      rep_sc(NUMBASETERM)
+    ),
+    applyNumFunc
   )
 );
 
 NUMMIDTERM.setPattern(
   lrec_sc(
-    NUMBASETERM,
+    alt(NUMFUNCTERM, NUMBASETERM),
     seq(alt(tok(lex.TokenKind.Mul), tok(lex.TokenKind.Div)), NUMBASETERM),
     applyBinOp
   )
@@ -228,7 +236,35 @@ function applyConst(args: Token): ast.ASTNode {
   return zxconst;
 }
 
+function applySignRealNumber(value: [Token, ast.Num]): ast.Num {
+  return {
+    expr: value[0].text.concat(value[1].expr),
+    val: value[0].text.concat(value[1].val),
+    kind: value[1].kind,
+  } as ast.Num;
+}
+
 REALNUMBER.setPattern(
+  alt(
+    apply(
+      seq(
+        kright(
+          tok(lex.TokenKind.LParen),
+          alt(
+            tok(lex.TokenKind.Sub),
+            tok(lex.TokenKind.Root),
+            tok(lex.TokenKind.Div)
+          )
+        ),
+        kleft(REALNUMBER2, tok(lex.TokenKind.RParen))
+      ),
+      applySignRealNumber
+    ),
+    REALNUMBER2
+  )
+);
+
+REALNUMBER2.setPattern(
   alt(
     apply(alt(tok(lex.TokenKind.R0), tok(lex.TokenKind.R1)), applyRConst),
     apply(
@@ -252,23 +288,23 @@ function applyRealNum(value: [Token | undefined, ast.Num]): ast.Num {
     switch (value[0].kind) {
       case lex.TokenKind.Root: {
         return {
-          val: value[0].text + value[1].expr,
+          val: value[0].text.concat(value[1].expr),
           kind: "realnum",
-          expr: value[0].text + value[1].expr,
+          expr: value[0].text.concat(value[1].expr),
         } as ast.RealNum;
       }
       case lex.TokenKind.Sub: {
         return {
-          val: value[0].text + value[1].val,
+          val: value[0].text.concat(value[1].expr),
           kind: "realnum",
-          expr: value[0].text + value[1].val,
+          expr: value[0].text.concat(value[1].expr),
         } as ast.RealNum;
       }
       case lex.TokenKind.Div: {
         return {
-          val: value[0].text + value[1].val,
+          val: value[0].text.concat(value[1].expr),
           kind: "realnum",
-          expr: value[0].text + value[1].val,
+          expr: value[0].text.concat(value[1].expr),
         } as ast.RealNum;
       }
       default: {
@@ -277,9 +313,9 @@ function applyRealNum(value: [Token | undefined, ast.Num]): ast.Num {
     }
   }
   return {
-    val: value[1].val,
+    val: value[1].expr,
     kind: "realnum",
-    expr: value[1].val,
+    expr: value[1].expr,
   } as ast.RealNum;
 }
 
@@ -431,19 +467,13 @@ function applyNStack(args: [ast.Num, Token, ast.ASTNode]): ast.ASTNode {
     case lex.TokenKind.NStack: {
       let n = parseInt(args[0].val);
       // loop faster than map performance wise
-      let arr = new Array(n);
-      for (let i = 0; i < n; i++) {
-        arr[i] = args[2];
-      }
-      return { kind: "nstack", n: args[0], nodes: arr } as ast.ASTNStack;
+
+      return { kind: "nstack", n: args[0], node: args[2] } as ast.ASTNStack;
     }
     case lex.TokenKind.NStack1: {
       let n = parseInt(args[0].val);
-      let arr = new Array(n);
-      for (let i = 0; i < n; i++) {
-        arr[i] = JSON.parse(JSON.stringify(args[2]));
-      }
-      return { kind: "nstack1", n: args[0], nodes: arr } as ast.ASTNStack1;
+
+      return { kind: "nstack1", n: args[0], node: args[2] } as ast.ASTNStack1;
     }
     default: {
       throw new Error(`Unknown nstack???: ${args[1].kind}`);
@@ -552,8 +582,14 @@ function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
 ASTNODE.setPattern(ZXTRANSFORML0);
 
 export function parseAST(expr: string): ast.ASTNode {
+  lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
-  console.log(parsed);
+  if (parsed.successful && parsed.candidates.length > 1) {
+    let i = 0;
+    while (i < parsed.candidates.length - 1) {
+      console.log(diff(parsed.candidates[i], parsed.candidates[i + 1]));
+    }
+  }
   return expectSingleResult(parsed);
 }
 

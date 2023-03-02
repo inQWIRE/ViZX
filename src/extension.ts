@@ -26,7 +26,9 @@ export function activate(context: vscode.ExtensionContext) {
         let node: ast.ASTNode;
         try {
           node = parser.parseAST(expr);
+          console.log("parsed: ", node);
           node = sizer.addSizes(node);
+          console.log("sized: ", node);
           const size = sizer.determineCanvasWidthHeight(node);
           setCanvasWidthHeight(size);
           node = coord.addCoords(node, boundary);
