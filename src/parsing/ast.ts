@@ -33,11 +33,6 @@ export interface Num {
   expr: string;
 }
 
-export interface RealNum extends Num {
-  kind: "realnum";
-  val: string;
-}
-
 export interface Number extends Num {
   kind: "num";
   val: string;
@@ -54,6 +49,17 @@ export interface ArithOp extends Num {
   val: "+" | "-" | "*" | "/" | "^";
   left: Num;
   right: Num;
+}
+
+export interface NumFunc extends Num {
+  kind: "numfunc";
+  fname: string;
+  args: [Num];
+}
+
+export interface Real01 extends Num {
+  kind: "numreal01";
+  n: "R0" | "R1";
 }
 
 export interface ASTConst extends ASTNode {
@@ -101,12 +107,6 @@ export interface ASTCast extends ASTNode {
   n: Num;
   node: ASTNode;
 }
-export interface NumFunc extends Num {
-  kind: "numfunc";
-  fname: string;
-  args: [Num];
-}
-
 export interface ASTFunc extends ASTNode {
   kind: "function";
   fname: string;
@@ -134,8 +134,4 @@ export interface ASTTransform extends ASTNode {
   kind: "transform";
   transform: MTransform;
   node: ASTNode;
-}
-export interface Real01 extends Num {
-  kind: "real01";
-  n: "R0" | "R1";
 }

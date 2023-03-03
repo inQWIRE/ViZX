@@ -372,7 +372,7 @@ function text_format(loc: string, chars: number) {
       break;
     }
     case "spider_alpha": {
-      ctx.font = "30px Arial";
+      ctx.font = "20px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;

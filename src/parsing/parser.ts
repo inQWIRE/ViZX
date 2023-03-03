@@ -18,7 +18,7 @@ import {
 import { diff } from "deep-object-diff";
 
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
-// TODO some sort of bug with parentheses? For some reason won't parse of form "ZXNODE ⟷|↕ (ZXNODE ⟷|↕ ZXNODE)"" but will parse without parens
+// TODO change parser rule names to something reasonable
 
 import * as ast from "./ast";
 import * as lex from "./lexer";
@@ -94,7 +94,10 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
     fname: args[0].text,
     args: args[2],
     val: args[0].text,
-    expr: args[0].text.concat(" ").concat(args[2].map((x) => x.expr).join(" ")),
+    expr: args[0].text
+      .concat(" (")
+      .concat(args[2].map((x) => x.expr).join(" "))
+      .concat(")"),
   } as ast.NumFunc;
 }
 
@@ -105,10 +108,10 @@ function applyNumberSucc(value: [Token, ast.Num]): ast.Num {
 function applyRConst(val: Token): ast.Num {
   switch (val.kind) {
     case lex.TokenKind.R0: {
-      return { kind: "real01", n: "R0", expr: "R0" } as ast.Real01;
+      return { kind: "numreal01", n: "R0", expr: "R0" } as ast.Real01;
     }
     case lex.TokenKind.R1: {
-      return { kind: "real01", n: "R1", expr: "R1" } as ast.Real01;
+      return { kind: "numreal01", n: "R1", expr: "R1" } as ast.Real01;
     }
     default: {
       throw new Error(`Unknown real: ${val.text}`);
@@ -117,61 +120,105 @@ function applyRConst(val: Token): ast.Num {
 }
 
 // numbers
-const NUMBASETERM = rule<lex.TokenKind, ast.Num>();
-const NUMFUNCTERM = rule<lex.TokenKind, ast.Num>();
-const NUMMIDTERM = rule<lex.TokenKind, ast.Num>();
-const NUMMID2TERM = rule<lex.TokenKind, ast.Num>();
-const NUMBER = rule<lex.TokenKind, ast.Num>();
-const REALNUMBER = rule<lex.TokenKind, ast.Num>();
-const REALNUMBER2 = rule<lex.TokenKind, ast.Num>();
+const NUML0 = rule<lex.TokenKind, ast.Num>();
+const NUML10 = rule<lex.TokenKind, ast.Num>();
+const NUML20 = rule<lex.TokenKind, ast.Num>();
+const NUML30 = rule<lex.TokenKind, ast.Num>();
+const NUML40 = rule<lex.TokenKind, ast.Num>();
 
-//  base num =
-// | Nat
-// | S Number
-// | ( Number )
-// | fname ?( Number+ ?)
-// | numvar
-
-NUMBASETERM.setPattern(
+NUML0.setPattern(
   alt(
-    apply(seq(tok(lex.TokenKind.Succ), NUMBER), applyNumberSucc),
+    apply(alt(tok(lex.TokenKind.R0), tok(lex.TokenKind.R1)), applyRConst),
     apply(tok(lex.TokenKind.NumberToken), applyNumber),
-    kmid(tok(lex.TokenKind.LParen), NUMBER, tok(lex.TokenKind.RParen)),
+    apply(
+      seq(tok(lex.TokenKind.Sub), tok(lex.TokenKind.NumberToken)),
+      applySign
+    ),
+    kmid(tok(lex.TokenKind.LParen), NUML40, tok(lex.TokenKind.RParen)),
     apply(tok(lex.TokenKind.Str), applyNumVar)
   )
 );
 
-NUMFUNCTERM.setPattern(
-  apply(
-    seq(
-      tok(lex.TokenKind.Str),
-      // hack so functions have at least one parameter
-      NUMBASETERM,
-      rep_sc(NUMBASETERM)
+NUML10.setPattern(
+  alt(
+    apply(
+      seq(
+        alt(
+          tok(lex.TokenKind.Sub),
+          tok(lex.TokenKind.Div),
+          tok(lex.TokenKind.Root)
+        ),
+        rep_sc(
+          alt(
+            tok(lex.TokenKind.Sub),
+            tok(lex.TokenKind.Div),
+            tok(lex.TokenKind.Root)
+          )
+        ),
+        NUML0
+      ),
+      applyUnaryOp
     ),
-    applyNumFunc
+    apply(seq(tok(lex.TokenKind.Succ), NUML0), applyNumberSucc),
+    apply(
+      seq(
+        tok(lex.TokenKind.Str),
+        // hack so functions have at least one parameter
+        NUML0,
+        rep_sc(NUML0)
+      ),
+      applyNumFunc
+    )
   )
 );
 
-NUMMIDTERM.setPattern(
+NUML20.setPattern(
   lrec_sc(
-    alt(NUMFUNCTERM, NUMBASETERM),
-    seq(alt(tok(lex.TokenKind.Mul), tok(lex.TokenKind.Div)), NUMBASETERM),
+    alt(NUML10, NUML0),
+    seq(alt(tok(lex.TokenKind.Mul), tok(lex.TokenKind.Div)), NUML0),
     applyBinOp
   )
 );
 
-NUMMID2TERM.setPattern(
+NUML30.setPattern(
   lrec_sc(
-    NUMMIDTERM,
-    seq(alt(tok(lex.TokenKind.Add), tok(lex.TokenKind.Sub)), NUMMIDTERM),
+    NUML20,
+    seq(alt(tok(lex.TokenKind.Add), tok(lex.TokenKind.Sub)), NUML20),
     applyBinOp
   )
 );
 
-NUMBER.setPattern(
-  lrec_sc(NUMMID2TERM, seq(tok(lex.TokenKind.Exp), NUMMID2TERM), applyBinOp)
+NUML40.setPattern(
+  lrec_sc(NUML30, seq(tok(lex.TokenKind.Exp), NUML30), applyBinOp)
 );
+
+// todo check actual tokens
+function applyUnaryOp(args: [Token, Token[], ast.Num]): ast.Num {
+  args[1].unshift(args[0]);
+  return {
+    val: args[1]
+      .map((x) => x.text)
+      .join(" ")
+      .concat(" (")
+      .concat(args[2].expr)
+      .concat(")".repeat(args[1].length)),
+    kind: "num",
+    expr: args[1]
+      .map((x) => x.text)
+      .join(" ")
+      .concat(" (")
+      .concat(args[2].expr)
+      .concat(")".repeat(args[1].length)),
+  } as ast.Num;
+}
+
+function applySign(args: [Token, Token]): ast.Num {
+  return {
+    val: args[0].text.concat(args[1].text),
+    kind: "num",
+    expr: args[0].text.concat(args[1].text),
+  } as ast.Number;
+}
 
 // ZXConsts
 
@@ -236,89 +283,6 @@ function applyConst(args: Token): ast.ASTNode {
   return zxconst;
 }
 
-function applySignRealNumber(value: [Token, ast.Num]): ast.Num {
-  return {
-    expr: value[0].text.concat(value[1].expr),
-    val: value[0].text.concat(value[1].val),
-    kind: value[1].kind,
-  } as ast.Num;
-}
-
-REALNUMBER.setPattern(
-  alt(
-    apply(
-      seq(
-        kright(
-          tok(lex.TokenKind.LParen),
-          alt(
-            tok(lex.TokenKind.Sub),
-            tok(lex.TokenKind.Root),
-            tok(lex.TokenKind.Div)
-          )
-        ),
-        kleft(REALNUMBER2, tok(lex.TokenKind.RParen))
-      ),
-      applySignRealNumber
-    ),
-    REALNUMBER2
-  )
-);
-
-REALNUMBER2.setPattern(
-  alt(
-    apply(alt(tok(lex.TokenKind.R0), tok(lex.TokenKind.R1)), applyRConst),
-    apply(
-      seq(
-        opt_sc(
-          alt(
-            tok(lex.TokenKind.Sub),
-            tok(lex.TokenKind.Root),
-            tok(lex.TokenKind.Div)
-          )
-        ),
-        NUMBER
-      ),
-      applyRealNum
-    )
-  )
-);
-
-function applyRealNum(value: [Token | undefined, ast.Num]): ast.Num {
-  if (value[0] !== undefined) {
-    switch (value[0].kind) {
-      case lex.TokenKind.Root: {
-        return {
-          val: value[0].text.concat(value[1].expr),
-          kind: "realnum",
-          expr: value[0].text.concat(value[1].expr),
-        } as ast.RealNum;
-      }
-      case lex.TokenKind.Sub: {
-        return {
-          val: value[0].text.concat(value[1].expr),
-          kind: "realnum",
-          expr: value[0].text.concat(value[1].expr),
-        } as ast.RealNum;
-      }
-      case lex.TokenKind.Div: {
-        return {
-          val: value[0].text.concat(value[1].expr),
-          kind: "realnum",
-          expr: value[0].text.concat(value[1].expr),
-        } as ast.RealNum;
-      }
-      default: {
-        throw new Error(`Unknown unary operator: ${value[0].text}`);
-      }
-    }
-  }
-  return {
-    val: value[1].expr,
-    kind: "realnum",
-    expr: value[1].expr,
-  } as ast.RealNum;
-}
-
 function applyVar(val: Token): ast.ASTNode {
   return { kind: "var", val: val.text } as ast.ASTVar;
 }
@@ -363,18 +327,18 @@ ZXBASETERM.setPattern(
     apply(
       seq(
         tok(lex.TokenKind.Str),
-        alt(NUMBER, ASTNODE),
-        rep_sc(alt(NUMBER, ASTNODE))
+        alt(NUML40, ASTNODE),
+        rep_sc(alt(NUML40, ASTNODE))
       ),
       applyFunc
     ),
-    apply(kright(tok(lex.TokenKind.NWire), NUMBER), applyNWire),
+    apply(kright(tok(lex.TokenKind.NWire), NUML40), applyNWire),
     apply(
       seq(
         alt(tok(lex.TokenKind.XToken), tok(lex.TokenKind.ZToken)),
-        NUMBER,
-        NUMBER,
-        REALNUMBER
+        NUML40,
+        NUML40,
+        NUML40
       ),
       applySpider
     ),
@@ -392,9 +356,9 @@ ZXBASETERM.setPattern(
             tok(lex.TokenKind.RParen)
           )
         ),
-        NUMBER,
-        NUMBER,
-        REALNUMBER
+        NUML40,
+        NUML40,
+        NUML40
       ),
       applySpider
     ),
@@ -488,7 +452,7 @@ function applyCast(args: [ast.Num, ast.Num, ast.ASTNode]): ast.ASTNode {
 ZXNSTACK.setPattern(
   apply(
     seq(
-      NUMBER,
+      NUML40,
       alt(tok(lex.TokenKind.NStack), tok(lex.TokenKind.NStack1)),
       alt(ZXSTACKCOMPOSE, ZXNSTACK)
     ),
@@ -499,8 +463,8 @@ ZXNSTACK.setPattern(
 ZXCAST.setPattern(
   apply(
     seq(
-      kright(tok(lex.TokenKind.Cast$), NUMBER),
-      kright(tok(lex.TokenKind.Comma), NUMBER),
+      kright(tok(lex.TokenKind.Cast$), NUML40),
+      kright(tok(lex.TokenKind.Comma), NUML40),
       kmid(tok(lex.TokenKind.Cast3Colon), ASTNODE, tok(lex.TokenKind.Cast$))
     ),
     applyCast
@@ -584,6 +548,7 @@ ASTNODE.setPattern(ZXTRANSFORML0);
 export function parseAST(expr: string): ast.ASTNode {
   lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
+  // debugging only. should never have more than one
   if (parsed.successful && parsed.candidates.length > 1) {
     let i = 0;
     while (i < parsed.candidates.length - 1) {
@@ -591,63 +556,4 @@ export function parseAST(expr: string): ast.ASTNode {
     }
   }
   return expectSingleResult(parsed);
-}
-
-// this is not a very good pretty printer todo improve maybe
-export function parserPrettyPrinter(node: ast.ASTNode) {
-  switch (node.kind) {
-    case "const": {
-      let node_ = <ast.ASTConst>node;
-      console.log("( ", node_.val.toString(), " )");
-      break;
-    }
-    case "spider": {
-      let node_ = <ast.ASTSpider>node;
-      console.log(
-        "( ",
-        node_.val,
-        node_.in.val,
-        node_.out.val,
-        node_.alpha.val,
-        " )"
-      );
-      break;
-    }
-    case "stack": {
-      let node_ = <ast.ASTStack>node;
-      console.log("( Stack ");
-      console.log("{");
-      parserPrettyPrinter(node_.left);
-      console.log("}");
-      console.log("{");
-      parserPrettyPrinter(node_.right);
-      console.log("}");
-      console.log(" )");
-      break;
-    }
-    case "compose": {
-      let node_ = <ast.ASTCompose>node;
-      console.log("( Compose ");
-      console.log("{");
-      parserPrettyPrinter(node_.left);
-      console.log("}");
-      console.log("{");
-      parserPrettyPrinter(node_.right);
-      console.log("}");
-      console.log(" )");
-      break;
-    }
-    case "propto": {
-      let node_ = <ast.ASTPropTo>node;
-      console.log("( PropTo ");
-      console.log("{");
-      parserPrettyPrinter(node_.l);
-      console.log("}");
-      console.log("{");
-      parserPrettyPrinter(node_.r);
-      console.log("}");
-      console.log(")");
-      break;
-    }
-  }
 }
