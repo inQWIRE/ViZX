@@ -42,7 +42,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr.concat(" + ").concat(snd[1].expr),
+        expr: fst.expr.concat("+").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Sub: {
@@ -51,7 +51,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr.concat(" - ").concat(snd[1].expr),
+        expr: fst.expr.concat("-").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Mul: {
@@ -60,7 +60,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr.concat(" * ").concat(snd[1].expr),
+        expr: fst.expr.concat("*").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Div: {
@@ -69,7 +69,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr.concat(" / ").concat(snd[1].expr),
+        expr: fst.expr.concat("/").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     case lex.TokenKind.Exp: {
@@ -78,7 +78,7 @@ function applyBinOp(fst: ast.Num, snd: [Token, ast.Num]): ast.Num {
         left: fst,
         right: snd[1],
         kind: "num",
-        expr: fst.expr.concat(" ^ ").concat(snd[1].expr),
+        expr: fst.expr.concat("^").concat(snd[1].expr),
       } as ast.ArithOp;
     }
     default: {
@@ -95,7 +95,7 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
     args: args[2],
     val: args[0].text,
     expr: args[0].text
-      .concat(" (")
+      .concat("(")
       .concat(args[2].map((x) => x.expr).join(" "))
       .concat(")"),
   } as ast.NumFunc;
@@ -199,14 +199,14 @@ function applyUnaryOp(args: [Token, Token[], ast.Num]): ast.Num {
     val: args[1]
       .map((x) => x.text)
       .join(" ")
-      .concat(" (")
+      .concat("(")
       .concat(args[2].expr)
       .concat(")".repeat(args[1].length)),
     kind: "num",
     expr: args[1]
       .map((x) => x.text)
       .join(" ")
-      .concat(" (")
+      .concat("(")
       .concat(args[2].expr)
       .concat(")".repeat(args[1].length)),
   } as ast.Num;
@@ -362,7 +362,7 @@ ZXBASETERM.setPattern(
       ),
       applySpider
     ),
-    kmid(tok(lex.TokenKind.LParen), ASTNODE, tok(lex.TokenKind.RParen))
+    kmid(tok(lex.TokenKind.LParen), ZXTRANSFORML0, tok(lex.TokenKind.RParen))
   )
 );
 
@@ -402,7 +402,10 @@ function applySpider(args: [Token, ast.Num, ast.Num, ast.Num]): ast.ASTNode {
 ZXSTACKCOMPOSE.setPattern(
   lrec_sc(
     ZXBASETERM,
-    seq(alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)), ZXBASETERM),
+    seq(
+      alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)),
+      alt(ZXBASETERM, ZXCAST)
+    ),
     applyStackCompose
   )
 );
@@ -454,7 +457,7 @@ ZXNSTACK.setPattern(
     seq(
       NUML40,
       alt(tok(lex.TokenKind.NStack), tok(lex.TokenKind.NStack1)),
-      alt(ZXSTACKCOMPOSE, ZXNSTACK)
+      alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST)
     ),
     applyNStack
   )
@@ -488,7 +491,7 @@ ZXTRANSFORML10.setPattern(
     seq(
       rep_sc(tok(lex.TokenKind.ColorSwap)),
       lrec_sc(
-        alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST, ZXPROPTO),
+        alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST),
         tok(lex.TokenKind.Conjugate),
         applyTransformPost
       )
@@ -543,7 +546,7 @@ function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
   return { kind: "propto", l: args[0], r: args[2] } as ast.ASTPropTo;
 }
 
-ASTNODE.setPattern(ZXTRANSFORML0);
+ASTNODE.setPattern(alt(ZXTRANSFORML0, ZXPROPTO));
 
 export function parseAST(expr: string): ast.ASTNode {
   lexerPrettyPrinter(expr);

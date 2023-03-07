@@ -1,28 +1,28 @@
-export const addOp = "+";
-export const subOp = "-";
-export const mulOp = "*";
-export const divOp = "/";
-export const rootOp = "√";
-export const expOp = "^";
+export const ADD_OP = "+";
+export const SUB_OP = "-";
+export const MUL_OP = "*";
+export const DIV_OP = "/";
+export const ROOT_OP = "√";
+export const EXP_OP = "^";
 
-export const nStackOp = "⇑";
-export const compOp = "⟷";
-export const stackOp = "↕"; // \updownarrow
-export const nStack1Op = "↑"; //\longleftrightarrow
+export const N_STACK_OP = "⇑";
+export const COMPOSE_OP = "⟷";
+export const STACK_OP = "↕"; // \updownarrow
+export const N_STACK_1_OP = "↑"; //\longleftrightarrow
 
-export const propTo = "∝";
-export const cap = "⊂";
-export const cup = "⊃";
-export const wire = "—";
-export const box = "□";
-export const swap = "⨉";
-export const empty = "⦰";
+export const PROP_TO = "∝";
+export const CAP = "⊂";
+export const CUP = "⊃";
+export const WIRE = "—";
+export const BOX = "□";
+export const SWAP = "⨉";
+export const EMPTY = "⦰";
 
-export const transposeTransform = "⊤";
-export const conjugateTransform = "⊼";
-export const adjointTransform = "†";
-export const colorswapTransform = "⊙";
-export const flipTransform = "⥍";
+export const TRANSPOSE_TRANSFORM = "⊤";
+export const CONJUGATE_TRANSFORM = "⊼";
+export const ADJOINT_TRANSFORM = "†";
+export const COLORSWAP_TRANSFORM = "⊙";
+export const FLIP_TRANSFORM = "⥍";
 
 export const SCALE = 100;
 export const BASE_SIZE = 1 * SCALE;
@@ -32,14 +32,13 @@ export const CAST_SIZE = 0.3 * SCALE;
 export const TEXT_PAD_SIZE = 0.1 * SCALE;
 export const FUNC_ARG_SIZE = 0.4 * SCALE;
 
-export const number_kinds = ["realnum", "num", "numvar", "numfunc", "real01"];
+export const NUMBER_KINDS = ["realnum", "num", "numvar", "numfunc", "real01"];
 
 // yeah yeah not really a constant whatever
 export let CANVAS_WIDTH = 500;
 export let CANVAS_HEIGHT = 500;
 
 export function setCanvasWidthHeight(wh: [number, number]) {
-  console.log("setting width n height: ", wh);
   CANVAS_WIDTH = wh[0];
   CANVAS_HEIGHT = wh[1];
   boundary = {
@@ -62,14 +61,14 @@ export function setCanvasWidthHeight(wh: [number, number]) {
   };
 }
 
-export const ver_pad = 100;
-export const hor_pad = 100;
+export const VER_PAD = 100;
+export const HOR_PAD = 100;
 
-export const stack_dash: [number, number] = [10, 10];
-export const compose_dash: [number, number] = [6, 6];
-export const cast_dash: [number, number] = [3, 3];
-export const propto_dash: [number, number] = [1, 1];
-export const function_dash: [number, number] = [3, 15];
+export const STACK_DASH: [number, number] = [10, 10];
+export const COMPOSE_DASH: [number, number] = [6, 6];
+export const CAST_DASH: [number, number] = [3, 3];
+export const PROPTO_DASH: [number, number] = [1, 1];
+export const FUNCTION_DASH: [number, number] = [3, 15];
 
 export let boundary = {
   tl: {

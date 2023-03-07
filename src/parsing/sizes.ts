@@ -4,9 +4,9 @@ import {
   CAST_SIZE,
   PAD_SIZE,
   PROPTO_SIZE,
-  hor_pad,
-  ver_pad,
-  number_kinds,
+  HOR_PAD,
+  VER_PAD,
+  NUMBER_KINDS,
   FUNC_ARG_SIZE,
   SCALE,
 } from "../constants/consts";
@@ -124,7 +124,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       // TODO
       let node_ = <ast.ASTFunc>node;
       for (let arg of node_.args) {
-        if (number_kinds.includes(arg.kind)) {
+        if (NUMBER_KINDS.includes(arg.kind)) {
           node.hor_len += FUNC_ARG_SIZE;
         } else {
           let arg_ = <ast.ASTNode>arg;
@@ -189,7 +189,7 @@ export function determineCanvasWidthHeight(
 ): [number, number] {
   const max_width = node.hor_len!;
   const max_height = node.ver_len!;
-  let ver = 100 - (max_height % SCALE) + max_height + 2 * hor_pad;
-  let hor = 100 - (max_width % SCALE) + max_width + 2 * ver_pad;
+  let ver = 100 - (max_height % SCALE) + max_height + 2 * HOR_PAD;
+  let hor = 100 - (max_width % SCALE) + max_width + 2 * VER_PAD;
   return [hor, ver];
 }

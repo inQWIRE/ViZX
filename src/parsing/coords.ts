@@ -2,7 +2,7 @@ import * as ast from "./ast";
 import {
   CAST_SIZE,
   PAD_SIZE,
-  number_kinds,
+  NUMBER_KINDS,
   FUNC_ARG_SIZE,
 } from "../constants/consts";
 import { quad, coord } from "../constants/types";
@@ -331,7 +331,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       for (let arg of node_.args) {
         in_bound.tl.x += PAD_SIZE;
         in_bound.bl.x += PAD_SIZE;
-        if (number_kinds.includes(arg.kind)) {
+        if (NUMBER_KINDS.includes(arg.kind)) {
           in_bound.tr.x = in_bound.tl.x + FUNC_ARG_SIZE;
           in_bound.br.x = in_bound.bl.x + FUNC_ARG_SIZE;
         } else {
