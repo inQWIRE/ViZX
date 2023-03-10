@@ -24,13 +24,20 @@ export const ADJOINT_TRANSFORM = "†";
 export const COLORSWAP_TRANSFORM = "⊙";
 export const FLIP_TRANSFORM = "⥍";
 
-export const SCALE = 100;
+// SCALE = size of base square, ideally do not go below 100 or it'll be too small
+export const SCALE = 150;
 export const BASE_SIZE = 1 * SCALE;
 export const PAD_SIZE = 0.1 * SCALE;
 export const PROPTO_SIZE = 0.2 * SCALE;
 export const CAST_SIZE = 0.3 * SCALE;
-export const TEXT_PAD_SIZE = 0.1 * SCALE;
+export const TEXT_PAD_SIZE = 0.08 * SCALE;
+export const DOTS_PAD_SIZE = 0.1 * SCALE;
 export const FUNC_ARG_SIZE = 0.4 * SCALE;
+export const SMALL_TEXT_SIZE = (SCALE / 10).toString().concat("px");
+export const MEDIUM_TEXT_SIZE = (SCALE / 7).toString().concat("px");
+export const LARGE_TEXT_SIZE = (SCALE / 2).toString().concat("px");
+export const MONOSPACE_FONT = "Monospace";
+export const ARIAL_FONT = "Arial";
 
 export const NUMBER_KINDS = ["realnum", "num", "numvar", "numfunc", "real01"];
 

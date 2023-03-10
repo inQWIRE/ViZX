@@ -94,10 +94,7 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
     fname: args[0].text,
     args: args[2],
     val: args[0].text,
-    expr: args[0].text
-      .concat("(")
-      .concat(args[2].map((x) => x.expr).join(" "))
-      .concat(")"),
+    expr: args[0].text.concat(" ").concat(args[2].map((x) => x.expr).join(" ")),
   } as ast.NumFunc;
 }
 
@@ -134,7 +131,10 @@ NUML0.setPattern(
       seq(tok(lex.TokenKind.Sub), tok(lex.TokenKind.NumberToken)),
       applySign
     ),
-    kmid(tok(lex.TokenKind.LParen), NUML40, tok(lex.TokenKind.RParen)),
+    apply(
+      seq(tok(lex.TokenKind.LParen), NUML40, tok(lex.TokenKind.RParen)),
+      applyParens
+    ),
     apply(tok(lex.TokenKind.Str), applyNumVar)
   )
 );
@@ -199,16 +199,20 @@ function applyUnaryOp(args: [Token, Token[], ast.Num]): ast.Num {
     val: args[1]
       .map((x) => x.text)
       .join(" ")
-      .concat("(")
-      .concat(args[2].expr)
-      .concat(")".repeat(args[1].length)),
+      .concat(args[2].expr),
     kind: "num",
     expr: args[1]
       .map((x) => x.text)
       .join(" ")
-      .concat("(")
-      .concat(args[2].expr)
-      .concat(")".repeat(args[1].length)),
+      .concat(args[2].expr),
+  } as ast.Num;
+}
+
+function applyParens(args: [Token, ast.Num, Token]): ast.Num {
+  return {
+    val: "(".concat(args[1].expr).concat(")"),
+    kind: "num",
+    expr: "(".concat(args[1].expr).concat(")"),
   } as ast.Num;
 }
 

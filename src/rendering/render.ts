@@ -28,6 +28,12 @@ import {
   STACK_OP,
   N_STACK_OP,
   N_STACK_1_OP,
+  DOTS_PAD_SIZE,
+  LARGE_TEXT_SIZE,
+  MONOSPACE_FONT,
+  MEDIUM_TEXT_SIZE,
+  SMALL_TEXT_SIZE,
+  ARIAL_FONT,
 } from "../constants/consts";
 import {
   findCenter,
@@ -46,7 +52,8 @@ const white = "#FFFFFF";
 const black = "#000000";
 const red = "#FFA4A4";
 const green = "#A4FFA4";
-const gray = "#787878";
+const gray = "#303030";
+const white_trans = "rgba(255, 255, 255, 0.5)";
 // just for testing
 // canvas.width = CANVAS_WIDTH;
 // canvas.height = CANVAS_HEIGHT;
@@ -157,14 +164,14 @@ function drawNWireNode(node: ast.ASTNode) {
   ctx.lineTo(node.boundary!.br.x - PAD_SIZE, node.boundary!.br.y - PAD_SIZE);
   ctx.stroke();
   text_format("nwire_dots", ".");
-  ctx.fillText(".", center.x, center.y + 1.5 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y - 1.5 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y + 2 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y - 2 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y + 2.5 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y - 2.5 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y + 3 * TEXT_PAD_SIZE);
-  ctx.fillText(".", center.x, center.y - 3 * TEXT_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 1.5 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 1.5 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 2 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 2 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 2.5 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 2.5 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y + 3 * DOTS_PAD_SIZE);
+  ctx.fillText(".", center.x, center.y - 3 * DOTS_PAD_SIZE);
 }
 
 function drawStackNode(node: ast.ASTNode) {
@@ -255,16 +262,32 @@ function drawCastNode(node: ast.ASTNode) {
   drawBoundary(cast.boundary!, CAST_DASH);
   let lc = findLeftCenter(cast.boundary!);
   let rc = findRightCenter(cast.boundary!);
+  ctx.save();
+  ctx.translate(cast.node.boundary!.tl.x - TEXT_PAD_SIZE, lc.y);
+  let max_width: undefined | number = undefined;
+  if (cast.m.expr.length > 4) {
+    ctx.rotate(Math.PI / 2);
+    max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
+  }
   text_format("cast_in_background", cast.m.expr);
-  const in_arr = Array(cast.m.expr.length).fill("█").join();
-  ctx.fillText(in_arr, cast.node.boundary!.tl.x - TEXT_PAD_SIZE, lc.y);
+  const in_arr = Array(cast.m.expr.length).fill("█").join("");
+  ctx.fillText(in_arr, 0, 0, max_width);
   text_format("cast_in", cast.m.expr);
-  ctx.fillText(cast.m.expr, cast.node.boundary!.tl.x - TEXT_PAD_SIZE, lc.y);
+  ctx.fillText(cast.m.expr, 0, 0, max_width);
+  ctx.restore();
+  ctx.save();
+  ctx.translate(cast.node.boundary!.tr.x + TEXT_PAD_SIZE, rc.y);
+  max_width = undefined;
+  if (cast.n.expr.length > 4) {
+    ctx.rotate(-Math.PI / 2);
+    max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
+  }
   text_format("cast_out_background", cast.n.expr);
-  const out_arr = Array(cast.n.expr.length).fill("█").join();
-  ctx.fillText(out_arr, cast.node.boundary!.tr.x - TEXT_PAD_SIZE, rc.y);
+  const out_arr = Array(cast.n.expr.length).fill("█").join("");
+  ctx.fillText(out_arr, 0, 0, max_width);
   text_format("cast_out", cast.n.expr);
-  ctx.fillText(cast.n.expr, cast.node.boundary!.tr.x + TEXT_PAD_SIZE, rc.y);
+  ctx.fillText(cast.n.expr, 0, 0, max_width);
+  ctx.restore();
 }
 
 function drawBaseNode(node: ast.ASTNode) {
@@ -356,122 +379,145 @@ function drawBaseNode(node: ast.ASTNode) {
   let center = findCenter(node.boundary!);
   let left = findLeftCenter(node.boundary!);
   let right = findRightCenter(node.boundary!);
+  let max_width: number | undefined = undefined;
   text_format("spider_alpha", alpha);
-  ctx.strokeText(alpha, center.x, center.y);
+  max_width = (3 * node.hor_len!) / 4;
+  ctx.fillText(alpha, center.x, center.y, max_width);
   ctx.save();
   ctx.translate(right.x - TEXT_PAD_SIZE, right.y);
-  ctx.rotate(-Math.PI / 2);
+  max_width = undefined;
+  if (outputs.length > 4) {
+    ctx.rotate(-Math.PI / 2);
+    max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
+  }
+  text_format("spider_in_out_background", outputs);
+  const out_arr = Array(outputs.length).fill("█").join("");
+  ctx.fillText(out_arr, 0, 0, max_width);
   text_format("spider_in_out", outputs);
-  ctx.fillText(outputs, 0, 0);
+  ctx.fillText(outputs, 0, 0, max_width);
   ctx.restore();
   ctx.save();
+  max_width = undefined;
   ctx.translate(left.x + TEXT_PAD_SIZE, left.y);
-  ctx.rotate(Math.PI / 2);
+  if (inputs.length > 4) {
+    max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
+    ctx.rotate(Math.PI / 2);
+  }
+  text_format("spider_in_out_background", inputs);
+  const in_arr = Array(inputs.length).fill("█").join("");
+  ctx.fillText(in_arr, 0, 0, max_width);
   text_format("spider_in_out", inputs);
-  ctx.fillText(inputs, 0, 0);
+  ctx.fillText(inputs, 0, 0), max_width;
   ctx.restore();
 }
 
-function wrapText(text: string, x: number, y: number, max_width: number) {}
+// fit text within max width
+function wrapText(text: string, x: number, y: number, maxWidth: number) {
+  // TODO
+}
 
 function text_format(loc: string, text: string) {
   switch (loc) {
     case "spider_in_out": {
-      ctx.font = "10px Arial";
+      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
       ctx.fillStyle = gray;
       break;
     }
+    case "spider_in_out_background": {
+      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = white_trans;
+      break;
+    }
     case "spider_alpha": {
-      ctx.font = "15px Arial";
+      if (text.length > 10) {
+        ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      } else {
+        ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      }
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
-    case "stack_compose": {
-      ctx.font = "15px Arial";
+    case "cast_in": {
+      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "blue";
-      break;
-    }
-    case "cast_in": {
-      ctx.font = "10px Arial";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "cast_out": {
-      ctx.font = "10px Arial";
-      ctx.textAlign = "left";
+      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "cast_in_background": {
-      ctx.font = "10px Arial";
-      ctx.textAlign = "right";
+      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "white";
+      ctx.fillStyle = white_trans;
       break;
     }
     case "cast_out_background": {
-      ctx.font = "10px Arial";
-      ctx.textAlign = "left";
+      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "white";
+      ctx.fillStyle = white_trans;
       break;
     }
     case "nwire": {
-      ctx.font = "15px Arial";
+      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "nwire_dots": {
-      ctx.font = "15px Arial";
+      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "alphabetic";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "propto": {
-      ctx.font = "50px Arial";
+      ctx.font = LARGE_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "transform": {
-      ctx.font = "15px Arial";
+      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "nstack": {
-      ctx.font = "15px Arial";
+      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     case "function": {
-      ctx.font = "15px Arial";
+      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
     default: {
-      ctx.font = "15px Arial";
+      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "black";
+      ctx.fillStyle = black;
       break;
     }
   }
@@ -537,11 +583,11 @@ function render(this: Window, msg: MessageEvent<any>) {
   let command = msg.data.command;
   let node: ast.ASTNode = JSON.parse(command);
   setCanvasWidthHeight(determineCanvasWidthHeight(node));
-  canvas_format();
+  formatCanvas();
   draw(node);
 }
 
-function canvas_format() {
+function formatCanvas() {
   console.log("setting width, height in render: ", CANVAS_WIDTH, CANVAS_HEIGHT);
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;

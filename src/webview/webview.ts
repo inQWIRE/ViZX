@@ -21,7 +21,7 @@ export function getCanvasHtml(
     Uri.file(path.join(basePath, "out", "render.js"))
   );
   const cssUri = panel.webview.asWebviewUri(
-    Uri.file(path.join(basePath, "src", "runtime", "index.css"))
+    Uri.file(path.join(basePath, "src", "rendering", "index.css"))
   );
 
   const html = `<!DOCTYPE html>

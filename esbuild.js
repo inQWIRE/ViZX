@@ -28,14 +28,14 @@ const webviewConfig = {
   ...baseConfig,
   target: "es2020",
   format: "esm",
-  entryPoints: ["./src/runtime/render.ts"],
+  entryPoints: ["./src/rendering/render.ts"],
   outfile: "./out/render.js",
   plugins: [
     // Copy webview css files to `out` directory unaltered
     copy({
       resolveFrom: "cwd",
       assets: {
-        from: ["./src/runtime/*.css"],
+        from: ["./src/rendering/*.css"],
         to: ["./out"],
       },
     }),
