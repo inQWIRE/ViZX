@@ -18,7 +18,6 @@ import {
 import { diff } from "deep-object-diff";
 
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
-// TODO change parser rule names to something reasonable
 
 import * as ast from "./ast";
 import * as lex from "./lexer";
@@ -192,7 +191,6 @@ NUML40.setPattern(
   lrec_sc(NUML30, seq(tok(lex.TokenKind.Exp), NUML30), applyBinOp)
 );
 
-// todo check actual tokens
 function applyUnaryOp(args: [Token, Token[], ast.Num]): ast.Num {
   args[1].unshift(args[0]);
   return {
@@ -489,7 +487,6 @@ ZXPROPTO.setPattern(
   )
 );
 
-// todo add conjugate
 ZXTRANSFORML10.setPattern(
   apply(
     seq(

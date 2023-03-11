@@ -90,7 +90,6 @@ export const lexer = buildLexer([
 
   [true, new RegExp(`\^[${c.STACK_OP}]`, "g"), TokenKind.Stack],
   [true, new RegExp(`\^[${c.N_STACK_OP}]`, "g"), TokenKind.NStack],
-  // TODO differentiate nstack, nstack1
   [true, new RegExp(`\^[${c.N_STACK_1_OP}]`, "g"), TokenKind.NStack1],
   [true, new RegExp(`\^[${c.COMPOSE_OP}]`, "g"), TokenKind.Compose],
 

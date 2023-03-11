@@ -6,8 +6,6 @@ export interface ASTNode {
   boundary?: quad;
 }
 
-// TODO see if there is some way of initializing the interfaces? just so the kinds are pre-populated
-
 export enum ZXConst {
   Swap,
   Empty,

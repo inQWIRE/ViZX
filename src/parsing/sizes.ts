@@ -114,14 +114,12 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         inner_node.ver_len !== undefined &&
         inner_node.hor_len !== undefined
       ) {
-        // TODO if pad
         node.ver_len += inner_node.ver_len + 2 * PAD_SIZE;
         node.hor_len += inner_node.hor_len + 2 * CAST_SIZE;
       }
       break;
     }
     case "function": {
-      // TODO
       let node_ = <ast.ASTFunc>node;
       for (let arg of node_.args) {
         if (NUMBER_KINDS.includes(arg.kind)) {
@@ -153,7 +151,6 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         );
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-        // add space between TODO
         node.hor_len +=
           sleft.hor_len + sright.hor_len + PROPTO_SIZE + 4 * PAD_SIZE;
       } else {
