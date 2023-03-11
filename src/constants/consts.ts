@@ -33,6 +33,7 @@ export const CAST_SIZE = 0.3 * SCALE;
 export const TEXT_PAD_SIZE = 0.08 * SCALE;
 export const DOTS_PAD_SIZE = 0.1 * SCALE;
 export const FUNC_ARG_SIZE = 0.4 * SCALE;
+export const REALLY_SMALL_TEXT_SIZE = (SCALE / 15).toString().concat("px");
 export const SMALL_TEXT_SIZE = (SCALE / 10).toString().concat("px");
 export const MEDIUM_TEXT_SIZE = (SCALE / 7).toString().concat("px");
 export const LARGE_TEXT_SIZE = (SCALE / 2).toString().concat("px");

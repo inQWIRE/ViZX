@@ -34,6 +34,7 @@ import {
   MEDIUM_TEXT_SIZE,
   SMALL_TEXT_SIZE,
   ARIAL_FONT,
+  REALLY_SMALL_TEXT_SIZE,
 } from "../constants/consts";
 import {
   findCenter,
@@ -381,8 +382,20 @@ function drawBaseNode(node: ast.ASTNode) {
   let right = findRightCenter(node.boundary!);
   let max_width: number | undefined = undefined;
   text_format("spider_alpha", alpha);
-  max_width = (3 * node.hor_len!) / 4;
-  ctx.fillText(alpha, center.x, center.y, max_width);
+  max_width = node.hor_len! / 2;
+  if (ctx.measureText(alpha).width > max_width) {
+    wrapText(
+      alpha,
+      center.x,
+      center.y,
+      max_width,
+      ctx.measureText(alpha).actualBoundingBoxAscent +
+        ctx.measureText(alpha).actualBoundingBoxDescent,
+      false
+    );
+  } else {
+    ctx.fillText(alpha, center.x, center.y, max_width);
+  }
   ctx.save();
   ctx.translate(right.x - TEXT_PAD_SIZE, right.y);
   max_width = undefined;
@@ -392,9 +405,27 @@ function drawBaseNode(node: ast.ASTNode) {
   }
   text_format("spider_in_out_background", outputs);
   const out_arr = Array(outputs.length).fill("█").join("");
-  ctx.fillText(out_arr, 0, 0, max_width);
+  wrapText(
+    outputs,
+    0,
+    0,
+    max_width!,
+    ctx.measureText(outputs).actualBoundingBoxAscent +
+      ctx.measureText(outputs).actualBoundingBoxDescent,
+    true
+  );
+  // ctx.fillText(out_arr, 0, 0, max_width);
   text_format("spider_in_out", outputs);
-  ctx.fillText(outputs, 0, 0, max_width);
+  wrapText(
+    outputs,
+    0,
+    0,
+    max_width!,
+    ctx.measureText(outputs).actualBoundingBoxAscent +
+      ctx.measureText(outputs).actualBoundingBoxDescent,
+    false
+  );
+  // ctx.fillText(outputs, 0, 0, max_width);
   ctx.restore();
   ctx.save();
   max_width = undefined;
@@ -405,28 +436,103 @@ function drawBaseNode(node: ast.ASTNode) {
   }
   text_format("spider_in_out_background", inputs);
   const in_arr = Array(inputs.length).fill("█").join("");
-  ctx.fillText(in_arr, 0, 0, max_width);
+  wrapText(
+    inputs,
+    0,
+    0,
+    max_width!,
+    ctx.measureText(inputs).actualBoundingBoxAscent +
+      ctx.measureText(inputs).actualBoundingBoxDescent,
+    true
+  );
+  // ctx.fillText(in_arr, 0, 0, max_width);
   text_format("spider_in_out", inputs);
-  ctx.fillText(inputs, 0, 0), max_width;
+  wrapText(
+    inputs,
+    0,
+    0,
+    max_width!,
+    ctx.measureText(inputs).actualBoundingBoxAscent +
+      ctx.measureText(inputs).actualBoundingBoxDescent,
+    false
+  );
+  // ctx.fillText(inputs, 0, 0, max_width);
   ctx.restore();
 }
 
 // fit text within max width
-function wrapText(text: string, x: number, y: number, maxWidth: number) {
-  // TODO
+function wrapText(
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  background: boolean
+) {
+  let separated = text.split("(");
+  let line = "";
+  let lc = 0;
+  for (let i = 0; i < separated.length; i++) {
+    let testLine = line.concat(separated[i]);
+    if (i !== separated.length - 1) {
+      testLine = testLine.concat("(");
+    }
+    let metrics = ctx.measureText(testLine);
+    let testWidth = metrics.width;
+    if (testWidth > maxWidth && i > 0) {
+      lc++;
+      line = separated[i];
+      if (i !== separated.length - 1) {
+        line = line.concat("(");
+      }
+    } else {
+      line = testLine;
+    }
+  }
+  line = "";
+  y -= (lc / 2) * lineHeight;
+  for (let i = 0; i < separated.length; i++) {
+    let testLine = line.concat(separated[i]);
+    if (i !== separated.length - 1) {
+      testLine = testLine.concat("(");
+    }
+    let metrics = ctx.measureText(testLine);
+    let testWidth = metrics.width;
+    if (testWidth > maxWidth && i > 0) {
+      if (background) {
+        ctx.fillText(Array(line.length).fill("█").join(""), x, y);
+      }
+      ctx.fillText(line, x, y);
+      line = separated[i];
+      if (i !== separated.length - 1) {
+        line = line.concat("(");
+      }
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  if (background) {
+    ctx.fillText(Array(line.length).fill("█").join(""), x, y);
+  }
+  ctx.fillText(line, x, y);
 }
 
 function text_format(loc: string, text: string) {
+  let small_text = SMALL_TEXT_SIZE;
+  if (text.length > 15) {
+    small_text = REALLY_SMALL_TEXT_SIZE;
+  }
   switch (loc) {
     case "spider_in_out": {
-      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.font = small_text.concat(" ").concat(MONOSPACE_FONT);
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
       ctx.fillStyle = gray;
       break;
     }
     case "spider_in_out_background": {
-      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.font = small_text.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = white_trans;
