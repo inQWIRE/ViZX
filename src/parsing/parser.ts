@@ -403,7 +403,7 @@ function applySpider(args: [Token, ast.Num, ast.Num, ast.Num]): ast.ASTNode {
 
 ZXSTACKCOMPOSE.setPattern(
   lrec_sc(
-    ZXBASETERM,
+    alt(ZXBASETERM, ZXCAST),
     seq(
       alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)),
       alt(ZXBASETERM, ZXCAST)
@@ -459,7 +459,7 @@ ZXNSTACK.setPattern(
     seq(
       NUML40,
       alt(tok(lex.TokenKind.NStack), tok(lex.TokenKind.NStack1)),
-      alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST)
+      alt(ZXSTACKCOMPOSE, ZXNSTACK)
     ),
     applyNStack
   )
@@ -479,9 +479,9 @@ ZXCAST.setPattern(
 ZXPROPTO.setPattern(
   apply(
     seq(
-      alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST),
+      alt(ZXSTACKCOMPOSE, ZXNSTACK),
       tok(lex.TokenKind.PropTo),
-      alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST)
+      alt(ZXSTACKCOMPOSE, ZXNSTACK)
     ),
     applyPropTo
   )
@@ -492,7 +492,7 @@ ZXTRANSFORML10.setPattern(
     seq(
       rep_sc(tok(lex.TokenKind.ColorSwap)),
       lrec_sc(
-        alt(ZXSTACKCOMPOSE, ZXNSTACK, ZXCAST),
+        alt(ZXSTACKCOMPOSE, ZXNSTACK),
         tok(lex.TokenKind.Conjugate),
         applyTransformPost
       )
