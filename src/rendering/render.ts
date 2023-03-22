@@ -38,8 +38,6 @@ import {
   findCenter,
   findLeftCenter,
   findRightCenter,
-  findBottomCenter,
-  findTopCenter,
 } from "../parsing/coords";
 import { quad } from "../constants/types";
 import { determineCanvasWidthHeight } from "../parsing/sizes";

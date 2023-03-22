@@ -49,8 +49,6 @@ export enum TokenKind {
 }
 
 // longest parse, ties broken by array index
-
-// — ↕ (Z) n (S (S m)) α
 export const lexer = buildLexer([
   [true, /^\d+/g, TokenKind.NumberToken],
   [true, /^[Z]/g, TokenKind.ZToken],
@@ -105,5 +103,5 @@ export function lexerPrettyPrinter(expr: string) {
     printlx += TokenKind[lx.kind] + ", ";
     lx = lx?.next;
   }
-  console.log(printlx);
+  console.log(printlx.substring(0, printlx.length - 1));
 }
