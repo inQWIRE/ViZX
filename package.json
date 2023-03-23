@@ -1,6 +1,6 @@
 {
-  "name": "vyzxviz",
-  "displayName": "VyZXViz",
+  "name": "vizx",
+  "displayName": "ViZX",
   "description": "Visualizer for the ZX calculus",
   "version": "0.0.1",
   "engines": {
@@ -10,14 +10,14 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vyzxviz.render"
+    "onCommand:vizx.render"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vyzxviz.render",
-        "title": "Render expressions with VyZXViz"
+        "command": "vizx.render",
+        "title": "Render expressions with ViZX"
       }
     ]
   },

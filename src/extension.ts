@@ -12,11 +12,11 @@ import { getCanvasHtml } from "./webview/webview";
 export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "vyzxviz" is now active!');
+  console.log('Congratulations, your extension "ViZX" is now active!');
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand("vyzxviz.render", () => {
+  let disposable = vscode.commands.registerCommand("vizx.render", () => {
     const inputBox = vscode.window
       .showInputBox()
       .then((expr) => {
@@ -40,8 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
         const panel = vscode.window.createWebviewPanel(
-          "VyZXViz",
-          `VyZX Viz: ${expr}`,
+          "ViZX",
+          `ViZX: ${expr}`,
           vscode.ViewColumn.One,
           {
             enableScripts: true,
