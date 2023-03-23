@@ -4,6 +4,7 @@
   "description": "Visualizer for the ZX calculus",
   "version": "0.0.1",
   "repository": "https://github.com/inQWIRE/VyZXViz/",
+  "publisher": "inQWIRE",
   "engines": {
     "vscode": "^1.74.0"
   },
