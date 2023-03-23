@@ -17,48 +17,43 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand("vizx.render", () => {
-    const inputBox = vscode.window
-      .showInputBox()
-      .then((expr) => {
-        if (expr === undefined) {
-          return;
-        }
-        let node: ast.ASTNode;
-        try {
-          node = parser.parseAST(expr);
-          console.log("parsed: ", node);
-          node = sizer.addSizes(node);
-          console.log("sized: ", node);
-          const size = sizer.determineCanvasWidthHeight(node);
-          setCanvasWidthHeight(size);
-          node = coord.addCoords(node, boundary);
-          console.log(node);
-        } catch (e) {
-          vscode.window.showErrorMessage(
-            `Error rendering your VyZX expression (${expr}): ${e}`
-          );
-          return;
-        }
-        const panel = vscode.window.createWebviewPanel(
-          "ViZX",
-          `ViZX: ${expr}`,
-          vscode.ViewColumn.One,
-          {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-          }
+    const inputBox = vscode.window.showInputBox().then((expr) => {
+      if (expr === undefined) {
+        return;
+      }
+      let node: ast.ASTNode;
+      try {
+        node = parser.parseAST(expr);
+        console.log("parsed: ", node);
+        node = sizer.addSizes(node);
+        console.log("sized: ", node);
+        const size = sizer.determineCanvasWidthHeight(node);
+        setCanvasWidthHeight(size);
+        node = coord.addCoords(node, boundary);
+        console.log(node);
+      } catch (e) {
+        vscode.window.showErrorMessage(
+          `Error rendering your VyZX expression (${expr}): ${e}`
         );
-        panel.webview.html = getCanvasHtml(panel, context);
-        panel.webview.onDidReceiveMessage((msg) => console.log(msg));
-        panel.webview.postMessage({ command: JSON.stringify(node) });
-        //    console.log(`message posted: ${JSON.stringify(node)}`);
-      })
-      .then(undefined, (err) => {
-        console.error("Error in extension.activate, ", err);
-      });
-  });
+        return;
+      }
+      const panel = vscode.window.createWebviewPanel(
+        "ViZX",
+        `ViZX: ${expr}`,
+        vscode.ViewColumn.One,
+        {
+          enableScripts: true,
+          retainContextWhenHidden: true,
+        }
+      );
+      panel.webview.html = getCanvasHtml(panel, context);
+      panel.webview.onDidReceiveMessage((msg) => console.log(msg));
+      panel.webview.postMessage({ command: JSON.stringify(node) });
+      //    console.log(`message posted: ${JSON.stringify(node)}`);
+    });
 
-  context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable);
+  });
 }
 
 // this method is called when your extension is deactivated

@@ -34,13 +34,7 @@ import {
   ARIAL_FONT,
   REALLY_SMALL_TEXT_SIZE,
 } from "../constants/consts";
-import {
-  findCenter,
-  findLeftCenter,
-  findRightCenter,
-  findBottomCenter,
-  findTopCenter,
-} from "../parsing/coords";
+import { findCenter, findLeftCenter, findRightCenter } from "../parsing/coords";
 import { quad } from "../constants/types";
 import { determineCanvasWidthHeight } from "../parsing/sizes";
 
