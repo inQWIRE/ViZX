@@ -1,0 +1,27 @@
+name: CI for Github
+
+on:
+  push:
+    branches: ["main", "bhakti-branch"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        coq_version: ["8.16"]
+        os: ["windows-latest", "ubuntu-latest", "macos-latest"]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm install
+      - name: Compile
+        run: npm run compile

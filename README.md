@@ -1,4 +1,6 @@
-# ViZX README
+# ViZX: A Visualizer for the ZX Calculus
+
+Install [here](https://marketplace.visualstudio.com/items?itemName=inQWIRE.vizx).
 
 To render, use command `Render Expressions with ViZX`.
 
