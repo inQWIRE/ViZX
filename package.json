@@ -13,7 +13,8 @@
   ],
   "activationEvents": [
     "onCommand:vizx.render",
-    "onCommand:vizx.lspRender"
+    "onCommand:vizx.lspRender",
+    "onCommand:vizx.activateRendering"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -25,6 +26,10 @@
       {
         "command": "vizx.lspRender",
         "title": "Render expressions with ViZX using CoqLSP information"
+      },
+      {
+        "command": "vizx.activateRendering",
+        "title": "Activate ViZX rendering"
       }
     ]
   },

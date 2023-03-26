@@ -26,6 +26,10 @@ export function activate(context: vscode.ExtensionContext) {
     renderCallback(context, expr)
   );
   context.subscriptions.push(disposable);
+  disposable = vscode.commands.registerCommand("vizx.activateRendering", () => {
+    vscode.window.showInformationMessage("Automatic rendering is now turned on.");
+  });
+  context.subscriptions.push(disposable);
 }
 
 function renderCallback(context: vscode.ExtensionContext, expr: any) {
@@ -33,6 +37,9 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
     if (expr === undefined) {
       console.log("no expression to be rendered");
       return;
+    }
+    if (expr.goals !== undefined) {
+      expr = expr.goals.goals[0];
     }
     console.log("expr: ", expr);
     let node: ast.ASTNode;
