@@ -26,12 +26,8 @@ jobs:
           node-version: 14
       - name: Install dependencies
         run: npm install
-      - name: Compile on linux
-        run: xvfb-run -a npm compile
-        if: runner.os == 'Linux'
-      - name: Compile on windows, macos
+      - name: Compile 
         run: npm compile
-        if: runner.os != 'Linux'
       - name: Publish
         if: success() && startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
         run: npm run deploy
