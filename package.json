@@ -12,7 +12,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vizx.render"
+    "onCommand:vizx.render",
+    "onCommand:vizx.lspRender"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -20,6 +21,10 @@
       {
         "command": "vizx.render",
         "title": "Render expressions with ViZX"
+      },
+      {
+        "command": "vizx.lspRender",
+        "title": "Render expressions with ViZX using CoqLSP information"
       }
     ]
   },
@@ -28,19 +33,19 @@
     "compile": "node ./esbuild.js",
     "package": "NODE_ENV=production node ./esbuild.js",
     "watch": "node ./esbuild.js --watch",
-    "lint": "eslint src --ext ts & npx prettier --write ."
+    "lint": "eslint src --ext ts & npx prettier --write .",
+    "deploy": "vsce publish --yarn"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
-    "@types/mocha": "^9.1.0",
     "@types/node": "14.x",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "@vscode/test-electron": "^2.1.3",
+    "@vscode/vsce": "^2.18.0",
     "eslint": "^8.11.0",
     "glob": "^7.2.0",
-    "mocha": "^9.2.2",
     "prettier": "2.8.4",
     "typescript": "^4.5.5"
   },

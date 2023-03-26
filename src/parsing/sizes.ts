@@ -186,7 +186,7 @@ export function determineCanvasWidthHeight(
 ): [number, number] {
   const max_width = node.hor_len!;
   const max_height = node.ver_len!;
-  let ver = 100 - (max_height % SCALE) + max_height + 2 * HOR_PAD;
-  let hor = 100 - (max_width % SCALE) + max_width + 2 * VER_PAD;
+  let ver = SCALE - (max_height % SCALE) + max_height + 2 * HOR_PAD;
+  let hor = SCALE - (max_width % SCALE) + max_width + 2 * VER_PAD;
   return [hor, ver];
 }
