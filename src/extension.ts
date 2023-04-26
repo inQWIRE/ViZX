@@ -86,7 +86,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
     }
     if (expr.arg1 !== undefined) {
       // extract correct field from lsp information
-      expr = expr.goals.goals[0].ty;
+      expr = expr.goals.goals[0].ty.toString();
     }
     console.log("expr: ", expr);
     if (openTabNames.includes(expr)) {
