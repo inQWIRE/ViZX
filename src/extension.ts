@@ -86,6 +86,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       return;
     }
     if (openWebview !== undefined) {
+      openTabNames.filter(x => x !== openWebview!.title);
       openWebview.dispose();
     }
     const panel = vscode.window.createWebviewPanel(
