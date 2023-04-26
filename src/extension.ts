@@ -84,7 +84,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       console.log("no expression to be rendered");
       return;
     }
-    if (expr.arg1 !== undefined) {
+    if (expr.goals !== undefined) {
       // extract correct field from lsp information
       expr = expr.goals.goals[0].ty.toString();
     }
