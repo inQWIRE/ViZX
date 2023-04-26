@@ -31,6 +31,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     case "spider": {
       node.hor_len += BASE_SIZE;
       node.ver_len += BASE_SIZE;
+      console.log("size = ", node.hor_len, ", ", node.ver_len);
       break;
     }
     case "var": {

@@ -403,10 +403,10 @@ function applySpider(args: [Token, ast.Num, ast.Num, ast.Num]): ast.ASTNode {
 
 ZXSTACKCOMPOSE.setPattern(
   lrec_sc(
-    alt(ZXBASETERM, ZXCAST),
+    alt(ZXBASETERM, ZXCAST, ZXNSTACK),
     seq(
       alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)),
-      alt(ZXBASETERM, ZXCAST)
+      alt(ZXBASETERM, ZXCAST, ZXNSTACK)
     ),
     applyStackCompose
   )
@@ -550,7 +550,7 @@ function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
 ASTNODE.setPattern(alt(ZXTRANSFORML0, ZXPROPTO));
 
 export function parseAST(expr: string): ast.ASTNode {
-  lexerPrettyPrinter(expr);
+  // lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
   // debugging only. should never have more than one
   if (parsed.successful && parsed.candidates.length > 1) {
