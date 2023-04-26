@@ -66,7 +66,7 @@ export function scaleUp() {
 export function scaleDown() {
   SCALE = SCALE * 0.9;
   CANVAS_WIDTH = CANVAS_WIDTH * 0.9;
-  CANVAS_HEIGHT = CANVAS_HEIGHT * 0.;
+  CANVAS_HEIGHT = CANVAS_HEIGHT * 0;
   BASE_SIZE = 1 * SCALE;
   PAD_SIZE = 0.1 * SCALE;
   PROPTO_SIZE = 0.2 * SCALE;
@@ -78,7 +78,6 @@ export function scaleDown() {
   SMALL_TEXT = (SCALE / 10).toString().concat("px");
   MEDIUM_TEXT = (SCALE / 7).toString().concat("px");
   LARGE_TEXT = (SCALE / 2).toString().concat("px");
-
 }
 
 export function setCanvasWidthHeight(wh: [number, number]) {

@@ -4,13 +4,18 @@ import * as vscode from "vscode";
 import * as parser from "./parsing/parser";
 import * as sizer from "./parsing/sizes";
 import * as coord from "./parsing/coords";
-import { boundary, setCanvasWidthHeight, scaleUp, scaleDown } from "./constants/consts";
+import {
+  boundary,
+  setCanvasWidthHeight,
+  scaleUp,
+  scaleDown,
+} from "./constants/consts";
 import * as consts from "./constants/consts";
 import * as ast from "./parsing/ast";
 import { getCanvasHtml } from "./webview/webview";
 
-let openTabNames : String[] = [];
-let openWebview : vscode.WebviewPanel | undefined = undefined;
+let openTabNames: String[] = [];
+let openWebview: vscode.WebviewPanel | undefined = undefined;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -37,21 +42,38 @@ export function activate(context: vscode.ExtensionContext) {
     );
   });
   context.subscriptions.push(disposable);
-  disposable = vscode.commands.registerCommand("vizx.deactivateRendering", () => {
-    deactivate();
-    (vscode.window.showInformationMessage(
-      "Automatic rendering is now turned off."
-    ));
-  });
+  disposable = vscode.commands.registerCommand(
+    "vizx.deactivateRendering",
+    () => {
+      deactivate();
+      vscode.window.showInformationMessage(
+        "Automatic rendering is now turned off."
+      );
+    }
+  );
   context.subscriptions.push(disposable);
   disposable = vscode.commands.registerCommand("vizx.scaleUp", () => {
     scaleUp();
-    console.log("SCALE: ", consts.SCALE, " HEIGHT: ", consts.CANVAS_HEIGHT, "WIDTH: ", consts.CANVAS_WIDTH)
+    console.log(
+      "SCALE: ",
+      consts.SCALE,
+      " HEIGHT: ",
+      consts.CANVAS_HEIGHT,
+      "WIDTH: ",
+      consts.CANVAS_WIDTH
+    );
   });
   context.subscriptions.push(disposable);
   disposable = vscode.commands.registerCommand("vizx.scaleDown", () => {
     scaleDown();
-    console.log("SCALE: ", consts.SCALE, " HEIGHT: ", consts.CANVAS_HEIGHT, "WIDTH: ", consts.CANVAS_WIDTH)
+    console.log(
+      "SCALE: ",
+      consts.SCALE,
+      " HEIGHT: ",
+      consts.CANVAS_HEIGHT,
+      "WIDTH: ",
+      consts.CANVAS_WIDTH
+    );
   });
   context.subscriptions.push(disposable);
 }
@@ -67,7 +89,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       expr = expr.goals.goals[0].ty;
     }
     console.log("expr: ", expr);
-    if(openTabNames.includes(expr)) {
+    if (openTabNames.includes(expr)) {
       return;
     }
     openTabNames.push(expr);
@@ -86,7 +108,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       return;
     }
     if (openWebview !== undefined) {
-      openTabNames.filter(x => x !== openWebview!.title);
+      openTabNames.filter((x) => x !== openWebview!.title);
       openWebview.dispose();
     }
     const panel = vscode.window.createWebviewPanel(
