@@ -15,8 +15,7 @@ import {
   rep_sc,
   rep,
 } from "typescript-parsec";
-import { diff } from "deep-object-diff";
-
+let _ = require('lodash');
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
 
 import * as ast from "./ast";
@@ -229,7 +228,6 @@ const ZXSTACKCOMPOSE = rule<lex.TokenKind, ast.ASTNode>();
 const ZXNSTACK = rule<lex.TokenKind, ast.ASTNode>();
 const ZXCAST = rule<lex.TokenKind, ast.ASTNode>();
 const ZXPROPTO = rule<lex.TokenKind, ast.ASTNode>();
-const ZXTRANSFORML10 = rule<lex.TokenKind, ast.ASTNode>();
 const ZXTRANSFORML0 = rule<lex.TokenKind, ast.ASTNode>();
 const ASTNODE = rule<lex.TokenKind, ast.ASTNode>();
 
@@ -459,7 +457,7 @@ ZXNSTACK.setPattern(
     seq(
       NUML40,
       alt(tok(lex.TokenKind.NStack), tok(lex.TokenKind.NStack1)),
-      alt(ZXSTACKCOMPOSE, ZXNSTACK)
+      ZXBASETERM
     ),
     applyNStack
   )
@@ -470,7 +468,7 @@ ZXCAST.setPattern(
     seq(
       kright(tok(lex.TokenKind.Cast$), NUML40),
       kright(tok(lex.TokenKind.Comma), NUML40),
-      kmid(tok(lex.TokenKind.Cast3Colon), ASTNODE, tok(lex.TokenKind.Cast$))
+      kmid(tok(lex.TokenKind.Cast3Colon), ZXTRANSFORML0, tok(lex.TokenKind.Cast$))
     ),
     applyCast
   )
@@ -479,21 +477,21 @@ ZXCAST.setPattern(
 ZXPROPTO.setPattern(
   apply(
     seq(
-      alt(ZXSTACKCOMPOSE, ZXNSTACK),
+      alt(ZXSTACKCOMPOSE, ZXCAST, ZXNSTACK),
       tok(lex.TokenKind.PropTo),
-      alt(ZXSTACKCOMPOSE, ZXNSTACK)
+      alt(ZXSTACKCOMPOSE, ZXCAST, ZXNSTACK)
     ),
     applyPropTo
   )
 );
 
-ZXTRANSFORML10.setPattern(
+ZXTRANSFORML0.setPattern(
   apply(
     seq(
       rep_sc(tok(lex.TokenKind.ColorSwap)),
       lrec_sc(
         alt(ZXSTACKCOMPOSE, ZXNSTACK),
-        tok(lex.TokenKind.Conjugate),
+        alt(tok(lex.TokenKind.Adjoint), tok(lex.TokenKind.Transpose), tok(lex.TokenKind.Conjugate)),
         applyTransformPost
       )
     ),
@@ -516,14 +514,6 @@ function nestColorSwap(node: ast.ASTNode): ast.ASTTransform {
     node: node,
   } as ast.ASTTransform;
 }
-
-ZXTRANSFORML0.setPattern(
-  lrec_sc(
-    ZXTRANSFORML10,
-    alt(tok(lex.TokenKind.Adjoint), tok(lex.TokenKind.Transpose)),
-    applyTransformPost
-  )
-);
 
 function applyTransformPost(node: ast.ASTNode, transform: Token): ast.ASTNode {
   let t;
@@ -553,11 +543,25 @@ export function parseAST(expr: string): ast.ASTNode {
   // lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
   // debugging only. should never have more than one
-  if (parsed.successful && parsed.candidates.length > 1) {
-    let i = 0;
-    while (i < parsed.candidates.length - 1) {
-      console.log(diff(parsed.candidates[i], parsed.candidates[i + 1]));
+  if (parsed.successful) {
+    for (let i = 0; i < parsed.candidates.length; i++) {
+      console.log(parsed.candidates[i].result);
     }
   }
+  if (parsed.successful && parsed.candidates.length > 1) {
+    let i = 0;
+    let flag = true;
+    while (i < parsed.candidates.length - 1) {
+      if (!(_.isEqual(parsed.candidates[i].result, parsed.candidates[i + 1].result))) {
+        flag = false; 
+        break;
+      }
+     i++;
+    }
+    if (flag) {
+      return parsed.candidates[0].result;
+    }
+  }
+  // console.log("candidate length = ", parsed.candidates.length);
   return expectSingleResult(parsed);
 }

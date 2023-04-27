@@ -103,12 +103,12 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       node = coord.addCoords(node, boundary);
     } catch (e) {
       vscode.window.showErrorMessage(
-        `Error rendering your VyZX expression (${expr}): ${e}`
+        `Error rendering your expression (${expr}): ${e}`
       );
       return;
     }
     if (openWebview !== undefined) {
-      openTabNames.filter((x) => x !== openWebview!.title);
+      openTabNames = openTabNames.filter((x) => x !== openWebview!.title);
       openWebview.dispose();
     }
     const panel = vscode.window.createWebviewPanel(
@@ -120,6 +120,10 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
         retainContextWhenHidden: true,
       }
     );
+    panel.onDidDispose(() => {
+      openTabNames = openTabNames.filter(x => x !== openWebview!.title);
+      openWebview = undefined;
+    });
     openWebview = panel;
     panel.webview.html = getCanvasHtml(panel, context);
     panel.webview.onDidReceiveMessage((msg) => console.log(msg));
