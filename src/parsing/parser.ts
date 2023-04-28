@@ -15,7 +15,7 @@ import {
   rep_sc,
   rep,
 } from "typescript-parsec";
-let _ = require('lodash');
+let _ = require("lodash");
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
 
 import * as ast from "./ast";
@@ -468,7 +468,11 @@ ZXCAST.setPattern(
     seq(
       kright(tok(lex.TokenKind.Cast$), NUML40),
       kright(tok(lex.TokenKind.Comma), NUML40),
-      kmid(tok(lex.TokenKind.Cast3Colon), ZXTRANSFORML0, tok(lex.TokenKind.Cast$))
+      kmid(
+        tok(lex.TokenKind.Cast3Colon),
+        ZXTRANSFORML0,
+        tok(lex.TokenKind.Cast$)
+      )
     ),
     applyCast
   )
@@ -491,7 +495,11 @@ ZXTRANSFORML0.setPattern(
       rep_sc(tok(lex.TokenKind.ColorSwap)),
       lrec_sc(
         alt(ZXSTACKCOMPOSE, ZXNSTACK),
-        alt(tok(lex.TokenKind.Adjoint), tok(lex.TokenKind.Transpose), tok(lex.TokenKind.Conjugate)),
+        alt(
+          tok(lex.TokenKind.Adjoint),
+          tok(lex.TokenKind.Transpose),
+          tok(lex.TokenKind.Conjugate)
+        ),
         applyTransformPost
       )
     ),
@@ -552,11 +560,13 @@ export function parseAST(expr: string): ast.ASTNode {
     let i = 0;
     let flag = true;
     while (i < parsed.candidates.length - 1) {
-      if (!(_.isEqual(parsed.candidates[i].result, parsed.candidates[i + 1].result))) {
-        flag = false; 
+      if (
+        !_.isEqual(parsed.candidates[i].result, parsed.candidates[i + 1].result)
+      ) {
+        flag = false;
         break;
       }
-     i++;
+      i++;
     }
     if (flag) {
       return parsed.candidates[0].result;

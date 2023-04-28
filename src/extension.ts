@@ -121,7 +121,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       }
     );
     panel.onDidDispose(() => {
-      openTabNames = openTabNames.filter(x => x !== openWebview!.title);
+      openTabNames = openTabNames.filter((x) => x !== openWebview!.title);
       openWebview = undefined;
     });
     openWebview = panel;
