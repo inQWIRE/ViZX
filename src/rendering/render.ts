@@ -3,37 +3,39 @@ import {
   STACK_DASH,
   COMPOSE_DASH,
   CAST_DASH,
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  TEXT_PAD_SIZE,
   CAP,
   CUP,
   BOX,
   WIRE,
   SWAP,
   EMPTY,
-  PAD_SIZE,
-  setCanvasWidthHeight,
-  boundary,
   PROP_TO,
-  PROPTO_SIZE,
   COLORSWAP_TRANSFORM,
   ADJOINT_TRANSFORM,
   CONJUGATE_TRANSFORM,
   TRANSPOSE_TRANSFORM,
   FUNCTION_DASH,
   NUMBER_KINDS,
-  FUNC_ARG_SIZE,
   N_STACK_OP,
   N_STACK_1_OP,
-  DOTS_PAD_SIZE,
-  LARGE_TEXT_SIZE,
-  MONOSPACE_FONT,
-  MEDIUM_TEXT_SIZE,
-  SMALL_TEXT_SIZE,
-  ARIAL_FONT,
-  REALLY_SMALL_TEXT_SIZE,
 } from "../constants/consts";
+import {
+  PAD_SIZE,
+  setCanvasWidthHeight,
+  boundary,
+  PROPTO_SIZE,
+  FUNC_ARG_SIZE,
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  TEXT_PAD_SIZE,
+  DOTS_PAD_SIZE,
+  LARGE_TEXT,
+  MONOSPACE_FONT,
+  MEDIUM_TEXT,
+  SMALL_TEXT,
+  ARIAL_FONT,
+  REALLY_SMALL_TEXT,
+} from "../constants/variableconsts";
 import { findCenter, findLeftCenter, findRightCenter } from "../parsing/coords";
 import { quad } from "../constants/types";
 import { determineCanvasWidthHeight } from "../parsing/sizes";
@@ -511,9 +513,9 @@ function wrapText(
 }
 
 function text_format(loc: string, text: string) {
-  let small_text = SMALL_TEXT_SIZE;
+  let small_text = SMALL_TEXT;
   if (text.length > 15) {
-    small_text = REALLY_SMALL_TEXT_SIZE;
+    small_text = REALLY_SMALL_TEXT;
   }
   switch (loc) {
     case "spider_in_out": {
@@ -532,9 +534,9 @@ function text_format(loc: string, text: string) {
     }
     case "spider_alpha": {
       if (text.length > 10) {
-        ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+        ctx.font = SMALL_TEXT.concat(" ").concat(ARIAL_FONT);
       } else {
-        ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+        ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       }
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -542,77 +544,89 @@ function text_format(loc: string, text: string) {
       break;
     }
     case "cast_in": {
-      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.font = SMALL_TEXT.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     case "cast_out": {
-      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.font = SMALL_TEXT.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     case "cast_in_background": {
-      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.font = SMALL_TEXT.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = white_trans;
       break;
     }
     case "cast_out_background": {
-      ctx.font = SMALL_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      ctx.font = SMALL_TEXT.concat(" ").concat(MONOSPACE_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = white_trans;
       break;
     }
     case "nwire": {
-      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     case "nwire_dots": {
-      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "alphabetic";
       ctx.fillStyle = black;
       break;
     }
     case "propto": {
-      ctx.font = LARGE_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      ctx.font = LARGE_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     case "transform": {
-      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     case "nstack": {
-      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     case "function": {
-      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(ARIAL_FONT);
+      if (text.length > 15) {
+        ctx.font = REALLY_SMALL_TEXT.concat(" ").concat(ARIAL_FONT);
+      } else if (text.length > 10) {
+        ctx.font = SMALL_TEXT.concat(" ").concat(ARIAL_FONT);
+      } else {
+        ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
+      }
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
       break;
     }
     default: {
-      ctx.font = MEDIUM_TEXT_SIZE.concat(" ").concat(MONOSPACE_FONT);
+      if (text.length > 15) {
+        ctx.font = REALLY_SMALL_TEXT.concat(" ").concat(ARIAL_FONT);
+      } else if (text.length > 10) {
+        ctx.font = SMALL_TEXT.concat(" ").concat(ARIAL_FONT);
+      } else {
+        ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
+      }
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;

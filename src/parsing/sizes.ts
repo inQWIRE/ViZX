@@ -1,15 +1,13 @@
 import * as ast from "./ast";
+import { HOR_PAD, VER_PAD, NUMBER_KINDS } from "../constants/consts";
 import {
   BASE_SIZE,
   CAST_SIZE,
   PAD_SIZE,
   PROPTO_SIZE,
-  HOR_PAD,
-  VER_PAD,
-  NUMBER_KINDS,
   FUNC_ARG_SIZE,
   SCALE,
-} from "../constants/consts";
+} from "../constants/variableconsts";
 export function addSizes(node: ast.ASTNode): ast.ASTNode {
   node.hor_len = 0;
   node.ver_len = 0;
