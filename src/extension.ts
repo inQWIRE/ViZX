@@ -9,12 +9,11 @@ import {
   setCanvasWidthHeight,
   scaleUp,
   scaleDown,
-} from "./constants/consts";
-import * as consts from "./constants/consts";
+} from "./constants/variableconsts";
+import * as vconsts from "./constants/variableconsts";
 import * as ast from "./parsing/ast";
 import { getCanvasHtml } from "./webview/webview";
 
-let openTabNames: String[] = [];
 let openWebview: vscode.WebviewPanel | undefined = undefined;
 
 // this method is called when your extension is activated
@@ -56,11 +55,11 @@ export function activate(context: vscode.ExtensionContext) {
     scaleUp();
     console.log(
       "SCALE: ",
-      consts.SCALE,
+      vconsts.SCALE,
       " HEIGHT: ",
-      consts.CANVAS_HEIGHT,
+      vconsts.CANVAS_HEIGHT,
       "WIDTH: ",
-      consts.CANVAS_WIDTH
+      vconsts.CANVAS_WIDTH
     );
   });
   context.subscriptions.push(disposable);
@@ -68,11 +67,11 @@ export function activate(context: vscode.ExtensionContext) {
     scaleDown();
     console.log(
       "SCALE: ",
-      consts.SCALE,
+      vconsts.SCALE,
       " HEIGHT: ",
-      consts.CANVAS_HEIGHT,
+      vconsts.CANVAS_HEIGHT,
       "WIDTH: ",
-      consts.CANVAS_WIDTH
+      vconsts.CANVAS_WIDTH
     );
   });
   context.subscriptions.push(disposable);
@@ -89,10 +88,6 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       expr = expr.goals.goals[0].ty.toString();
     }
     console.log("expr: ", expr);
-    if (openTabNames.includes(expr)) {
-      return;
-    }
-    openTabNames.push(expr);
     let node: ast.ASTNode;
     try {
       node = parser.parseAST(expr);
@@ -108,7 +103,6 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
       return;
     }
     if (openWebview !== undefined) {
-      openTabNames = openTabNames.filter((x) => x !== openWebview!.title);
       openWebview.dispose();
     }
     const panel = vscode.window.createWebviewPanel(
@@ -120,10 +114,14 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
         retainContextWhenHidden: true,
       }
     );
-    panel.onDidDispose(() => {
-      openTabNames = openTabNames.filter((x) => x !== openWebview!.title);
-      openWebview = undefined;
-    });
+    panel.onDidDispose(
+      async () => {
+        console.log("openWebview before: ", openWebview);
+        openWebview = undefined;
+      },
+      null,
+      context.subscriptions
+    );
     openWebview = panel;
     panel.webview.html = getCanvasHtml(panel, context);
     panel.webview.onDidReceiveMessage((msg) => console.log(msg));

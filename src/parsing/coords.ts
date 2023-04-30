@@ -1,10 +1,10 @@
 import * as ast from "./ast";
+import { NUMBER_KINDS } from "../constants/consts";
 import {
+  FUNC_ARG_SIZE,
   CAST_SIZE,
   PAD_SIZE,
-  NUMBER_KINDS,
-  FUNC_ARG_SIZE,
-} from "../constants/consts";
+} from "../constants/variableconsts";
 import { quad, coord } from "../constants/types";
 
 export function findCenter(q: quad): coord {

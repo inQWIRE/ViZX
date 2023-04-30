@@ -557,20 +557,20 @@ export function parseAST(expr: string): ast.ASTNode {
     }
   }
   if (parsed.successful && parsed.candidates.length > 1) {
-    let i = 0;
-    let flag = true;
-    while (i < parsed.candidates.length - 1) {
-      if (
-        !_.isEqual(parsed.candidates[i].result, parsed.candidates[i + 1].result)
-      ) {
-        flag = false;
-        break;
-      }
-      i++;
-    }
-    if (flag) {
-      return parsed.candidates[0].result;
-    }
+    // let i = 0;
+    // let flag = true;
+    // while (i < parsed.candidates.length - 1) {
+    //   if (
+    //     !_.isEqual(parsed.candidates[i].result, parsed.candidates[i + 1].result)
+    //   ) {
+    //     flag = false;
+    //     break;
+    //   }
+    //   i++;
+    // }
+    // if (flag) {
+    return parsed.candidates[0].result;
+    // }
   }
   // console.log("candidate length = ", parsed.candidates.length);
   return expectSingleResult(parsed);
