@@ -2,6 +2,8 @@ import { quad } from "../constants/types";
 export interface ASTNode {
   kind: string;
   hor_len?: number;
+  hor_len_unpadded?: number;
+  ver_len_unpadded?: number;
   ver_len?: number;
   boundary?: quad;
 }

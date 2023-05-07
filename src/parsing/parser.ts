@@ -362,7 +362,7 @@ ZXBASETERM.setPattern(
       ),
       applySpider
     ),
-    kmid(tok(lex.TokenKind.LParen), ZXTRANSFORML0, tok(lex.TokenKind.RParen))
+    kmid(tok(lex.TokenKind.LParen), ASTNODE, tok(lex.TokenKind.RParen))
   )
 );
 
@@ -470,7 +470,7 @@ ZXCAST.setPattern(
       kright(tok(lex.TokenKind.Comma), NUML40),
       kmid(
         tok(lex.TokenKind.Cast3Colon),
-        ZXTRANSFORML0,
+        alt(ZXBASETERM, ZXNSTACK, ZXSTACKCOMPOSE, ZXCAST),
         tok(lex.TokenKind.Cast$)
       )
     ),
@@ -480,21 +480,18 @@ ZXCAST.setPattern(
 
 ZXPROPTO.setPattern(
   apply(
-    seq(
-      alt(ZXSTACKCOMPOSE, ZXCAST, ZXNSTACK),
-      tok(lex.TokenKind.PropTo),
-      alt(ZXSTACKCOMPOSE, ZXCAST, ZXNSTACK)
-    ),
+    seq(ZXTRANSFORML0, tok(lex.TokenKind.PropTo), ZXTRANSFORML0),
     applyPropTo
   )
 );
 
+// put transform in base term
 ZXTRANSFORML0.setPattern(
   apply(
     seq(
       rep_sc(tok(lex.TokenKind.ColorSwap)),
       lrec_sc(
-        alt(ZXSTACKCOMPOSE, ZXNSTACK),
+        alt(ZXBASETERM, ZXNSTACK, ZXCAST, ZXSTACKCOMPOSE),
         alt(
           tok(lex.TokenKind.Adjoint),
           tok(lex.TokenKind.Transpose),

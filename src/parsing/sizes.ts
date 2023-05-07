@@ -8,33 +8,72 @@ import {
   FUNC_ARG_SIZE,
   SCALE,
 } from "../constants/variableconsts";
+
+export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
+  if (node.ver_len === undefined || node.hor_len === undefined) {
+    throw new Error(`length undefined in second sizing\n`);
+  }
+  switch (node.kind) {
+    case "stack": {
+      let node_ = <ast.ASTStack>node;
+      node_.left.hor_len = node.hor_len_unpadded;
+      node_.right.hor_len = node.hor_len_unpadded;
+      node = node_;
+      // node_.right = addSizesHappyRobot(node_.right);
+      // node_.left = addSizesHappyRobot(node_.left);
+      break;
+    }
+    case "compose": {
+      let node_ = <ast.ASTStack>node;
+      node_.left.ver_len = node.ver_len_unpadded;
+      node_.right.ver_len = node.ver_len_unpadded;
+      node = node_;
+      // node_.right = addSizesHappyRobot(node_.right);
+      // node_.left = addSizesHappyRobot(node_.left);
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return node;
+}
 export function addSizes(node: ast.ASTNode): ast.ASTNode {
   node.hor_len = 0;
   node.ver_len = 0;
+  node.hor_len_unpadded = 0;
+  node.ver_len_unpadded = 0;
   switch (node.kind) {
     case "transform": {
       let node_ = <ast.ASTTransform>node;
       let snode = addSizes(node_.node);
       if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
-        node.hor_len += snode.hor_len + 2 * PAD_SIZE + FUNC_ARG_SIZE;
-        node.ver_len += snode.ver_len + 2 * PAD_SIZE;
+        node.hor_len_unpadded += snode.hor_len + FUNC_ARG_SIZE;
+        node.hor_len += node.hor_len_unpadded + 2 * PAD_SIZE;
+        node.ver_len_unpadded += snode.ver_len;
+        node.ver_len += node.ver_len_unpadded + 2 * PAD_SIZE;
       }
       break;
     }
     case "const": {
-      node.hor_len += BASE_SIZE;
-      node.ver_len += BASE_SIZE;
+      node.hor_len_unpadded += BASE_SIZE;
+      node.hor_len = node.hor_len_unpadded;
+      node.ver_len_unpadded += BASE_SIZE;
+      node.ver_len = node.ver_len_unpadded;
       break;
     }
     case "spider": {
-      node.hor_len += BASE_SIZE;
-      node.ver_len += BASE_SIZE;
-      console.log("size = ", node.hor_len, ", ", node.ver_len);
+      node.hor_len_unpadded += BASE_SIZE;
+      node.hor_len = node.hor_len_unpadded;
+      node.ver_len_unpadded += BASE_SIZE;
+      node.ver_len = node.ver_len_unpadded;
       break;
     }
     case "var": {
-      node.hor_len += BASE_SIZE;
-      node.ver_len += BASE_SIZE;
+      node.hor_len_unpadded += BASE_SIZE;
+      node.hor_len = node.hor_len_unpadded;
+      node.ver_len_unpadded += BASE_SIZE;
+      node.ver_len = node.ver_len_unpadded;
       break;
     }
     case "stack": {
@@ -42,14 +81,16 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let sleft = addSizes(node_.left);
       let sright = addSizes(node_.right);
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-        node.hor_len += Math.max(sleft.hor_len, sright.hor_len) + 2 * PAD_SIZE;
+        node.hor_len_unpadded += Math.max(sleft.hor_len, sright.hor_len);
+        node.hor_len += node.hor_len_unpadded + 2 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as stack node: horizontal len`
         );
       }
       if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
-        node.ver_len += sleft.ver_len + sright.ver_len + 4 * PAD_SIZE;
+        node.ver_len_unpadded += sleft.ver_len + sright.ver_len;
+        node.ver_len += node.ver_len_unpadded + 4 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as stack node: vertical len`
@@ -62,14 +103,18 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let sleft = addSizes(node_.left);
       let sright = addSizes(node_.right);
       if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
-        node.ver_len += Math.max(sleft.ver_len, sright.ver_len) + 2 * PAD_SIZE;
+        node.ver_len_unpadded += Math.max(sleft.ver_len, sright.ver_len);
+        node.ver_len += node.ver_len_unpadded + 2 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as compose node: horizontal len`
         );
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-        node.hor_len += sleft.hor_len + sright.hor_len + 4 * PAD_SIZE;
+        node.hor_len_unpadded += sleft.hor_len + sright.hor_len;
+        node.hor_len += node.hor_len_unpadded + 4 * PAD_SIZE;
+        // sleft.hor_len = node.hor_len - 4*PAD_SIZE;
+        // sright.hor_len = node.hor_len - 4*PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as compose node: vertical len`
@@ -84,8 +129,10 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         node_.node.ver_len !== undefined &&
         node_.node.hor_len !== undefined
       ) {
-        node.ver_len += 2 * PAD_SIZE + node_.node.ver_len;
-        node.hor_len += node_.node.hor_len + 2 * PAD_SIZE + FUNC_ARG_SIZE;
+        node.ver_len_unpadded += node_.node.ver_len;
+        node.ver_len += node.ver_len_unpadded + 2 * PAD_SIZE;
+        node.hor_len_unpadded += node_.node.hor_len + FUNC_ARG_SIZE;
+        node.hor_len += node.hor_len_unpadded + 2 * PAD_SIZE;
       } else {
         throw new Error(`Could not size node ${node} as nstack node`);
       }
@@ -98,9 +145,10 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         node_.node.ver_len !== undefined &&
         node_.node.hor_len !== undefined
       ) {
-        node.ver_len += node_.node.ver_len + 2 * PAD_SIZE;
-        node.hor_len += node_.node.hor_len;
-        +2 * PAD_SIZE + FUNC_ARG_SIZE;
+        node.ver_len_unpadded += node_.node.ver_len;
+        node.ver_len += node.ver_len_unpadded + 2 * PAD_SIZE;
+        node.hor_len_unpadded += node_.node.hor_len + FUNC_ARG_SIZE;
+        node.hor_len += node.hor_len_unpadded + 2 * PAD_SIZE;
       } else {
         throw new Error(`Could not size node ${node} as nstack1 node`);
       }
@@ -113,8 +161,10 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         inner_node.ver_len !== undefined &&
         inner_node.hor_len !== undefined
       ) {
-        node.ver_len += inner_node.ver_len + 2 * PAD_SIZE;
-        node.hor_len += inner_node.hor_len + 2 * CAST_SIZE;
+        node.ver_len_unpadded += inner_node.ver_len;
+        node.ver_len += node.ver_len_unpadded + 2 * PAD_SIZE;
+        node.hor_len_unpadded += inner_node.hor_len;
+        node.hor_len += node.hor_len_unpadded + 2 * CAST_SIZE;
       }
       break;
     }
@@ -122,6 +172,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let node_ = <ast.ASTFunc>node;
       for (let arg of node_.args) {
         if (NUMBER_KINDS.includes(arg.kind)) {
+          node.hor_len_unpadded += FUNC_ARG_SIZE;
           node.hor_len += FUNC_ARG_SIZE;
         } else {
           let arg_ = <ast.ASTNode>arg;
@@ -129,12 +180,16 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
           if (arg_.ver_len !== undefined && arg_.hor_len !== undefined) {
             node.ver_len += arg_.ver_len;
             node.hor_len += arg_.hor_len;
+            node.hor_len_unpadded += arg_.hor_len;
+            node.ver_len_unpadded += arg_.ver_len;
           } else {
             throw new Error(`could not size arg ${arg_} while sizing function`);
           }
         }
       }
-      node.hor_len += (node_.args.length + 1) * PAD_SIZE + FUNC_ARG_SIZE;
+      node.hor_len_unpadded += FUNC_ARG_SIZE;
+      node.hor_len +=
+        (node_.args.length + 1) * PAD_SIZE + node.hor_len_unpadded;
       node.ver_len += 2 * PAD_SIZE;
       break;
     }
@@ -143,15 +198,16 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       let sleft = addSizes(node_.l);
       let sright = addSizes(node_.r);
       if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
-        node.ver_len += Math.max(sleft.ver_len, sright.ver_len) + 2 * PAD_SIZE;
+        node.ver_len_unpadded += Math.max(sleft.ver_len, sright.ver_len);
+        node.ver_len += node.ver_len_unpadded + 2 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as propto node: horizontal len`
         );
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-        node.hor_len +=
-          sleft.hor_len + sright.hor_len + PROPTO_SIZE + 4 * PAD_SIZE;
+        node.hor_len_unpadded += sleft.hor_len + sright.hor_len + PROPTO_SIZE;
+        node.hor_len += node.hor_len_unpadded + 4 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as propto node: vertical len`
@@ -167,6 +223,8 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       snode = <ast.ASTConst>addSizes(snode);
       if (snode.ver_len !== undefined && snode.hor_len !== undefined) {
         node.ver_len += snode.ver_len;
+        node.ver_len_unpadded += snode.ver_len;
+        node.hor_len_unpadded += snode.hor_len;
         node.hor_len += snode.hor_len;
       } else {
         throw new Error(`Could not size node ${node} as nwire node`);
@@ -177,6 +235,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       throw new Error(`Unknown kind: ${node.kind}`);
     }
   }
+  node = addSizesHappyRobot(node);
   return node;
 }
 
