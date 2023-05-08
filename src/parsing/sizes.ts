@@ -16,20 +16,61 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
   switch (node.kind) {
     case "stack": {
       let node_ = <ast.ASTStack>node;
+      node_.left.hor_len_unpadded =
+        node.hor_len_unpadded! -
+        (-node_.left.hor_len_unpadded! + node_.left.hor_len!);
       node_.left.hor_len = node.hor_len_unpadded;
+      node_.right.hor_len_unpadded =
+        node.hor_len_unpadded! -
+        (-node_.right.hor_len_unpadded! + node_.left.hor_len_unpadded!);
       node_.right.hor_len = node.hor_len_unpadded;
+      node_.right = addSizesHappyRobot(node_.right);
+      node_.left = addSizesHappyRobot(node_.left);
       node = node_;
       // node_.right = addSizesHappyRobot(node_.right);
       // node_.left = addSizesHappyRobot(node_.left);
       break;
     }
     case "compose": {
-      let node_ = <ast.ASTStack>node;
+      let node_ = <ast.ASTCompose>node;
+      node_.left.ver_len_unpadded =
+        node.ver_len_unpadded! -
+        (-node_.left.ver_len_unpadded! + node_.left.ver_len!);
       node_.left.ver_len = node.ver_len_unpadded;
+      node_.right.ver_len_unpadded =
+        node.ver_len_unpadded! -
+        (-node_.right.ver_len_unpadded! + node_.right.ver_len!);
       node_.right.ver_len = node.ver_len_unpadded;
+      node_.right = addSizesHappyRobot(node_.right);
+      node_.left = addSizesHappyRobot(node_.left);
       node = node_;
       // node_.right = addSizesHappyRobot(node_.right);
       // node_.left = addSizesHappyRobot(node_.left);
+      break;
+    }
+    case "nstack": {
+      let node_ = <ast.ASTNStack>node;
+      node_.node.ver_len_unpadded =
+        node.ver_len_unpadded! -
+        (-node_.node.ver_len_unpadded! + node_.node.ver_len!);
+      node_.node.ver_len = node.ver_len_unpadded;
+      node_.node.hor_len_unpadded =
+        node.hor_len_unpadded! -
+        FUNC_ARG_SIZE -
+        (-node_.node.hor_len_unpadded! + node_.node.hor_len!);
+      node_.node.hor_len = node.hor_len_unpadded! - FUNC_ARG_SIZE;
+      node_.node = addSizesHappyRobot(node_.node);
+      node = node_;
+      break;
+    }
+    case "nstack1": {
+      let node_ = <ast.ASTNStack1>node;
+      node_.node.ver_len_unpadded =
+        node.ver_len_unpadded! -
+        (-node_.node.ver_len_unpadded! + node_.node.ver_len!);
+      node_.node.ver_len = node.ver_len_unpadded;
+      node_.node = addSizesHappyRobot(node_.node);
+      node = node_;
       break;
     }
     default: {

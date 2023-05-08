@@ -92,8 +92,8 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
     try {
       node = parser.parseAST(expr);
       node = sizer.addSizes(node);
+      console.log("sized node: ", node);
       const size = sizer.determineCanvasWidthHeight(node);
-      console.log("size = ", size);
       setCanvasWidthHeight(size);
       node = coord.addCoords(node, boundary);
     } catch (e) {
