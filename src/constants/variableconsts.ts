@@ -36,7 +36,7 @@ export let CANVAS_WIDTH = 500;
 export let CANVAS_HEIGHT = 500;
 
 // SCALE = size of base square, ideally do not go below 100 or it'll be too small
-export let SCALE = 200;
+export let SCALE = 100;
 export let BASE_SIZE = 1 * SCALE;
 export let PAD_SIZE = 0.1 * SCALE;
 export let PROPTO_SIZE = 0.2 * SCALE;
