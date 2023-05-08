@@ -24,11 +24,14 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
         node.hor_len_unpadded! -
         (-node_.right.hor_len_unpadded! + node_.left.hor_len_unpadded!);
       node_.right.hor_len = node.hor_len_unpadded;
+      let inner_ver = node_.right.ver_len! + node_.left.ver_len!;
+      node_.right.ver_len =
+        (node_.right.ver_len! / inner_ver) * node.ver_len_unpadded!;
+      node_.left.ver_len =
+        (node_.left.ver_len! / inner_ver) * node.ver_len_unpadded!;
       node_.right = addSizesHappyRobot(node_.right);
       node_.left = addSizesHappyRobot(node_.left);
       node = node_;
-      // node_.right = addSizesHappyRobot(node_.right);
-      // node_.left = addSizesHappyRobot(node_.left);
       break;
     }
     case "compose": {
@@ -41,11 +44,14 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
         node.ver_len_unpadded! -
         (-node_.right.ver_len_unpadded! + node_.right.ver_len!);
       node_.right.ver_len = node.ver_len_unpadded;
+      let inner_hor = node_.right.hor_len! + node_.left.hor_len!;
+      node_.right.hor_len =
+        (node_.right.hor_len! / inner_hor) * node.hor_len_unpadded!;
+      node_.left.hor_len =
+        (node_.left.hor_len! / inner_hor) * node.hor_len_unpadded!;
       node_.right = addSizesHappyRobot(node_.right);
       node_.left = addSizesHappyRobot(node_.left);
       node = node_;
-      // node_.right = addSizesHappyRobot(node_.right);
-      // node_.left = addSizesHappyRobot(node_.left);
       break;
     }
     case "nstack": {
@@ -69,6 +75,11 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
         node.ver_len_unpadded! -
         (-node_.node.ver_len_unpadded! + node_.node.ver_len!);
       node_.node.ver_len = node.ver_len_unpadded;
+      node_.node.hor_len_unpadded =
+        node.hor_len_unpadded! -
+        FUNC_ARG_SIZE -
+        (-node_.node.hor_len_unpadded! + node_.node.hor_len!);
+      node_.node.hor_len = node.hor_len_unpadded! - FUNC_ARG_SIZE;
       node_.node = addSizesHappyRobot(node_.node);
       node = node_;
       break;
@@ -131,7 +142,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
         node.ver_len_unpadded += sleft.ver_len + sright.ver_len;
-        node.ver_len += node.ver_len_unpadded + 4 * PAD_SIZE;
+        node.ver_len += node.ver_len_unpadded + 3 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as stack node: vertical len`
@@ -153,7 +164,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
         node.hor_len_unpadded += sleft.hor_len + sright.hor_len;
-        node.hor_len += node.hor_len_unpadded + 4 * PAD_SIZE;
+        node.hor_len += node.hor_len_unpadded + 3 * PAD_SIZE;
         // sleft.hor_len = node.hor_len - 4*PAD_SIZE;
         // sright.hor_len = node.hor_len - 4*PAD_SIZE;
       } else {
