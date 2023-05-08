@@ -235,7 +235,7 @@ function drawFuncBoundary(boundary: quad) {
   ctx.lineTo(boundary.bl.x + PAD_SIZE, boundary.bl.y);
   ctx.stroke();
 
-  ctx.strokeStyle = black;
+  // ctx.strokeStyle = black;
   ctx.moveTo(boundary.tr.x - PAD_SIZE, boundary.tr.y);
   ctx.lineTo(boundary.tr.x, boundary.tr.y);
   ctx.lineTo(boundary.br.x, boundary.br.y);
@@ -533,7 +533,7 @@ function text_format(loc: string, text: string) {
       break;
     }
     case "spider_alpha": {
-      if (text.length > 10) {
+      if (text.length > 9) {
         ctx.font = SMALL_TEXT.concat(" ").concat(ARIAL_FONT);
       } else {
         ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
