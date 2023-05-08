@@ -33,7 +33,9 @@ export function getCanvasHtml(
       <script>var exports = {};</script>
       <script defer type="text/javascript" nonce="${nonce}" src="${scriptUri}""></script>  </head>
   <body>
-      <canvas id="canvas"></canvas>
+       <button id="download-button-png">Download PNG</button>
+       <button id="download-button-svg">Download SVG</button>
+       <canvas id="canvas"></canvas>
   </body>
   </html>
 `;

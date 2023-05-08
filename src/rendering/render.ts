@@ -708,6 +708,47 @@ function formatCanvas() {
   ctx.strokeStyle = black;
 }
 
+function downloadSVG() {
+  const svgData = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${
+    canvas.height
+  }">
+      <foreignObject width="100%" height="100%">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          <img src="${canvas.toDataURL("image/png")}" width="${
+    canvas.width
+  }" height="${canvas.height}"></img>
+        </div>
+      </foreignObject>
+    </svg>
+  `;
+
+  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+
+  const link = document.createElement("a");
+  link.download = "canvas.svg";
+  link.href = svgUrl;
+  link.click();
+
+  URL.revokeObjectURL(svgUrl);
+}
+
+function downloadPNG() {
+  canvas.toBlob(function (blob) {
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(blob!);
+    downloadLink.download = "canvas.png";
+    downloadLink.click();
+  }, "image/png");
+}
+
+const downloadButtonSvg = document.getElementById("download-button-svg");
+downloadButtonSvg!.addEventListener("click", downloadSVG);
+
+const downloadButtonPng = document.getElementById("download-button-png");
+downloadButtonPng!.addEventListener("click", downloadPNG);
+
 window.addEventListener("message", render);
 
 // esbuild auto reload

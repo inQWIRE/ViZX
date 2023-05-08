@@ -108,7 +108,10 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
     const panel = vscode.window.createWebviewPanel(
       "ViZX",
       `ViZX: ${expr}`,
-      vscode.ViewColumn.Three,
+      {
+        viewColumn: vscode.ViewColumn.Three,
+        preserveFocus: true,
+      },
       {
         enableScripts: true,
         retainContextWhenHidden: true,
