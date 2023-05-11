@@ -18,16 +18,26 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
       }
       let desired_hor = node_.hor_len - 3 * PAD_SIZE;
       let desired_ver = node_.ver_len - 2 * PAD_SIZE;
-      let sleft = node_.left;
-      let sright = node_.right;
-      node_.left.hor_len =
-        (sleft.hor_len! / (sleft.hor_len! + sright.hor_len!)) * desired_hor;
-      node_.right.hor_len =
-        (sright.hor_len! / (sleft.hor_len! + sright.hor_len!)) * desired_hor;
+      let sleft = JSON.parse(JSON.stringify(node_.left));
+      let sright = JSON.parse(JSON.stringify(node_.right));
+      node_.left.hor_len = Number(
+        (
+          (sleft.hor_len! /
+            Number((sleft.hor_len! + sright.hor_len!).toFixed(0))) *
+          desired_hor
+        ).toFixed(0)
+      );
+      node_.right.hor_len = Number(
+        (
+          (sright.hor_len! /
+            Number((sleft.hor_len! + sright.hor_len!).toFixed(0))) *
+          desired_hor
+        ).toFixed(0)
+      );
       node_.left.ver_len = desired_ver;
       node_.right.ver_len = desired_ver;
-      node_.right = addSizesHappyRobot(node_.right);
       node_.left = addSizesHappyRobot(node_.left);
+      node_.right = addSizesHappyRobot(node_.right);
       node = node_;
       break;
     }
@@ -38,16 +48,26 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
       }
       let desired_hor = node_.hor_len - 2 * PAD_SIZE;
       let desired_ver = node_.ver_len - 3 * PAD_SIZE;
-      let sleft = node_.left;
-      let sright = node_.right;
+      let sleft = JSON.parse(JSON.stringify(node_.left));
+      let sright = JSON.parse(JSON.stringify(node_.right));
       node_.left.hor_len = desired_hor;
       node_.right.hor_len = desired_hor;
-      node_.left.ver_len =
-        (sleft.ver_len! / (sleft.ver_len! + sright.ver_len!)) * desired_ver;
-      node_.right.ver_len =
-        (sright.ver_len! / (sleft.ver_len! + sright.ver_len!)) * desired_ver;
-      node_.right = addSizesHappyRobot(node_.right);
+      node_.left.ver_len = Number(
+        (
+          (sleft.ver_len! /
+            Number((sleft.ver_len! + sright.ver_len!).toFixed(0))) *
+          desired_ver
+        ).toFixed(0)
+      );
+      node_.right.ver_len = Number(
+        (
+          (sright.ver_len! /
+            Number((sleft.ver_len! + sright.ver_len!).toFixed(0))) *
+          desired_ver
+        ).toFixed(0)
+      );
       node_.left = addSizesHappyRobot(node_.left);
+      node_.right = addSizesHappyRobot(node_.right);
       node = node_;
       break;
     }
@@ -99,18 +119,18 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       break;
     }
     case "const": {
-      node.hor_len += BASE_SIZE;
-      node.ver_len += BASE_SIZE;
+      node.hor_len = BASE_SIZE;
+      node.ver_len = BASE_SIZE;
       break;
     }
     case "spider": {
-      node.hor_len += BASE_SIZE;
-      node.ver_len += BASE_SIZE;
+      node.hor_len = BASE_SIZE;
+      node.ver_len = BASE_SIZE;
       break;
     }
     case "var": {
-      node.hor_len += BASE_SIZE;
-      node.ver_len += BASE_SIZE;
+      node.hor_len = BASE_SIZE;
+      node.ver_len = BASE_SIZE;
       break;
     }
     case "stack": {

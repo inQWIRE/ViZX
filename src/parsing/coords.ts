@@ -181,7 +181,6 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
         node.hor_len!,
         node.ver_len!
       );
-      console.log("compose node bound: ", node_.boundary);
       let l_bound = {
         tl: {
           x: node_.boundary.tl.x + PAD_SIZE,
