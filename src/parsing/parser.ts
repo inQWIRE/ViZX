@@ -10,10 +10,7 @@ import {
   expectEOF,
   expectSingleResult,
   kright,
-  kleft,
-  opt_sc,
   rep_sc,
-  rep,
 } from "typescript-parsec";
 let _ = require("lodash");
 // https://github.com/microsoft/ts-parsec/blob/master/doc/ParserCombinators.md
@@ -23,6 +20,8 @@ import * as lex from "./lexer";
 import { lexerPrettyPrinter } from "./lexer";
 
 type Token = psec.Token<lex.TokenKind>;
+
+/*********************** NUMBERS ******************************/
 
 function applyNumber(value: Token): ast.Num {
   return { val: value.text, kind: "num", expr: value.text } as ast.Number;
@@ -221,14 +220,16 @@ function applySign(args: [Token, Token]): ast.Num {
   } as ast.Number;
 }
 
-// ZXConsts
+/*********************** ZXTERMS ******************************/
 
 const ZXBASETERM = rule<lex.TokenKind, ast.ASTNode>();
-const ZXSTACKCOMPOSE = rule<lex.TokenKind, ast.ASTNode>();
+const ZXBASETRANSFORMED = rule<lex.TokenKind, ast.ASTNode>();
 const ZXNSTACK = rule<lex.TokenKind, ast.ASTNode>();
+const ZXNSTACKTRANSFORMED = rule<lex.TokenKind, ast.ASTNode>();
 const ZXCAST = rule<lex.TokenKind, ast.ASTNode>();
+const ZXCASTTRANSFORMED = rule<lex.TokenKind, ast.ASTNode>();
 const ZXPROPTO = rule<lex.TokenKind, ast.ASTNode>();
-const ZXTRANSFORML0 = rule<lex.TokenKind, ast.ASTNode>();
+const ZXSTACKCOMPOSE = rule<lex.TokenKind, ast.ASTNode>();
 const ASTNODE = rule<lex.TokenKind, ast.ASTNode>();
 
 function applyConst(args: Token): ast.ASTNode {
@@ -362,7 +363,25 @@ ZXBASETERM.setPattern(
       ),
       applySpider
     ),
-    kmid(tok(lex.TokenKind.LParen), ZXTRANSFORML0, tok(lex.TokenKind.RParen))
+    kmid(tok(lex.TokenKind.LParen), ASTNODE, tok(lex.TokenKind.RParen))
+  )
+);
+
+ZXBASETRANSFORMED.setPattern(
+  apply(
+    seq(
+      rep_sc(tok(lex.TokenKind.ColorSwap)),
+      lrec_sc(
+        ZXBASETERM,
+        alt(
+          tok(lex.TokenKind.Adjoint),
+          tok(lex.TokenKind.Transpose),
+          tok(lex.TokenKind.Conjugate)
+        ),
+        applyTransformPost
+      )
+    ),
+    applyTransformPre
   )
 );
 
@@ -401,10 +420,10 @@ function applySpider(args: [Token, ast.Num, ast.Num, ast.Num]): ast.ASTNode {
 
 ZXSTACKCOMPOSE.setPattern(
   lrec_sc(
-    alt(ZXBASETERM, ZXCAST, ZXNSTACK),
+    alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED),
     seq(
       alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)),
-      alt(ZXBASETERM, ZXCAST, ZXNSTACK)
+      alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED)
     ),
     applyStackCompose
   )
@@ -457,9 +476,27 @@ ZXNSTACK.setPattern(
     seq(
       NUML40,
       alt(tok(lex.TokenKind.NStack), tok(lex.TokenKind.NStack1)),
-      ZXBASETERM
+      ZXBASETRANSFORMED
     ),
     applyNStack
+  )
+);
+
+ZXNSTACKTRANSFORMED.setPattern(
+  apply(
+    seq(
+      rep_sc(tok(lex.TokenKind.ColorSwap)),
+      lrec_sc(
+        ZXNSTACK,
+        alt(
+          tok(lex.TokenKind.Adjoint),
+          tok(lex.TokenKind.Transpose),
+          tok(lex.TokenKind.Conjugate)
+        ),
+        applyTransformPost
+      )
+    ),
+    applyTransformPre
   )
 );
 
@@ -470,7 +507,7 @@ ZXCAST.setPattern(
       kright(tok(lex.TokenKind.Comma), NUML40),
       kmid(
         tok(lex.TokenKind.Cast3Colon),
-        ZXTRANSFORML0,
+        alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXSTACKCOMPOSE, ZXCAST),
         tok(lex.TokenKind.Cast$)
       )
     ),
@@ -478,23 +515,12 @@ ZXCAST.setPattern(
   )
 );
 
-ZXPROPTO.setPattern(
-  apply(
-    seq(
-      alt(ZXSTACKCOMPOSE, ZXCAST, ZXNSTACK),
-      tok(lex.TokenKind.PropTo),
-      alt(ZXSTACKCOMPOSE, ZXCAST, ZXNSTACK)
-    ),
-    applyPropTo
-  )
-);
-
-ZXTRANSFORML0.setPattern(
+ZXCASTTRANSFORMED.setPattern(
   apply(
     seq(
       rep_sc(tok(lex.TokenKind.ColorSwap)),
       lrec_sc(
-        alt(ZXSTACKCOMPOSE, ZXNSTACK),
+        ZXCAST,
         alt(
           tok(lex.TokenKind.Adjoint),
           tok(lex.TokenKind.Transpose),
@@ -504,6 +530,27 @@ ZXTRANSFORML0.setPattern(
       )
     ),
     applyTransformPre
+  )
+);
+
+ZXPROPTO.setPattern(
+  apply(
+    seq(
+      alt(
+        ZXBASETRANSFORMED,
+        ZXNSTACKTRANSFORMED,
+        ZXSTACKCOMPOSE,
+        ZXCASTTRANSFORMED
+      ),
+      tok(lex.TokenKind.PropTo),
+      alt(
+        ZXBASETRANSFORMED,
+        ZXNSTACKTRANSFORMED,
+        ZXSTACKCOMPOSE,
+        ZXCASTTRANSFORMED
+      )
+    ),
+    applyPropTo
   )
 );
 
@@ -545,18 +592,26 @@ function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
   return { kind: "propto", l: args[0], r: args[2] } as ast.ASTPropTo;
 }
 
-ASTNODE.setPattern(alt(ZXTRANSFORML0, ZXPROPTO));
+ASTNODE.setPattern(
+  alt(
+    ZXPROPTO,
+    ZXBASETRANSFORMED,
+    ZXNSTACKTRANSFORMED,
+    ZXSTACKCOMPOSE,
+    ZXCASTTRANSFORMED
+  )
+);
 
 export function parseAST(expr: string): ast.ASTNode {
   // lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
-  // debugging only. should never have more than one
-  if (parsed.successful) {
-    for (let i = 0; i < parsed.candidates.length; i++) {
-      console.log(parsed.candidates[i].result);
-    }
-  }
+  // if (parsed.successful) {
+  //   for (let i = 0; i < parsed.candidates.length; i++) {
+  //     console.log(parsed.candidates[i].result);
+  //   }
+  // }
   if (parsed.successful && parsed.candidates.length > 1) {
+    console.log(`${parsed.candidates.length} results parsed.`);
     // let i = 0;
     // let flag = true;
     // while (i < parsed.candidates.length - 1) {
