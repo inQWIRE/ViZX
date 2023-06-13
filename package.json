@@ -2,7 +2,7 @@
   "name": "vizx",
   "displayName": "ViZX",
   "description": "Visualizer for the ZX calculus",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "repository": "https://github.com/inQWIRE/ViZX/",
   "publisher": "inQWIRE",
   "engines": {
@@ -37,11 +37,11 @@
       },
       {
         "command": "vizx.activateRendering",
-        "title": "Activate ViZX automatic rendering"
+        "title": "Activate ZXViz automatic rendering"
       },
       {
         "command": "vizx.deactivateRendering",
-        "title": "Deactivate ViZX automatic rendering"
+        "title": "Deactivate ZXViz automatic rendering"
       }
     ]
   },
