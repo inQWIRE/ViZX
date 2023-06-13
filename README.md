@@ -7,7 +7,7 @@ To render automatically, use command `Activate ZXViz automatic rendering`. To st
 
 ## Requirements
 
-Requires `coq-lsp 0.1.7` for automatic rendering. Syntax of valid terms = valid ZX diagrams in [VyZX](https://github.com/inQWIRE/VyZX). See [src/CoreData/ZXCore](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/ZXCore.v) for the base definitions, and [src/CoreData/Proportional](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/Proportional.v) for proportionality definitions.
+Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic rendering. Syntax of valid terms = valid ZX diagrams in [VyZX](https://github.com/inQWIRE/VyZX). See [src/CoreData/ZXCore](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/ZXCore.v) for the base definitions, and [src/CoreData/Proportional](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/Proportional.v) for proportionality definitions.
 
 ## Extension Settings
 
