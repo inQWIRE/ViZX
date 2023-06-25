@@ -27,6 +27,10 @@ function applyNumber(value: Token): ast.Num {
   return { val: value.text, kind: "num", expr: value.text } as ast.Number;
 }
 
+function applyPi(value: Token): ast.Num {
+  return { val: "π", kind: "num", expr: "π" } as ast.Number;
+}
+
 function applyNumVar(value: Token): ast.Num {
   return { val: value.text, kind: "numvar", expr: value.text } as ast.NumVar;
 }
@@ -96,7 +100,7 @@ function applyNumFunc(args: [Token, ast.Num, ast.Num[]]): ast.Num {
 }
 
 function applyNumberSucc(value: [Token, ast.Num]): ast.Num {
-  return { expr: value[1].expr.concat("+1"), kind: "num" } as ast.Number;
+  return { expr: "1+".concat(value[1].expr), kind: "num" } as ast.Number;
 }
 
 function applyRConst(val: Token): ast.Num {
@@ -124,6 +128,7 @@ NUML0.setPattern(
   alt(
     apply(alt(tok(lex.TokenKind.R0), tok(lex.TokenKind.R1)), applyRConst),
     apply(tok(lex.TokenKind.NumberToken), applyNumber),
+    apply(tok(lex.TokenKind.PI), applyPi),
     apply(
       seq(tok(lex.TokenKind.Sub), tok(lex.TokenKind.NumberToken)),
       applySign

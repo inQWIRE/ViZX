@@ -696,6 +696,7 @@ function render(this: Window, msg: MessageEvent<any>) {
   let node: ast.ASTNode = JSON.parse(command);
   setCanvasWidthHeight(determineCanvasWidthHeight(node));
   formatCanvas();
+  console.log("b4 drawing really small text = ", REALLY_SMALL_TEXT);
   draw(node);
 }
 

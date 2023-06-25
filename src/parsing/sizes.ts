@@ -1,6 +1,8 @@
 import * as ast from "./ast";
-import { HOR_PAD, VER_PAD, NUMBER_KINDS } from "../constants/consts";
+import { NUMBER_KINDS } from "../constants/consts";
 import {
+  HOR_PAD,
+  VER_PAD,
   BASE_SIZE,
   CAST_SIZE,
   PAD_SIZE,

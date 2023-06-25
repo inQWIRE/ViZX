@@ -2,7 +2,7 @@
   "name": "vizx",
   "displayName": "ViZX",
   "description": "Visualizer for the ZX calculus",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "repository": "https://github.com/inQWIRE/ViZX/",
   "publisher": "inQWIRE",
   "engines": {

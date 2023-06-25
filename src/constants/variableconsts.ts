@@ -50,6 +50,8 @@ export let MEDIUM_TEXT = (SCALE / 7).toString().concat("px");
 export let LARGE_TEXT = (SCALE / 2).toString().concat("px");
 export let MONOSPACE_FONT = "Monospace";
 export let ARIAL_FONT = "Arial";
+export let HOR_PAD = 0.01 * SCALE;
+export let VER_PAD = 0.01 * SCALE;
 
 export let boundary = {
   tl: {
