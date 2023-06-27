@@ -260,28 +260,29 @@ function drawCastNode(node: ast.ASTNode) {
   ctx.save();
   ctx.translate(cast.node.boundary!.tl.x - TEXT_PAD_SIZE, lc.y);
   let max_width: undefined | number = undefined;
-  if (cast.m.expr.length > 2) {
+  if (cast.n.expr.length > 2) {
     ctx.rotate(Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
-  text_format("cast_in_background", cast.m.expr);
-  const in_arr = Array(cast.m.expr.length).fill("█").join("");
+  text_format("cast_in_background", cast.n.expr);
+  const in_arr = Array(cast.n.expr.length).fill("█").join("");
   ctx.fillText(in_arr, 0, 0, max_width);
-  text_format("cast_in", cast.m.expr);
-  ctx.fillText(cast.m.expr, 0, 0, max_width);
+  text_format("cast_in", cast.n.expr);
+  ctx.fillText(cast.n.expr, 0, 0, max_width);
   ctx.restore();
   ctx.save();
+
   ctx.translate(cast.node.boundary!.tr.x + TEXT_PAD_SIZE, rc.y);
   max_width = undefined;
-  if (cast.n.expr.length > 2) {
+  if (cast.m.expr.length > 2) {
     ctx.rotate(-Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
-  text_format("cast_out_background", cast.n.expr);
-  const out_arr = Array(cast.n.expr.length).fill("█").join("");
+  text_format("cast_out_background", cast.m.expr);
+  const out_arr = Array(cast.m.expr.length).fill("█").join("");
   ctx.fillText(out_arr, 0, 0, max_width);
-  text_format("cast_out", cast.n.expr);
-  ctx.fillText(cast.n.expr, 0, 0, max_width);
+  text_format("cast_out", cast.m.expr);
+  ctx.fillText(cast.m.expr, 0, 0, max_width);
   ctx.restore();
 }
 
