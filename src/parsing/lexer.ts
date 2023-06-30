@@ -8,6 +8,7 @@ export enum TokenKind {
   Succ,
   R0,
   R1,
+  PI,
 
   ZToken,
   XToken,
@@ -62,6 +63,7 @@ export const lexer = buildLexer([
   [true, /^S\s/g, TokenKind.Succ],
   [true, /^\(/g, TokenKind.LParen],
   [true, /^\)/g, TokenKind.RParen],
+  [true, /^PI/g, TokenKind.PI],
 
   [true, /^[A-WYa-zΑ-Ωα-ω][A-Za-zΑ-Ωα-ω0-9'_]*/g, TokenKind.Str],
   [true, /^\,/g, TokenKind.Comma],

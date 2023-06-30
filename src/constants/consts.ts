@@ -25,12 +25,3 @@ export const COLORSWAP_TRANSFORM = "⊙";
 export const FLIP_TRANSFORM = "⥍";
 
 export const NUMBER_KINDS = ["realnum", "num", "numvar", "numfunc", "real01"];
-
-export const VER_PAD = 100;
-export const HOR_PAD = 100;
-
-export const STACK_DASH: [number, number] = [10, 10];
-export const COMPOSE_DASH: [number, number] = [6, 6];
-export const CAST_DASH: [number, number] = [3, 3];
-export const PROPTO_DASH: [number, number] = [1, 1];
-export const FUNCTION_DASH: [number, number] = [3, 15];

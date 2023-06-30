@@ -1,8 +1,5 @@
 import * as ast from "../parsing/ast";
 import {
-  STACK_DASH,
-  COMPOSE_DASH,
-  CAST_DASH,
   CAP,
   CUP,
   BOX,
@@ -14,12 +11,16 @@ import {
   ADJOINT_TRANSFORM,
   CONJUGATE_TRANSFORM,
   TRANSPOSE_TRANSFORM,
-  FUNCTION_DASH,
   NUMBER_KINDS,
   N_STACK_OP,
   N_STACK_1_OP,
 } from "../constants/consts";
 import {
+  LINE_WIDTH,
+  FUNCTION_DASH,
+  STACK_DASH,
+  COMPOSE_DASH,
+  CAST_DASH,
   PAD_SIZE,
   setCanvasWidthHeight,
   boundary,
@@ -42,6 +43,7 @@ import { determineCanvasWidthHeight } from "../parsing/sizes";
 
 const canvas = document.querySelector("canvas")!;
 const ctx = canvas.getContext("2d")!;
+ctx.lineWidth = LINE_WIDTH;
 // // colors
 const white = "#FFFFFF";
 const black = "#000000";
@@ -214,6 +216,7 @@ function drawBoundary(boundary: quad, dash?: [number, number]) {
   } else {
     ctx.setLineDash([]);
   }
+  ctx.lineWidth = LINE_WIDTH;
   ctx.strokeStyle = black;
   ctx.beginPath();
   ctx.moveTo(boundary.tl.x, boundary.tl.y);
@@ -228,6 +231,7 @@ function drawBoundary(boundary: quad, dash?: [number, number]) {
 function drawFuncBoundary(boundary: quad) {
   ctx.setLineDash([]);
   ctx.strokeStyle = black;
+  ctx.lineWidth = LINE_WIDTH;
   ctx.beginPath();
   ctx.moveTo(boundary.tl.x + PAD_SIZE, boundary.tl.y);
   ctx.lineTo(boundary.tl.x, boundary.tl.y);
@@ -260,34 +264,36 @@ function drawCastNode(node: ast.ASTNode) {
   ctx.save();
   ctx.translate(cast.node.boundary!.tl.x - TEXT_PAD_SIZE, lc.y);
   let max_width: undefined | number = undefined;
-  if (cast.m.expr.length > 2) {
+  if (cast.n.expr.length > 2) {
     ctx.rotate(Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
-  text_format("cast_in_background", cast.m.expr);
-  const in_arr = Array(cast.m.expr.length).fill("█").join("");
+  text_format("cast_in_background", cast.n.expr);
+  const in_arr = Array(cast.n.expr.length).fill("█").join("");
   ctx.fillText(in_arr, 0, 0, max_width);
-  text_format("cast_in", cast.m.expr);
-  ctx.fillText(cast.m.expr, 0, 0, max_width);
+  text_format("cast_in", cast.n.expr);
+  ctx.fillText(cast.n.expr, 0, 0, max_width);
   ctx.restore();
   ctx.save();
+
   ctx.translate(cast.node.boundary!.tr.x + TEXT_PAD_SIZE, rc.y);
   max_width = undefined;
-  if (cast.n.expr.length > 2) {
+  if (cast.m.expr.length > 2) {
     ctx.rotate(-Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
-  text_format("cast_out_background", cast.n.expr);
-  const out_arr = Array(cast.n.expr.length).fill("█").join("");
+  text_format("cast_out_background", cast.m.expr);
+  const out_arr = Array(cast.m.expr.length).fill("█").join("");
   ctx.fillText(out_arr, 0, 0, max_width);
-  text_format("cast_out", cast.n.expr);
-  ctx.fillText(cast.n.expr, 0, 0, max_width);
+  text_format("cast_out", cast.m.expr);
+  ctx.fillText(cast.m.expr, 0, 0, max_width);
   ctx.restore();
 }
 
 function drawBaseNode(node: ast.ASTNode) {
   ctx.fillStyle = white;
   ctx.setLineDash([]);
+  ctx.lineWidth = LINE_WIDTH;
   ctx.strokeStyle = black;
   let inputs: string;
   let outputs: string;
@@ -397,17 +403,17 @@ function drawBaseNode(node: ast.ASTNode) {
     ctx.rotate(-Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
-  text_format("spider_in_out_background", outputs);
-  const out_arr = Array(outputs.length).fill("█").join("");
-  wrapText(
-    outputs,
-    0,
-    0,
-    max_width!,
-    ctx.measureText(outputs).actualBoundingBoxAscent +
-      ctx.measureText(outputs).actualBoundingBoxDescent,
-    true
-  );
+  // text_format("spider_in_out_background", outputs);
+  // const out_arr = Array(outputs.length).fill("█").join("");
+  // wrapText(
+  //   outputs,
+  //   0,
+  //   0,
+  //   max_width!,
+  //   ctx.measureText(outputs).actualBoundingBoxAscent +
+  //     ctx.measureText(outputs).actualBoundingBoxDescent,
+  //   true
+  // );
   // ctx.fillText(out_arr, 0, 0, max_width);
   text_format("spider_in_out", outputs);
   wrapText(
@@ -428,17 +434,17 @@ function drawBaseNode(node: ast.ASTNode) {
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
     ctx.rotate(Math.PI / 2);
   }
-  text_format("spider_in_out_background", inputs);
-  const in_arr = Array(inputs.length).fill("█").join("");
-  wrapText(
-    inputs,
-    0,
-    0,
-    max_width!,
-    ctx.measureText(inputs).actualBoundingBoxAscent +
-      ctx.measureText(inputs).actualBoundingBoxDescent,
-    true
-  );
+  // text_format("spider_in_out_background", inputs);
+  // const in_arr = Array(inputs.length).fill("█").join("");
+  // wrapText(
+  //   inputs,
+  //   0,
+  //   0,
+  //   max_width!,
+  //   ctx.measureText(inputs).actualBoundingBoxAscent +
+  //     ctx.measureText(inputs).actualBoundingBoxDescent,
+  //   true
+  // );
   // ctx.fillText(in_arr, 0, 0, max_width);
   text_format("spider_in_out", inputs);
   wrapText(
@@ -696,6 +702,7 @@ function render(this: Window, msg: MessageEvent<any>) {
   let node: ast.ASTNode = JSON.parse(command);
   setCanvasWidthHeight(determineCanvasWidthHeight(node));
   formatCanvas();
+  console.log("b4 drawing really small text = ", REALLY_SMALL_TEXT);
   draw(node);
 }
 
