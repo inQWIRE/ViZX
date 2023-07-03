@@ -42,8 +42,8 @@ export function scaleDown() {
   FUNCTION_DASH = [0.03 * SCALE, 0.01 * SCALE];
 }
 
-export let CANVAS_WIDTH = 500;
-export let CANVAS_HEIGHT = 500;
+export let CANVAS_WIDTH = 100;
+export let CANVAS_HEIGHT = 100;
 
 // SCALE = size of base square, ideally do not go below 100 or it'll be too small
 export let SCALE = 100;
@@ -61,8 +61,8 @@ export let MEDIUM_TEXT = (SCALE / 7).toString().concat("px");
 export let LARGE_TEXT = (SCALE / 2).toString().concat("px");
 export let MONOSPACE_FONT = "Monospace";
 export let ARIAL_FONT = "Arial";
-export let HOR_PAD = 0.01 * SCALE;
-export let VER_PAD = 0.01 * SCALE;
+export let HOR_PAD = 0.1 * SCALE;
+export let VER_PAD = 0.1 * SCALE;
 export let STACK_DASH: [number, number] = [0.06 * SCALE, 0.06 * SCALE];
 export let COMPOSE_DASH: [number, number] = [0.16 * SCALE, 0.16 * SCALE];
 export let CAST_DASH: [number, number] = [0.02 * SCALE, 0.02 * SCALE];
