@@ -7,6 +7,10 @@ To render automatically, use command `Activate ZXViz automatic rendering`. To st
 
 Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic rendering. Syntax of valid terms = valid ZX diagrams in VyZX. See src/CoreData/ZXCore for the base definitions, and src/CoreData/Proportional for proportionality definitions.
 
+## Build
+
+Build in VSCode using the included run configuration
+
 ## Extension Settings
 
 This extension contributes the following settings:
