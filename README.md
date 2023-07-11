@@ -1,13 +1,11 @@
-# ViZX: A Visualizer for the ZX Calculus
+# ZXViz: A Visualizer for the ZX Calculus
 
-Install [here](https://marketplace.visualstudio.com/items?itemName=inQWIRE.vizx).
-
-To render manually, use command `Render Expressions with ViZX`.
+To render manually, use command `Render Expressions with ZXViz`.
 To render automatically, use command `Activate ZXViz automatic rendering`. To stop rendering automatically, use command `Deactivate ZXViz automatic rendering`.
 
 ## Requirements
 
-Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic rendering. Syntax of valid terms = valid ZX diagrams in [VyZX](https://github.com/inQWIRE/VyZX). See [src/CoreData/ZXCore](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/ZXCore.v) for the base definitions, and [src/CoreData/Proportional](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/Proportional.v) for proportionality definitions.
+Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic rendering. Syntax of valid terms = valid ZX diagrams in VyZX. See src/CoreData/ZXCore for the base definitions, and src/CoreData/Proportional for proportionality definitions.
 
 ## Extension Settings
 

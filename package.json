@@ -1,10 +1,10 @@
 {
   "name": "vizx",
-  "displayName": "ViZX",
+  "displayName": "ZXViz",
   "description": "Visualizer for the ZX calculus",
   "version": "0.1.2",
-  "repository": "https://github.com/inQWIRE/ViZX/",
-  "publisher": "inQWIRE",
+  "repository": "https://github.com/REDACTED",
+  "publisher": "REDACTED",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -21,7 +21,7 @@
     "commands": [
       {
         "command": "vizx.render",
-        "title": "Render expressions with ViZX"
+        "title": "Render expressions with ZXViz"
       },
       {
         "command": "vizx.scaleUp",
@@ -33,7 +33,7 @@
       },
       {
         "command": "vizx.lspRender",
-        "title": "Render expressions with ViZX using CoqLSP information"
+        "title": "Render expressions with ZXViz using CoqLSP information"
       },
       {
         "command": "vizx.activateRendering",
