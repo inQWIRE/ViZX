@@ -9,7 +9,8 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic 
 
 ## Build
 
-Build in VSCode using the included run configuration
+- Run `yarn`
+- Build in VSCode using the included run configuration
 
 ## Extension Settings
 
