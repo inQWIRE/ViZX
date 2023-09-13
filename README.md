@@ -9,8 +9,18 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic 
 
 ## Build
 
-- Run `yarn`
-- Build in VSCode using the included run configuration
+- Install [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) if you do not have it already.
+- in the source directory for this project, run `npm i`.
+- run `vsce package`.
+- on running `ls`, you should be able to see `vizx-0.1.2.vsix`.
+- If the `code` command is functioning:
+  -  run `code --install-extension vizx-0.1.2.vsix`.
+  - in the same terminal, run `code .`.
+- If the `code` command is not functioning:
+  - launch an instance of [VSCode](https://code.visualstudio.com/download).
+  - Navigate to View > Extensions > ... > Install from VISX.
+  - Locate the `vizx-0.1.2.vsix` file you just created and select it.
+- You should now be able to view `ZXViz` as an extension in the extensions tab, and use it in the required fashion.
 
 ## Extension Settings
 
