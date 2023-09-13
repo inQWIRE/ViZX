@@ -18,7 +18,7 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic 
   - in the same terminal, run `code .`.
 - If the `code` command is not functioning:
   - launch an instance of [VSCode](https://code.visualstudio.com/download).
-  - Navigate to View > Extensions > ... > Install from VISX.
+  - Navigate to View > Extensions > ... > Install from VSIX.
   - Locate the `vizx-0.1.2.vsix` file you just created and select it.
 - You should now be able to view `ZXViz` as an extension in the extensions tab, and use it in the required fashion.
 
