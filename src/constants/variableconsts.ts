@@ -1,47 +1,3 @@
-export function scaleUp() {
-  SCALE = SCALE * 1.1;
-  CANVAS_WIDTH = CANVAS_WIDTH * 1.1;
-  CANVAS_HEIGHT = CANVAS_HEIGHT * 1.1;
-  BASE_SIZE = 1 * SCALE;
-  PAD_SIZE = 0.1 * SCALE;
-  PROPTO_SIZE = 0.2 * SCALE;
-  CAST_SIZE = 0.3 * SCALE;
-  TEXT_PAD_SIZE = 0.08 * SCALE;
-  DOTS_PAD_SIZE = 0.1 * SCALE;
-  FUNC_ARG_SIZE = 0.7 * SCALE;
-  REALLY_SMALL_TEXT = (SCALE / 15).toString().concat("px");
-  SMALL_TEXT = (SCALE / 10).toString().concat("px");
-  MEDIUM_TEXT = (SCALE / 7).toString().concat("px");
-  LARGE_TEXT = (SCALE / 2).toString().concat("px");
-  STACK_DASH = [0.06 * SCALE, 0.06 * SCALE];
-  COMPOSE_DASH = [0.16 * SCALE, 0.16 * SCALE];
-  CAST_DASH = [0.02 * SCALE, 0.02 * SCALE];
-  PROPTO_DASH = [0.005 * SCALE, 0.005 * SCALE];
-  FUNCTION_DASH = [0.03 * SCALE, 0.01 * SCALE];
-}
-
-export function scaleDown() {
-  SCALE = SCALE * 0.9;
-  CANVAS_WIDTH = CANVAS_WIDTH * 0.9;
-  CANVAS_HEIGHT = CANVAS_HEIGHT * 0.9;
-  BASE_SIZE = 1 * SCALE;
-  PAD_SIZE = 0.1 * SCALE;
-  PROPTO_SIZE = 0.2 * SCALE;
-  CAST_SIZE = 0.3 * SCALE;
-  TEXT_PAD_SIZE = 0.08 * SCALE;
-  DOTS_PAD_SIZE = 0.1 * SCALE;
-  FUNC_ARG_SIZE = 0.7 * SCALE;
-  REALLY_SMALL_TEXT = (SCALE / 15).toString().concat("px");
-  SMALL_TEXT = (SCALE / 10).toString().concat("px");
-  MEDIUM_TEXT = (SCALE / 7).toString().concat("px");
-  LARGE_TEXT = (SCALE / 2).toString().concat("px");
-  STACK_DASH = [0.06 * SCALE, 0.06 * SCALE];
-  COMPOSE_DASH = [0.16 * SCALE, 0.16 * SCALE];
-  CAST_DASH = [0.02 * SCALE, 0.02 * SCALE];
-  PROPTO_DASH = [0.005 * SCALE, 0.005 * SCALE];
-  FUNCTION_DASH = [0.03 * SCALE, 0.01 * SCALE];
-}
-
 export let CANVAS_WIDTH = 100;
 export let CANVAS_HEIGHT = 100;
 
@@ -55,11 +11,11 @@ export let CAST_SIZE = 0.3 * SCALE;
 export let TEXT_PAD_SIZE = 0.08 * SCALE;
 export let DOTS_PAD_SIZE = 0.1 * SCALE;
 export let FUNC_ARG_SIZE = 0.7 * SCALE;
-export let REALLY_SMALL_TEXT = (SCALE / 15).toString().concat("px");
-export let SMALL_TEXT = (SCALE / 10).toString().concat("px");
-export let MEDIUM_TEXT = (SCALE / 7).toString().concat("px");
-export let LARGE_TEXT = (SCALE / 2).toString().concat("px");
-export let MONOSPACE_FONT = "Monospace";
+export let REALLY_SMALL_TEXT = (SCALE / 10).toString().concat("px");
+export let SMALL_TEXT = (SCALE / 8).toString().concat("px");
+export let MEDIUM_TEXT = (SCALE / 5).toString().concat("px");
+export let LARGE_TEXT = (SCALE / 2.5).toString().concat("px");
+export let MONOSPACE_FONT = "Helvetica";
 export let ARIAL_FONT = "Arial";
 export let HOR_PAD = 0.1 * SCALE;
 export let VER_PAD = 0.1 * SCALE;
