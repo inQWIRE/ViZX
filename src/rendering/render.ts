@@ -399,7 +399,7 @@ function drawBaseNode(node: ast.ASTNode) {
   ctx.save();
   ctx.translate(right.x - TEXT_PAD_SIZE, right.y);
   max_width = undefined;
-  if (outputs.length > 4) {
+  if (outputs.length > 2) {
     ctx.rotate(-Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
@@ -430,7 +430,7 @@ function drawBaseNode(node: ast.ASTNode) {
   ctx.save();
   max_width = undefined;
   ctx.translate(left.x + TEXT_PAD_SIZE, left.y);
-  if (inputs.length > 4) {
+  if (inputs.length > 2) {
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
     ctx.rotate(Math.PI / 2);
   }

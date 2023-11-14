@@ -7,8 +7,6 @@ import * as coord from "./parsing/coords";
 import {
   boundary,
   setCanvasWidthHeight,
-  scaleUp,
-  scaleDown,
 } from "./constants/variableconsts";
 import * as vconsts from "./constants/variableconsts";
 import * as ast from "./parsing/ast";
@@ -50,30 +48,6 @@ export function activate(context: vscode.ExtensionContext) {
       );
     }
   );
-  context.subscriptions.push(disposable);
-  disposable = vscode.commands.registerCommand("vizx.scaleUp", () => {
-    scaleUp();
-    console.log(
-      "SCALE: ",
-      vconsts.SCALE,
-      " HEIGHT: ",
-      vconsts.CANVAS_HEIGHT,
-      "WIDTH: ",
-      vconsts.CANVAS_WIDTH
-    );
-  });
-  context.subscriptions.push(disposable);
-  disposable = vscode.commands.registerCommand("vizx.scaleDown", () => {
-    scaleDown();
-    console.log(
-      "SCALE: ",
-      vconsts.SCALE,
-      " HEIGHT: ",
-      vconsts.CANVAS_HEIGHT,
-      "WIDTH: ",
-      vconsts.CANVAS_WIDTH
-    );
-  });
   context.subscriptions.push(disposable);
 }
 
