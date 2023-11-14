@@ -1,10 +1,10 @@
 {
   "name": "vizx",
-  "displayName": "ViZX",
+  "displayName": "ZXViz",
   "description": "Visualizer for the ZX calculus",
   "version": "0.1.3",
-  "repository": "https://github.com/inQWIRE/ViZX/",
-  "publisher": "inQWIRE",
+  "repository": "REDACTED",
+  "publisher": "REDACTED",
   "engines": {
     "vscode": "^1.74.0"
   },
