@@ -13,6 +13,8 @@ export enum ZXConst {
   Box,
   Cap,
   Cup,
+  TriangleLeft,
+  TriangleRight,
 }
 
 export enum MTransform {

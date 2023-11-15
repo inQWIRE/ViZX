@@ -4,10 +4,7 @@ import * as vscode from "vscode";
 import * as parser from "./parsing/parser";
 import * as sizer from "./parsing/sizes";
 import * as coord from "./parsing/coords";
-import {
-  boundary,
-  setCanvasWidthHeight,
-} from "./constants/variableconsts";
+import { boundary, setCanvasWidthHeight } from "./constants/variableconsts";
 import * as vconsts from "./constants/variableconsts";
 import * as ast from "./parsing/ast";
 import { getCanvasHtml } from "./webview/webview";
@@ -65,6 +62,7 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
     let node: ast.ASTNode;
     try {
       node = parser.parseAST(expr);
+      console.log("parsed");
       node = sizer.addSizes(node);
       console.log("sized node: ", node);
       const size = sizer.determineCanvasWidthHeight(node);

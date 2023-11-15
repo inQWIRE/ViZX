@@ -14,6 +14,8 @@ import {
   NUMBER_KINDS,
   N_STACK_OP,
   N_STACK_1_OP,
+  TRIANGLE_LEFT,
+  TRIANGLE_RIGHT,
 } from "../constants/consts";
 import {
   LINE_WIDTH,
@@ -350,6 +352,18 @@ function drawBaseNode(node: ast.ASTNode) {
           inputs = "2";
           outputs = "2";
           alpha = SWAP;
+          break;
+        }
+        case ast.ZXConst.TriangleLeft: {
+          inputs = "1";
+          outputs = "1";
+          alpha = TRIANGLE_LEFT;
+          break;
+        }
+        case ast.ZXConst.TriangleRight: {
+          inputs = "1";
+          outputs = "1";
+          alpha = TRIANGLE_RIGHT;
           break;
         }
         default: {

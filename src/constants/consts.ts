@@ -17,6 +17,8 @@ export const WIRE = "—";
 export const BOX = "□";
 export const SWAP = "⨉";
 export const EMPTY = "⦰";
+export const TRIANGLE_RIGHT = "▹";
+export const TRIANGLE_LEFT = "◃";
 
 export const TRANSPOSE_TRANSFORM = "⊤";
 export const CONJUGATE_TRANSFORM = "⊼";

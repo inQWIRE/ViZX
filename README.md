@@ -15,7 +15,7 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic 
 - run `vsce package`.
 - on running `ls`, you should be able to see `vizx-0.1.2.vsix`.
 - If the `code` command is functioning:
-  -  run `code --install-extension vizx-0.1.2.vsix`.
+  - run `code --install-extension vizx-0.1.2.vsix`.
   - in the same terminal, run `code .`.
 - If the `code` command is not functioning:
   - launch an instance of [VSCode](https://code.visualstudio.com/download).

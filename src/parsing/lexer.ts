@@ -26,6 +26,8 @@ export enum TokenKind {
   Box,
   Cap,
   Cup,
+  TriangleRight,
+  TriangleLeft,
 
   Transpose,
   Conjugate,
@@ -81,6 +83,8 @@ export const lexer = buildLexer([
   [true, new RegExp(`\^[${c.BOX}]`, "g"), TokenKind.Box],
   [true, new RegExp(`\^[${c.CAP}]`, "g"), TokenKind.Cap],
   [true, new RegExp(`\^[${c.CUP}]`, "g"), TokenKind.Cup],
+  [true, new RegExp(`\^[${c.TRIANGLE_LEFT}]`, "g"), TokenKind.TriangleLeft],
+  [true, new RegExp(`\^[${c.TRIANGLE_RIGHT}]`, "g"), TokenKind.TriangleRight],
 
   [true, new RegExp(`\^[${c.TRANSPOSE_TRANSFORM}]`, "g"), TokenKind.Transpose],
   [true, new RegExp(`\^[${c.CONJUGATE_TRANSFORM}]`, "g"), TokenKind.Conjugate],

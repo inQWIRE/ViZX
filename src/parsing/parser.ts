@@ -282,6 +282,20 @@ function applyConst(args: Token): ast.ASTNode {
       } as ast.ASTConst;
       break;
     }
+    case lex.TokenKind.TriangleLeft: {
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.TriangleLeft,
+      } as ast.ASTConst;
+      break;
+    }
+    case lex.TokenKind.TriangleRight: {
+      zxconst = {
+        kind: "const",
+        val: ast.ZXConst.TriangleRight,
+      } as ast.ASTConst;
+      break;
+    }
     default: {
       throw new Error(`Unknown const: ${args.kind}`);
     }
@@ -325,7 +339,9 @@ ZXBASETERM.setPattern(
         tok(lex.TokenKind.Cap),
         tok(lex.TokenKind.Empty),
         tok(lex.TokenKind.Wire),
-        tok(lex.TokenKind.Swap)
+        tok(lex.TokenKind.Swap),
+        tok(lex.TokenKind.TriangleLeft),
+        tok(lex.TokenKind.TriangleRight)
       ),
       applyConst
     ),
@@ -608,7 +624,7 @@ ASTNODE.setPattern(
 );
 
 export function parseAST(expr: string): ast.ASTNode {
-  // lexerPrettyPrinter(expr);
+  lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
   // if (parsed.successful) {
   //   for (let i = 0; i < parsed.candidates.length; i++) {
