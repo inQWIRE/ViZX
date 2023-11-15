@@ -9,11 +9,15 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic 
 
 ## Build
 
+- If you have and trust the `.vsix` binary, you can skip this section. 
 - Install [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) if you do not have it already.
 - Install vsce using command `npm install -g @vscode/vsce`
 - in the source directory for this project, run `npm i`.
 - run `vsce package`.
 - on running `ls`, you should be able to see `vizx-0.1.2.vsix`.
+
+## Installation
+
 - If the `code` command is functioning:
   - run `code --install-extension vizx-0.1.2.vsix`.
   - in the same terminal, run `code .`.
