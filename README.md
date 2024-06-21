@@ -14,8 +14,9 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic 
 This extension contributes the following settings:
 
 - `vizx.render`: render a valid ZX diagram via manual input.
-- `vizx.scaleUp`: increase the scale of the generated diagram by 10%.
-- `vizx.scaleDown`: decrease the scale of the generated diagram by 10%.
+- `vizx.scale`: edit scale of the generated diagram
+- `vizx.exportscale`: set scale for export
+- `vizx.viewscale`: set scale for viewing
 - `vizx.lspRender`: to communicate with coq-lsp for automatic rendering. should not be used manually.
 - `vizx.activateRendering`: activates automatic rendering of goal state.
 - `vizx.deactivateRendering`: deactivates automatic rendering of goal state.
