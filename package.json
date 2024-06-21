@@ -18,10 +18,32 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "vizx.historyLength": {
+          "type": "number",
+          "default": 20,
+          "description": "Maximum number of items to keep in history"
+        }
+      }
+    },
     "commands": [
       {
         "command": "vizx.render",
         "title": "ZXViz: Render expressions with ZXViz"
+      },
+      {
+        "command": "vizx.scale",
+        "title": "ZXViz: Edit scale size of diagrams"
+      },
+      {
+        "command": "vizx.exportscale",
+        "title": "ZXViz: Set diagram scale to be export ready"
+      },
+      {
+        "command": "vizx.viewscale",
+        "title": "ZXViz: Set diagram scale to be view ready"
       },
       {
         "command": "vizx.lspRender",
