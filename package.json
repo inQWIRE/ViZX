@@ -13,6 +13,9 @@
   ],
   "activationEvents": [
     "onCommand:vizx.render",
+    "onCommand:vizx.scale",
+    "onCommand:vizx.exportscale",
+    "onCommand:vizx.viewscale",
     "onCommand:vizx.lspRender",
     "onCommand:vizx.activateRendering"
   ],
