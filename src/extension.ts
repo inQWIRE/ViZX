@@ -4,19 +4,17 @@ import * as vscode from "vscode";
 import * as parser from "./parsing/parser";
 import * as sizer from "./parsing/sizes";
 import * as coord from "./parsing/coords";
-import {
-  boundary,
-  setCanvasWidthHeight,
-} from "./constants/variableconsts";
+import { boundary, setCanvasWidthHeight } from "./constants/variableconsts";
 import * as vconsts from "./constants/variableconsts";
 import * as ast from "./parsing/ast";
 import { getCanvasHtml } from "./webview/webview";
 
 let openWebview: vscode.WebviewPanel | undefined = undefined;
 let history: string[] = [];
-const HISTORY_LENGTH = vscode.workspace.getConfiguration('vizx').get<number>('historyLength', 25);
-const HISTORY_KEY = 'vizxInputHistory';
-
+const HISTORY_LENGTH = vscode.workspace
+  .getConfiguration("vizx")
+  .get<number>("historyLength", 25);
+const HISTORY_KEY = "vizxInputHistory";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -29,19 +27,19 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand("vizx.render", () => {
-    const newDiag = 'New...';
+    const newDiag = "New...";
     const inputBox = vscode.window
       .showQuickPick([...history, newDiag], {
-        placeHolder: 'Diagram syntax with notations',
-        title: 'Enter or choose diagram'
-      }
-      ).then((selected) => {
+        placeHolder: "Diagram syntax with notations",
+        title: "Enter or choose diagram",
+      })
+      .then((selected) => {
         if (selected === undefined) {
           return;
-        }
-        else if (selected === newDiag) {
-          vscode.window.showInputBox({ prompt: 'Enter diagram syntax with notations' })
-            .then(value => {
+        } else if (selected === newDiag) {
+          vscode.window
+            .showInputBox({ prompt: "Enter diagram syntax with notations" })
+            .then((value) => {
               if (value) {
                 history.unshift(value); // Add to history
                 if (history.length > HISTORY_LENGTH) {
@@ -52,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
               }
             });
         } else {
-          history = history.filter(item => item !== selected);
+          history = history.filter((item) => item !== selected);
           history.unshift(selected); // Add to the front of history
           context.workspaceState.update(HISTORY_KEY, history);
           renderCallback(context, selected);
@@ -80,7 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
       );
     }
   );
-  
+
   context.subscriptions.push(disposable);
 }
 
@@ -140,4 +138,4 @@ function renderCallback(context: vscode.ExtensionContext, expr: any) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
