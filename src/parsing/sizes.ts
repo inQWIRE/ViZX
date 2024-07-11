@@ -103,7 +103,7 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
       break;
     }
   }
-  console.log("happy robot! ", node);
+  // console.log("happy robot! ", node);
   return node;
 }
 export function addSizes(node: ast.ASTNode): ast.ASTNode {
@@ -276,9 +276,9 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       throw new Error(`Unknown kind: ${node.kind}`);
     }
   }
-  console.log("before happy robot: ", node);
+  // console.log("before happy robot: ", node);
   node = addSizesHappyRobot(node);
-  console.log("after happy robot: ", node);
+  // console.log("after happy robot: ", node);
   return node;
 }
 

@@ -77,12 +77,14 @@ export interface ASTStack extends ASTNode {
   kind: "stack";
   left: ASTNode;
   right: ASTNode;
+  index: number;
 }
 
 export interface ASTCompose extends ASTNode {
   kind: "compose";
   left: ASTNode;
   right: ASTNode;
+  index: number;
 }
 
 export interface ASTNStack extends ASTNode {

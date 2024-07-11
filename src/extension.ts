@@ -63,6 +63,11 @@ export function activate(context: vscode.ExtensionContext) {
     renderCallback(context, expr)
   );
   context.subscriptions.push(disposable);
+  let coqLspApi = vscode.extensions.getExtension("ejgallego.coq-lsp")!.exports;
+  let hook = coqLspApi.onUserGoals((goals: any) =>
+    vscode.commands.executeCommand("vizx.lspRender", goals)
+  );
+
   disposable = vscode.commands.registerCommand("vizx.activateRendering", () => {
     vscode.window.showInformationMessage(
       "Automatic rendering is now turned on."
@@ -76,6 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(
         "Automatic rendering is now turned off."
       );
+      hook.dispose();
     }
   );
 

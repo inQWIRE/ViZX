@@ -36,6 +36,7 @@ import {
   SMALL_TEXT,
   ARIAL_FONT,
   REALLY_SMALL_TEXT,
+  COLOR_DICT,
 } from "../constants/variableconsts";
 import { findCenter, findLeftCenter, findRightCenter } from "../parsing/coords";
 import { quad } from "../constants/types";
@@ -173,18 +174,18 @@ function drawNWireNode(node: ast.ASTNode) {
 
 function drawStackNode(node: ast.ASTNode) {
   let stack = <ast.ASTStack>node;
+  drawBoundary(node.boundary!, STACK_DASH, COLOR_DICT[stack.index]);
   draw(stack.left);
   draw(stack.right);
-  drawBoundary(node.boundary!, STACK_DASH);
 }
 
 function drawNStackNode(node: ast.ASTNode) {
   let nstack = <ast.ASTNStack>node;
-  draw(nstack.node);
   let label_bound = JSON.parse(JSON.stringify(nstack.boundary!));
   label_bound.tr.x = label_bound.tl.x + FUNC_ARG_SIZE;
   label_bound.br.x = label_bound.bl.x + FUNC_ARG_SIZE;
   drawBoundary(label_bound, FUNCTION_DASH);
+  draw(nstack.node);
   let bound = JSON.parse(JSON.stringify(nstack.boundary!));
   bound.tl.x += FUNC_ARG_SIZE;
   bound.bl.x += FUNC_ARG_SIZE;
@@ -196,11 +197,11 @@ function drawNStackNode(node: ast.ASTNode) {
 
 function drawNStack1Node(node: ast.ASTNode) {
   let nstack = <ast.ASTNStack>node;
-  draw(nstack.node);
   let label_bound = JSON.parse(JSON.stringify(nstack.boundary!));
   label_bound.tr.x = label_bound.tl.x + FUNC_ARG_SIZE;
   label_bound.br.x = label_bound.bl.x + FUNC_ARG_SIZE;
   drawBoundary(label_bound, FUNCTION_DASH);
+  draw(nstack.node);
   let bound = JSON.parse(JSON.stringify(nstack.boundary!));
   bound.tl.x += FUNC_ARG_SIZE;
   bound.bl.x += FUNC_ARG_SIZE;
@@ -210,7 +211,11 @@ function drawNStack1Node(node: ast.ASTNode) {
   ctx.fillText(nstack.n.expr.concat(N_STACK_1_OP), cent.x, cent.y);
 }
 
-function drawBoundary(boundary: quad, dash?: [number, number]) {
+function drawBoundary(
+  boundary: quad,
+  dash?: [number, number],
+  color: string = white
+) {
   if (dash !== undefined) {
     ctx.setLineDash(dash);
   } else {
@@ -218,6 +223,8 @@ function drawBoundary(boundary: quad, dash?: [number, number]) {
   }
   ctx.lineWidth = LINE_WIDTH;
   ctx.strokeStyle = black;
+  console.log("setting fill style in draw boundary, ", color);
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(boundary.tl.x, boundary.tl.y);
   ctx.lineTo(boundary.tr.x, boundary.tr.y);
@@ -225,6 +232,7 @@ function drawBoundary(boundary: quad, dash?: [number, number]) {
   ctx.lineTo(boundary.bl.x, boundary.bl.y);
   ctx.closePath();
   ctx.stroke();
+  ctx.fill();
   return;
 }
 
@@ -250,15 +258,15 @@ function drawFuncBoundary(boundary: quad) {
 
 function drawComposeNode(node: ast.ASTNode) {
   let compose = <ast.ASTCompose>node;
+  drawBoundary(node.boundary!, COMPOSE_DASH, COLOR_DICT[compose.index]);
   draw(compose.left);
   draw(compose.right);
-  drawBoundary(node.boundary!, COMPOSE_DASH);
 }
 
 function drawCastNode(node: ast.ASTNode) {
   let cast = <ast.ASTCast>node;
-  draw(cast.node);
   drawBoundary(cast.boundary!, CAST_DASH);
+  draw(cast.node);
   let lc = findLeftCenter(cast.boundary!);
   let rc = findRightCenter(cast.boundary!);
   ctx.save();

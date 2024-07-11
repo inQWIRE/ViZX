@@ -17,9 +17,19 @@ let _ = require("lodash");
 
 import * as ast from "./ast";
 import * as lex from "./lexer";
+import * as v from "../constants/variableconsts";
 import { lexerPrettyPrinter } from "./lexer";
 
 type Token = psec.Token<lex.TokenKind>;
+let index = 0;
+
+function incrIndex() {
+  console.log("incrementing index: ", index + 1);
+  console.log("length of dict at incr index: ", v.getColorDictLength());
+  let r = index;
+  index = ++index % v.getColorDictLength();
+  return r;
+}
 
 /*********************** NUMBERS ******************************/
 
@@ -441,10 +451,20 @@ function applyStackCompose(
   // console.log('calling applyStackCompose');
   switch (args[0].kind) {
     case lex.TokenKind.Compose: {
-      return { kind: "compose", left: l, right: args[1] } as ast.ASTCompose;
+      return {
+        kind: "compose",
+        left: l,
+        right: args[1],
+        index: incrIndex(),
+      } as ast.ASTCompose;
     }
     case lex.TokenKind.Stack: {
-      return { kind: "stack", left: l, right: args[1] } as ast.ASTStack;
+      return {
+        kind: "stack",
+        left: l,
+        right: args[1],
+        index: incrIndex(),
+      } as ast.ASTStack;
     }
     default: {
       // throw new Error(`Unknown compose: ${args[0].text}`);

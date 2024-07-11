@@ -2,7 +2,7 @@
 
 Install [here](https://marketplace.visualstudio.com/items?itemName=inQWIRE.vizx).
 
-To render manually, use command `Render Expressions with ViZX`.
+To render manually, use command `Render Expressions with ZXViz`.
 To render automatically, use command `Activate ZXViz automatic rendering`. To stop rendering automatically, use command `Deactivate ZXViz automatic rendering`.
 
 ## Requirements

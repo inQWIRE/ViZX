@@ -92,3 +92,29 @@ export function setCanvasWidthHeight(wh: [number, number]) {
     },
   };
 }
+
+export let COLOR_DICT: string[] = ["#FFFFFF"];
+// export let COLOR_DICT : string[] = [
+//   "#d0d6e4",
+//   "#cfb77f",
+//   "#a48758",
+//   "#b5bccd",
+//   "#8b92a2"
+// ];
+
+export function updateColorDict(newDict: Array<string>) {
+  console.log("pre update in update: ", COLOR_DICT);
+  if (COLOR_DICT !== undefined) {
+    while (COLOR_DICT.pop() !== undefined) {}
+  }
+  let w = JSON.parse(JSON.stringify(newDict.pop()));
+  while (w !== undefined) {
+    COLOR_DICT.push(JSON.parse(JSON.stringify(w)));
+    w = newDict.pop();
+  }
+  console.log("post update in update: ", COLOR_DICT);
+}
+
+export function getColorDictLength() {
+  return COLOR_DICT.length;
+}
