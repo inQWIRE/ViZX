@@ -13,14 +13,14 @@ Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.10` for automatic
 - Install vsce using command `npm install -g @vscode/vsce`
 - in the source directory for this project, run `npm i`.
 - run `vsce package`.
-- on running `ls`, you should be able to see `vizx-0.1.2.vsix`.
+- on running `ls`, you should be able to see `vizx-0.1.4.vsix`.
 - If the `code` command is functioning:
-  -  run `code --install-extension vizx-0.1.2.vsix`.
+  -  run `code --install-extension vizx-0.1.4.vsix`.
   - in the same terminal, run `code .`.
 - If the `code` command is not functioning:
   - launch an instance of [VSCode](https://code.visualstudio.com/download).
   - Navigate to View > Extensions > ... > Install from VSIX.
-  - Locate the `vizx-0.1.2.vsix` file you just created and select it.
+  - Locate the `vizx-0.1.4.vsix` file you just created and select it.
 - You should now be able to view `ZXViz` as an extension in the extensions tab, and use it in the required fashion.
 
 ## Extension Settings
