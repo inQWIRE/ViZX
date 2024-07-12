@@ -3,8 +3,8 @@
   "displayName": "ViZX",
   "description": "Visualizer for the ZX calculus",
   "version": "0.1.4",
-  "repository": "https://github.com/inQWIRE/ViZX/",
-  "publisher": "inQWIRE",
+  "repository": "Anonymous",
+  "publisher": "Anonymous",
   "engines": {
     "vscode": "^1.74.0"
   },
