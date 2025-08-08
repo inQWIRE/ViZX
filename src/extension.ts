@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
   disposables.push(
     vscode.commands.registerCommand(
       "vizx.activateRendering",
-      () => activateRenderingCommmand(context)
+      () => activateRenderingCommand(context)
     )
   );
   disposables.push(

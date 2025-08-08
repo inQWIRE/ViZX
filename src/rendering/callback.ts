@@ -142,7 +142,7 @@ export function renderCallback(context: vscode.ExtensionContext, expr: any): voi
     return;
   }
   const exprStr = expr.goals.goals[0].ty.toString();
-  if (!is_potentally_valid(exprStr)) {
+  if (!is_potentially_valid(exprStr)) {
     return;
   }
   render(context, exprStr, false);
