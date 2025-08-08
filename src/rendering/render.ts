@@ -140,10 +140,11 @@ function drawPropToNode(node: ast.ASTNode) {
   // drawBoundary(node.boundary!, propto_dash);
   draw(propto.l);
   draw(propto.r);
+  // TODO: @ Bhakti how do I make this wider
   text_format("propto", PROP_TO);
   ctx.fillText(
-    PROP_TO,
-    propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE,
+    PROP_TO + propto.specialization,
+    propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE * (1 + propto.specialization.length),
     findCenter(boundary).y
   );
 }

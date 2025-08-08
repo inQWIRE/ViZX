@@ -568,6 +568,12 @@ ZXPROPTO.setPattern(
         ZXCASTTRANSFORMED
       ),
       tok(lex.TokenKind.PropTo),
+      psec.opt(
+        alt(
+          kmid(tok(lex.TokenKind.LBrack), NUML40, tok(lex.TokenKind.RBrack)),
+          tok(lex.TokenKind.Eq)
+        )
+      ),
       alt(
         ZXBASETRANSFORMED,
         ZXNSTACKTRANSFORMED,
@@ -613,8 +619,26 @@ function applyTransformPost(node: ast.ASTNode, transform: Token): ast.ASTNode {
   } as ast.ASTTransform;
 }
 
-function applyPropTo(args: [ast.ASTNode, Token, ast.ASTNode]): ast.ASTNode {
-  return { kind: "propto", l: args[0], r: args[2] } as ast.ASTPropTo;
+function applyPropTo(
+  args: [ast.ASTNode, Token, ast.Num | Token | undefined, ast.ASTNode]
+): ast.ASTNode {
+  const raw_specialization = args[2];
+  let specialization = "";
+  if (raw_specialization) {
+    if ((raw_specialization as Token).kind === lex.TokenKind.Eq) {
+      specialization = "=";
+    } else if ((raw_specialization as ast.Num).kind !== undefined) {
+      // if kind is anything but the eq tok type then we know it's a number
+      specialization = "[" + (raw_specialization as ast.Num).val + "]";
+    }
+  }
+
+  return {
+    kind: "propto",
+    l: args[0],
+    specialization,
+    r: args[3],
+  } as ast.ASTPropTo;
 }
 
 ASTNODE.setPattern(

@@ -121,6 +121,7 @@ export interface ASTVar extends ASTNode {
 
 export interface ASTPropTo extends ASTNode {
   kind: "propto";
+  specialization: string;
   l: ASTNode;
   r: ASTNode;
 }
