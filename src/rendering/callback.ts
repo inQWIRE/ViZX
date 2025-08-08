@@ -9,7 +9,7 @@ import * as c from "../constants/consts";
 
 let openWebview: vscode.WebviewPanel | undefined = undefined;
 
-function is_potentally_valid(expr: string | undefined): boolean {
+function is_potentially_valid(expr: string | undefined): boolean {
   if (!expr || expr.length === 0) {
     return false; // Empty expression is not valid
   }

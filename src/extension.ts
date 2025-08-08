@@ -110,7 +110,7 @@ function renderCommand(context: vscode.ExtensionContext): void {
     });
 }
 
-function activateRenderingCommmand(context: vscode.ExtensionContext): void {
+function activateRenderingCommand(context: vscode.ExtensionContext): void {
   const config = vscode.workspace.getConfiguration("vizx");
   const enabled = config.get<boolean>("enableAutomaticRendering", false);
   if (!enabled) {

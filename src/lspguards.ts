@@ -122,7 +122,7 @@ function ask_disable_vscoq(): boolean {
 function ask_enable_lsp(): void {
   assert(vscode.extensions.getExtension(LSP_EXT_ID)); // Needs lsp to be installed
   const message =
-    "ViZX needs the extension ${LSP_EXT_ID}. It is disabled right now. Would you like to enable it?";
+    `ViZX needs the extension ${LSP_EXT_ID}. It is disabled right now. Would you like to enable it?`;
   vscode.window
     .showErrorMessage(message, { modal: true }, YES, NO)
     .then((selection) => {
