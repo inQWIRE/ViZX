@@ -41,26 +41,42 @@ function is_potentially_valid(expr: string | undefined): boolean {
     c.FLIP_TRANSFORM,
   ];
 
-  return ops.some(op => expr.includes(op));
+  return ops.some((op) => expr.includes(op));
 }
 
 function createGitHubIssue(expr: any, e: any, stage: string): vscode.Uri {
   const issueTitle = encodeURIComponent("ViZX: Parsing error");
   const issueBody = encodeURIComponent(
-    `**Stage:**\n${stage}\n\n**Expression:**\n\`\`\`\n${expr}\n\`\`\`\n\n**Error:**\n\`\`\`\n${e?.message ?? e}\n\`\`\``
+    `**Stage:**\n${stage}\n\n**Expression:**\n\`\`\`\n${expr}\n\`\`\`\n\n**Error:**\n\`\`\`\n${
+      e?.message ?? e
+    }\n\`\`\``
   );
   const githubIssueUrl = `https://github.com/inQWIRE/VizX/issues/new?title=${issueTitle}&body=${issueBody}`;
   return vscode.Uri.parse(githubIssueUrl);
 }
 
-export function render(context: vscode.ExtensionContext, exprStr: string, manual: boolean = true): void {
+export function render(
+  context: vscode.ExtensionContext,
+  exprStr: string,
+  manual: boolean = true
+): void {
   const createIssueText = "Create GitHub Issue";
   const manualStr = manual ? " (manual)" : "";
   if (exprStr.includes("@")) {
-    vscode.window.showWarningMessage("Could not render the expression. Please disable Set Printing All. If you believe this is a bug, please create a GitHub issue.", createIssueText)
+    vscode.window
+      .showWarningMessage(
+        "Could not render the expression. Please disable Set Printing All. If you believe this is a bug, please create a GitHub issue.",
+        createIssueText
+      )
       .then((selection) => {
         if (selection === createIssueText) {
-          vscode.env.openExternal(createGitHubIssue(exprStr, "Set Printing All is enabled", 'Precheck' + manualStr));
+          vscode.env.openExternal(
+            createGitHubIssue(
+              exprStr,
+              "Set Printing All is enabled",
+              "Precheck" + manualStr
+            )
+          );
         }
       });
     return;
@@ -77,7 +93,9 @@ export function render(context: vscode.ExtensionContext, exprStr: string, manual
       )
       .then((selection) => {
         if (selection === createIssueText) {
-          vscode.env.openExternal(createGitHubIssue(exprStr, e, 'Parsing' + manualStr));
+          vscode.env.openExternal(
+            createGitHubIssue(exprStr, e, "Parsing" + manualStr)
+          );
         }
       });
     return;
@@ -96,7 +114,9 @@ export function render(context: vscode.ExtensionContext, exprStr: string, manual
       )
       .then((selection) => {
         if (selection === createIssueText) {
-          vscode.env.openExternal(createGitHubIssue(exprStr, e, 'Rendering' + manualStr));
+          vscode.env.openExternal(
+            createGitHubIssue(exprStr, e, "Rendering" + manualStr)
+          );
         }
       });
     return;
@@ -130,8 +150,10 @@ export function render(context: vscode.ExtensionContext, exprStr: string, manual
   panel.webview.postMessage({ command: JSON.stringify(node) });
 }
 
-export function renderCallback(context: vscode.ExtensionContext, expr: any): void {
-
+export function renderCallback(
+  context: vscode.ExtensionContext,
+  expr: any
+): void {
   if (expr === undefined) {
     return;
   }

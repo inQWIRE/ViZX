@@ -140,11 +140,20 @@ function drawPropToNode(node: ast.ASTNode) {
   // drawBoundary(node.boundary!, propto_dash);
   draw(propto.l);
   draw(propto.r);
-  // TODO: @ Bhakti how do I make this wider
   text_format("propto", PROP_TO);
   ctx.fillText(
-    PROP_TO + propto.specialization,
-    propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE * (1 + propto.specialization.length),
+    PROP_TO,
+    propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE,
+    findCenter(boundary).y - 0.5 * PAD_SIZE,
+    PROPTO_SIZE
+  );
+  text_format("proptospec", propto.specialization);
+  ctx.fillText(
+    propto.specialization,
+    propto.l.boundary!.tr.x +
+      PAD_SIZE +
+      PROPTO_SIZE +
+      PROPTO_SIZE * 0.3 * 0.5 * propto.specialization.length,
     findCenter(boundary).y
   );
 }
@@ -602,6 +611,13 @@ function text_format(loc: string, text: string) {
     }
     case "propto": {
       ctx.font = LARGE_TEXT.concat(" ").concat(ARIAL_FONT);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = black;
+      break;
+    }
+    case "proptospec": {
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;

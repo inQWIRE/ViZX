@@ -56,9 +56,7 @@ export interface GoalAnswer<Pp> {
   error?: Pp;
 }
 
-
 export interface CoqLspAPI {
-
   /**
    * Register callback on user-initiated goals request
    */

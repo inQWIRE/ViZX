@@ -632,7 +632,6 @@ function applyPropTo(
       specialization = "[" + (raw_specialization as ast.Num).val + "]";
     }
   }
-
   return {
     kind: "propto",
     l: args[0],
@@ -652,7 +651,6 @@ ASTNODE.setPattern(
 );
 
 export function parseAST(expr: string): ast.ASTNode {
-  // lexerPrettyPrinter(expr);
   let parsed = expectEOF(ASTNODE.parse(lex.lexer.parse(expr)));
   // if (parsed.successful) {
   //   for (let i = 0; i < parsed.candidates.length; i++) {

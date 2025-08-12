@@ -34,15 +34,13 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   disposables.push(
-    vscode.commands.registerCommand(
-      "vizx.activateRendering",
-      () => activateRenderingCommand(context)
+    vscode.commands.registerCommand("vizx.activateRendering", () =>
+      activateRenderingCommand(context)
     )
   );
   disposables.push(
-    vscode.commands.registerCommand(
-      "vizx.deactivateRendering",
-      () => deactivateRenderingCommand()
+    vscode.commands.registerCommand("vizx.deactivateRendering", () =>
+      deactivateRenderingCommand()
     )
   );
   context.subscriptions.push(...disposables);
@@ -188,4 +186,4 @@ function deactivateRendering() {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}

@@ -400,5 +400,4 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       throw new Error(`unidentifiable node ${node} in addCoords`);
     }
   }
-  throw new Error(`just so this file compiles <3`);
 }

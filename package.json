@@ -59,7 +59,7 @@
     "vscode:prepublish": "npm run package",
     "compile": "node ./esbuild.js",
     "package": "NODE_ENV=production node ./esbuild.js",
-    "watch": "node ./esbuild.js --watch",
+    "watch": "node ./esbuild.js & node ./esbuild.js --watch",
     "lint": "eslint src --ext ts & npx prettier --write .",
     "deploy": "vsce publish",
     "check-types": "tsc --noEmit"

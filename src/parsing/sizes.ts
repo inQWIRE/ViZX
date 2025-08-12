@@ -250,7 +250,11 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
         node.hor_len +=
-          sleft.hor_len + sright.hor_len + PROPTO_SIZE + 4 * PAD_SIZE;
+          sleft.hor_len +
+          sright.hor_len +
+          PROPTO_SIZE +
+          0.3 * PROPTO_SIZE * node_.specialization.length +
+          4 * PAD_SIZE;
       } else {
         throw new Error(
           `Could not size children of ${node} as propto node: vertical len`
