@@ -1,8 +1,8 @@
 {
   "name": "vizx",
-  "displayName": "ViZX",
+  "displayName": "ZXViz",
   "description": "Visualizer for the ZX calculus",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "repository": "https://github.com/inQWIRE/ViZX/",
   "publisher": "inQWIRE",
   "engines": {
@@ -12,11 +12,13 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vizx.render",
-    "onCommand:vizx.lspRender",
-    "onCommand:vizx.activateRendering"
+    "onLanguage:coq",
+    "onLanguage:rocq"
   ],
   "main": "./out/extension.js",
+  "extensionDependencies": [
+    "ejgallego.coq-lsp"
+  ],
   "contributes": {
     "commands": [
       {
@@ -35,21 +37,39 @@
         "command": "vizx.deactivateRendering",
         "title": "ZXViz: Deactivate ZXViz automatic rendering"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "ViZX Extension Configuration",
+      "properties": {
+        "vizx.ignoreActiveVsCoq": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow ViZX to run with VSCoq active despite possible issues. Setting to true will disable bug reporting features, as this is not officially supported."
+        },
+        "vizx.enableAutomaticRendering": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic rendering of ZX diagrams when the file is saved or the editor is focused. Disable this to manually trigger rendering."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "node ./esbuild.js",
     "package": "NODE_ENV=production node ./esbuild.js",
-    "watch": "node ./esbuild.js --watch",
+    "watch": "node ./esbuild.js & node ./esbuild.js --watch",
     "lint": "eslint src --ext ts & npx prettier --write .",
-    "deploy": "vsce publish"
+    "deploy": "vsce publish",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-typescript": "^7.21.4",
     "@types/glob": "^7.2.0",
+    "@types/minimatch": "^6.0.0",
     "@types/node": "14.x",
     "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
@@ -61,7 +81,8 @@
     "glob": "^7.2.0",
     "lodash": "^4.17.21",
     "prettier": "2.8.4",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "vscode-languageserver-types": "^3.17.5"
   },
   "dependencies": {
     "deep-object-diff": "^1.1.9",

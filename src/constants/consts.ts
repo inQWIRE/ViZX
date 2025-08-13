@@ -11,6 +11,7 @@ export const STACK_OP = "↕"; // \updownarrow
 export const N_STACK_1_OP = "↑";
 
 export const PROP_TO = "∝";
+export const EQ = "=";
 export const CAP = "⊂";
 export const CUP = "⊃";
 export const WIRE = "—";

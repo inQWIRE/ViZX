@@ -144,6 +144,16 @@ function drawPropToNode(node: ast.ASTNode) {
   ctx.fillText(
     PROP_TO,
     propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE,
+    findCenter(boundary).y - 0.5 * PAD_SIZE,
+    PROPTO_SIZE
+  );
+  text_format("proptospec", propto.specialization);
+  ctx.fillText(
+    propto.specialization,
+    propto.l.boundary!.tr.x +
+    PAD_SIZE +
+    PROPTO_SIZE +
+    PROPTO_SIZE * 0.3 * 0.5 * propto.specialization.length,
     findCenter(boundary).y
   );
 }
@@ -398,7 +408,7 @@ function drawBaseNode(node: ast.ASTNode) {
       center.y,
       max_width,
       ctx.measureText(alpha).actualBoundingBoxAscent +
-        ctx.measureText(alpha).actualBoundingBoxDescent,
+      ctx.measureText(alpha).actualBoundingBoxDescent,
       false
     );
   } else {
@@ -430,7 +440,7 @@ function drawBaseNode(node: ast.ASTNode) {
     0,
     max_width!,
     ctx.measureText(outputs).actualBoundingBoxAscent +
-      ctx.measureText(outputs).actualBoundingBoxDescent,
+    ctx.measureText(outputs).actualBoundingBoxDescent,
     false
   );
   // ctx.fillText(outputs, 0, 0, max_width);
@@ -461,7 +471,7 @@ function drawBaseNode(node: ast.ASTNode) {
     0,
     max_width!,
     ctx.measureText(inputs).actualBoundingBoxAscent +
-      ctx.measureText(inputs).actualBoundingBoxDescent,
+    ctx.measureText(inputs).actualBoundingBoxDescent,
     false
   );
   // ctx.fillText(inputs, 0, 0, max_width);
@@ -606,6 +616,13 @@ function text_format(loc: string, text: string) {
       ctx.fillStyle = black;
       break;
     }
+    case "proptospec": {
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = black;
+      break;
+    }
     case "transform": {
       ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
@@ -707,6 +724,11 @@ function draw(node: ast.ASTNode) {
 
 function render(this: Window, msg: MessageEvent<any>) {
   let command = msg.data.command;
+  let qualifiers = msg.data.qualifiers;
+  if (qualifiers) {
+    const qualifiersElement = document.getElementById("qualifiers")!;
+    qualifiersElement.textContent = `Qualifiers: ${qualifiers}`;
+  }
   let node: ast.ASTNode = JSON.parse(command);
   setCanvasWidthHeight(determineCanvasWidthHeight(node));
   formatCanvas();

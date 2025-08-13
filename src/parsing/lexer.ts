@@ -39,7 +39,10 @@ export enum TokenKind {
   Compose,
 
   PropTo,
+  Eq,
 
+  LBrack,
+  RBrack,
   LParen,
   RParen,
   Space,
@@ -63,6 +66,9 @@ export const lexer = buildLexer([
   [true, /^S\s/g, TokenKind.Succ],
   [true, /^\(/g, TokenKind.LParen],
   [true, /^\)/g, TokenKind.RParen],
+  [true, /^\[/g, TokenKind.LBrack],
+  [true, /^\]/g, TokenKind.RBrack],
+  [true, /^=/g, TokenKind.Eq],
   [true, /^PI/g, TokenKind.PI],
 
   [true, /^[A-WYa-zΑ-Ωα-ω][A-Za-zΑ-Ωα-ω0-9'_]*/g, TokenKind.Str],
