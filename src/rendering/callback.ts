@@ -6,6 +6,7 @@ import { boundary, setCanvasWidthHeight } from "../constants/variableconsts";
 import * as ast from "../parsing/ast";
 import { getCanvasHtml } from "../webview/webview";
 import * as c from "../constants/consts";
+import { str } from "typescript-parsec";
 
 let openWebview: vscode.WebviewPanel | undefined = undefined;
 
@@ -44,15 +45,43 @@ function is_potentially_valid(expr: string | undefined): boolean {
   return ops.some((op) => expr.includes(op));
 }
 
-function createGitHubIssue(expr: any, e: any, stage: string): vscode.Uri {
+function createGitHubIssue(expr: string | [string, string], e: any, stage: string): vscode.Uri {
+  function makeCodeStyling(text: string): string {
+    return `\`\`\`${text}\`\`\``; // Use backticks for inline code styling
+  }
   const issueTitle = encodeURIComponent("ViZX: Parsing error");
+  let exprs: string;
+  if (typeof expr === "string") {
+    exprs = makeCodeStyling(expr);
+  } else {
+    exprs = `${makeCodeStyling(expr[0])}\n${makeCodeStyling(expr[1])}`;
+  }
   const issueBody = encodeURIComponent(
-    `**Stage:**\n${stage}\n\n**Expression:**\n\`\`\`\n${expr}\n\`\`\`\n\n**Error:**\n\`\`\`\n${
-      e?.message ?? e
+    `**Stage:**\n${stage}\n\n**Expression:**\n${exprs}n\n**Error:**\n\`\`\`\n${e?.message ?? e
     }\n\`\`\``
   );
   const githubIssueUrl = `https://github.com/inQWIRE/VizX/issues/new?title=${issueTitle}&body=${issueBody}`;
   return vscode.Uri.parse(githubIssueUrl);
+}
+
+/**
+ * Remove any qualifiers from the expression.
+ * So this will turn forall x, exists y, z into a tuple ("forall x, exists y", "z").
+ * @param expr The string expression to strip qualifiers from
+ * @returns A tuple of the stripped expression and the remaining part
+ */
+function stripQualifiers(expr: string): [string, string] {
+  // This regex matches any sequence of "forall" or "exists" followed by a variables and a comma. 
+  // Note that .+? means it will match as few characters as possible, ensuring capturing of the comma. (lazy matching)
+  // The regex matches as many qualifiers as possible, so it will match "forall x, exists y, z" as "forall x, exists y,".
+  const regex = /^((?:forall|exists|∀|∃)\s+.+?,\s*)+/gu;
+  const match = expr.match(regex);
+  if (match) {
+    const strippedExpr = expr.replace(regex, "").trim();
+    const qualifiers = match[0].trim();
+    return [qualifiers, strippedExpr];
+  }
+  return ["", expr.trim()]; // No qualifiers found, return the original expression
 }
 
 export function render(
@@ -81,9 +110,10 @@ export function render(
       });
     return;
   }
+  const [qualifiers, strippedExpr] = stripQualifiers(exprStr);
   let node: ast.ASTNode;
   try {
-    node = parser.parseAST(exprStr);
+    node = parser.parseAST(strippedExpr);
   } catch (e: any) {
     // Allow user to create a GitHub issue right then and there, so we can debug the problem
     vscode.window
@@ -94,7 +124,7 @@ export function render(
       .then((selection) => {
         if (selection === createIssueText) {
           vscode.env.openExternal(
-            createGitHubIssue(exprStr, e, "Parsing" + manualStr)
+            createGitHubIssue([qualifiers, strippedExpr], e, "Parsing" + manualStr)
           );
         }
       });
@@ -115,7 +145,7 @@ export function render(
       .then((selection) => {
         if (selection === createIssueText) {
           vscode.env.openExternal(
-            createGitHubIssue(exprStr, e, "Rendering" + manualStr)
+            createGitHubIssue([qualifiers, strippedExpr], e, "Rendering" + manualStr)
           );
         }
       });
@@ -144,10 +174,11 @@ export function render(
     null,
     context.subscriptions
   );
+  const strippedQualifiers = qualifiers.slice(0, -1); // Remove trailing comma since it looks weird
   openWebview = panel;
   panel.webview.html = getCanvasHtml(panel, context);
   panel.webview.onDidReceiveMessage((msg) => console.log(msg));
-  panel.webview.postMessage({ command: JSON.stringify(node) });
+  panel.webview.postMessage({ command: JSON.stringify(node), qualifiers: strippedQualifiers });
 }
 
 export function renderCallback(
