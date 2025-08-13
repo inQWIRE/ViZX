@@ -22,8 +22,8 @@ function is_potentially_valid(expr: string | undefined): boolean {
   // Check for vyzx operators
 
   const ops = [
-    "Z",
-    "X",
+    "Z ",
+    "X ",
     c.N_STACK_OP,
     c.COMPOSE_OP,
     c.STACK_OP,
