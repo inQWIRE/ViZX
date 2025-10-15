@@ -186,13 +186,34 @@ function drawPropToNode(node: ast.ASTNode) {
   // drawBoundary(node.boundary!, propto_dash);
   draw(propto.l);
   draw(propto.r);
-  text_format("propto", PROP_TO + propto.specialization);
-  ctx.fillText(
-    PROP_TO + propto.specialization,
-    (propto.r.boundary!.tl.x + propto.l.boundary!.tr.x) / 2,
-    findCenter(boundary).y - 0.5 * PAD_SIZE,
-    Math.abs(propto.r.boundary!.tl.x - propto.l.boundary!.tr.x)
-  );
+  if (propto.specialization.length <= 1) {
+    text_format("propto", PROP_TO + propto.specialization);
+  }
+  else {
+    text_format("proptospec", PROP_TO + propto.specialization);
+  }
+  if (propto.specialization === "=") {
+    ctx.fillText(
+      PROP_TO,
+      (propto.r.boundary!.tl.x + propto.l.boundary!.tr.x) / 2 - 0.75 * PROPTO_SIZE,
+      findCenter(boundary).y,
+      Math.abs(propto.r.boundary!.tl.x - propto.l.boundary!.tr.x)
+    );
+    ctx.fillText(
+      "=",
+      (propto.r.boundary!.tl.x + propto.l.boundary!.tr.x) / 2 + 0.75 * PROPTO_SIZE,
+      findCenter(boundary).y + PROPTO_SIZE / 6,
+      Math.abs(propto.r.boundary!.tl.x - propto.l.boundary!.tr.x)
+    );
+  }
+  else {
+    ctx.fillText(
+      PROP_TO + propto.specialization,
+      (propto.r.boundary!.tl.x + propto.l.boundary!.tr.x) / 2,
+      findCenter(boundary).y,
+      Math.abs(propto.r.boundary!.tl.x - propto.l.boundary!.tr.x)
+    );
+  }
   // text_format("propto", PROP_TO);
   // ctx.fillText(
   //   PROP_TO,
@@ -663,7 +684,7 @@ function text_format(loc: string, text: string) {
       break;
     }
     case "propto": {
-      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
+      ctx.font = LARGE_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
