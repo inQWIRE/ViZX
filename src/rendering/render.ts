@@ -14,6 +14,8 @@ import {
   NUMBER_KINDS,
   N_STACK_OP,
   N_STACK_1_OP,
+  SCALE_OP,
+  // ZX_PLUS_OP,
 } from "../constants/consts";
 import {
   LINE_WIDTH,
@@ -72,7 +74,7 @@ function drawFunctionNode(node: ast.ASTNode) {
   ctx.fillText(func.fname, cent.x, cent.y);
   bound.tl.y += PAD_SIZE;
   bound.tr.y += PAD_SIZE;
-  bound.bl.y += PAD_SIZE;
+  bound.bl.y -= PAD_SIZE;
   bound.br.y -= PAD_SIZE;
   for (let arg of func.args) {
     bound.tl.x += PAD_SIZE;
@@ -135,27 +137,78 @@ function drawTransformNode(node: ast.ASTNode) {
   }
 }
 
+function get_font_size(font : string) : number {
+  let sizes = font.match(/([0-9\.]+)px/g);
+  return parseFloat(sizes![1])
+}
+
+function set_font_size(size: number, font : string) : string {
+  return font.replace(/([0-9\.]+)px/g, size.toString() + "px")
+}
+
+function text_format_fit(display_text : string, max_width : number) {
+  let current_width = ctx.measureText(display_text).width;
+  if (current_width <= max_width) {
+    return;
+  }
+  else {
+    let current_size = get_font_size(ctx.font);
+    let new_size = current_size * max_width / current_width;
+    ctx.font = set_font_size(new_size, ctx.font);
+  }
+}
+
+function drawScaleNode(node: ast.ASTNode) {
+  let scale = <ast.ASTScale>node;
+  let display_text = scale.coefficient.expr + " " + SCALE_OP;
+  let max_width = Math.max(0.3 * PROPTO_SIZE * display_text.length + PAD_SIZE, FUNC_ARG_SIZE);
+  let label_bound = JSON.parse(JSON.stringify(scale.boundary!));
+  label_bound.tr.x = label_bound.tl.x + max_width;
+  label_bound.br.x = label_bound.bl.x + max_width;
+  drawBoundary(label_bound, FUNCTION_DASH);
+  let bound = JSON.parse(JSON.stringify(scale.boundary!));
+  bound.tl.x += max_width;
+  bound.bl.x += max_width;
+  drawFuncBoundary(bound);
+  draw(scale.node);
+  let cent = findCenter(label_bound);
+  // text_format("",display_text);
+  // text_format_fit(display_text, FUNC_ARG_SIZE);
+  // text_format?
+  ctx.fillText(display_text, 
+      cent.x, cent.y, max_width);
+  // ctx.fillText(ctx.measureText(display_text).width.toString() + " " + FUNC_ARG_SIZE.toString() + " " + display_text, 
+  //     cent.x, cent.y, FUNC_ARG_SIZE);
+}
+
 function drawPropToNode(node: ast.ASTNode) {
   let propto = <ast.ASTPropTo>node;
   // drawBoundary(node.boundary!, propto_dash);
   draw(propto.l);
   draw(propto.r);
-  text_format("propto", PROP_TO);
+  text_format("propto", PROP_TO + propto.specialization);
   ctx.fillText(
-    PROP_TO,
-    propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE,
+    PROP_TO + propto.specialization,
+    (propto.r.boundary!.tl.x + propto.l.boundary!.tr.x) / 2,
     findCenter(boundary).y - 0.5 * PAD_SIZE,
-    PROPTO_SIZE
+    Math.abs(propto.r.boundary!.tl.x - propto.l.boundary!.tr.x)
   );
-  text_format("proptospec", propto.specialization);
-  ctx.fillText(
-    propto.specialization,
-    propto.l.boundary!.tr.x +
-    PAD_SIZE +
-    PROPTO_SIZE +
-    PROPTO_SIZE * 0.3 * 0.5 * propto.specialization.length,
-    findCenter(boundary).y
-  );
+  // text_format("propto", PROP_TO);
+  // ctx.fillText(
+  //   PROP_TO,
+  //   propto.l.boundary!.tr.x + PAD_SIZE + 0.5 * PROPTO_SIZE,
+  //   findCenter(boundary).y - 0.5 * PAD_SIZE,
+  //   PROPTO_SIZE
+  // );
+  // text_format("proptospec", propto.specialization);
+  // ctx.fillText(
+  //   propto.specialization,
+  //   propto.l.boundary!.tr.x +
+  //   PAD_SIZE +
+  //   PROPTO_SIZE +
+  //   PROPTO_SIZE * 0.3 * 0.5 * propto.specialization.length,
+  //   findCenter(boundary).y
+  // );
 }
 
 function drawNWireNode(node: ast.ASTNode) {
@@ -610,7 +663,7 @@ function text_format(loc: string, text: string) {
       break;
     }
     case "propto": {
-      ctx.font = LARGE_TEXT.concat(" ").concat(ARIAL_FONT);
+      ctx.font = MEDIUM_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;
@@ -687,6 +740,10 @@ function draw(node: ast.ASTNode) {
       drawComposeNode(node);
       break;
     }
+    // case "plus": {
+    //   drawPlusNode(node);
+    //   break;
+    // }
     case "nstack": {
       drawNStackNode(node);
       break;
@@ -706,6 +763,10 @@ function draw(node: ast.ASTNode) {
     case "propto": {
       drawPropToNode(node);
       break;
+    }
+    case "scale": {
+      drawScaleNode(node);
+      break
     }
     case "transform": {
       drawTransformNode(node);
@@ -780,11 +841,23 @@ function downloadPNG() {
   }, "image/png");
 }
 
+// function downloadSVG() {
+//   canvas.toBlob(function (blob) {
+//     const downloadLink = document.createElement("a");
+//     downloadLink.href = URL.createObjectURL(blob!);
+//     downloadLink.download = "canvas.svg";
+//     downloadLink.click();
+//   }, "image/svg");
+// }
+
 // const downloadButtonSvg = document.getElementById("download-button-svg");
 // downloadButtonSvg!.addEventListener("click", downloadSVG);
 
 const downloadButtonPng = document.getElementById("download-button-png");
 downloadButtonPng!.addEventListener("click", downloadPNG);
+
+// const downloadButtonSvg = document.getElementById("download-button-svg");
+// downloadButtonSvg!.addEventListener("click", downloadSVG);
 
 window.addEventListener("message", render);
 

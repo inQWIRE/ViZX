@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import { coqLspApi, only_with_lsp } from "./lspguards";
 import { render, renderCallback } from "./rendering/callback";
+import { lexer, lexerPrettyPrinter, lexerPrettyPrinter_string } from "./parsing/lexer";
 
 let history: string[] = [];
 const HISTORY_LENGTH = vscode.workspace
@@ -26,6 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
       renderCommand(context)
     ),
   ];
+  
+  disposables.push(
+    vscode.commands.registerCommand("vizx.lex", () =>
+      lexCommand(context)
+    )
+  );
 
   disposables.push(
     vscode.commands.registerCommand("vizx.lspRender", (expr) =>
@@ -43,6 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
       deactivateRenderingCommand()
     )
   );
+  
   context.subscriptions.push(...disposables);
 
   const config = vscode.workspace.getConfiguration("vizx");
@@ -106,6 +114,21 @@ function renderCommand(context: vscode.ExtensionContext): void {
         render(context, selected);
       }
     });
+}
+
+function lexCommand(context: vscode.ExtensionContext): void {
+  vscode.window
+    .showInputBox({ prompt: "Enter diagram syntax with notations" })
+    .then((value) => {
+      if (value) {
+        vscode.window
+          .showInformationMessage(
+            "Parsed expression: " + lexerPrettyPrinter_string(value),
+            "Ok"
+        )
+      }
+    }).then((selection) => {})
+  return;
 }
 
 function activateRenderingCommand(context: vscode.ExtensionContext): void {

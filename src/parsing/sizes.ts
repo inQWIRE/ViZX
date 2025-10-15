@@ -43,6 +43,36 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
       node = node_;
       break;
     }
+    // case "plus": {
+    //   let node_ = <ast.ASTPlus>node;
+    //   if (node_.ver_len === undefined || node_.hor_len === undefined) {
+    //     throw new Error(`length undefined in second sizing\n`);
+    //   }
+    //   let desired_hor = node_.hor_len - 3 * PAD_SIZE;
+    //   let desired_ver = node_.ver_len - 2 * PAD_SIZE;
+    //   let sleft = JSON.parse(JSON.stringify(node_.left));
+    //   let sright = JSON.parse(JSON.stringify(node_.right));
+    //   node_.left.hor_len = Number(
+    //     (
+    //       (sleft.hor_len! /
+    //         Number((sleft.hor_len! + sright.hor_len!).toFixed(0))) *
+    //       desired_hor
+    //     ).toFixed(0)
+    //   );
+    //   node_.right.hor_len = Number(
+    //     (
+    //       (sright.hor_len! /
+    //         Number((sleft.hor_len! + sright.hor_len!).toFixed(0))) *
+    //       desired_hor
+    //     ).toFixed(0)
+    //   );
+    //   node_.left.ver_len = desired_ver;
+    //   node_.right.ver_len = desired_ver;
+    //   node_.left = addSizesHappyRobot(node_.left);
+    //   node_.right = addSizesHappyRobot(node_.right);
+    //   node = node_;
+    //   break;
+    // }
     case "stack": {
       let node_ = <ast.ASTStack>node;
       if (node_.ver_len === undefined || node_.hor_len === undefined) {
@@ -120,6 +150,17 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       break;
     }
+    case "scale": {
+      let node_ = <ast.ASTScale>node;
+      let snode = addSizes(node_.node);
+      if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
+        node.hor_len += snode.hor_len + 
+          Math.max(0.3 * PROPTO_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
+            FUNC_ARG_SIZE);
+        node.ver_len += snode.ver_len + 2 * PAD_SIZE;
+      }
+      break;
+    }
     case "const": {
       node.hor_len = BASE_SIZE;
       node.ver_len = BASE_SIZE;
@@ -177,6 +218,27 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       break;
     }
+    // case "plus": {
+    //   let node_ = <ast.ASTPlus>node;
+    //   let sleft = addSizes(node_.left);
+    //   let sright = addSizes(node_.right);
+    //   if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
+    //     node.ver_len += Math.max(sleft.ver_len, sright.ver_len) + 2 * PAD_SIZE;
+    //   } else {
+    //     throw new Error(
+    //       `Could not size children of ${node} as plus node: horizontal len`
+    //     );
+    //   }
+    //   if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
+    //     node.hor_len +=
+    //       sleft.hor_len + sright.hor_len + PAD_SIZE + 4 * PAD_SIZE;
+    //   } else {
+    //     throw new Error(
+    //       `Could not size children of ${node} as plus node: vertical len`
+    //     );
+    //   }
+    //   break;
+    // }
     case "nstack": {
       let node_ = <ast.ASTNStack>node;
       node_.node = addSizes(node_.node);

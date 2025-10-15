@@ -7,6 +7,7 @@ import * as ast from "../parsing/ast";
 import { getCanvasHtml } from "../webview/webview";
 import * as c from "../constants/consts";
 import { str } from "typescript-parsec";
+import { lexerPrettyPrinter } from "../parsing/lexer";
 
 let openWebview: vscode.WebviewPanel | undefined = undefined;
 
@@ -40,6 +41,8 @@ function is_potentially_valid(expr: string | undefined): boolean {
     c.ADJOINT_TRANSFORM,
     c.COLORSWAP_TRANSFORM,
     c.FLIP_TRANSFORM,
+    c.SCALE_OP,
+    // c.ZX_PLUS_OP,
   ];
 
   return ops.some((op) => expr.includes(op));
@@ -113,6 +116,7 @@ export function render(
   const [qualifiers, strippedExpr] = stripQualifiers(exprStr);
   let node: ast.ASTNode;
   try {
+    console.log("Lexed string: "); lexerPrettyPrinter(strippedExpr)
     node = parser.parseAST(strippedExpr);
   } catch (e: any) {
     // Allow user to create a GitHub issue right then and there, so we can debug the problem

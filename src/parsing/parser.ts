@@ -19,6 +19,7 @@ import * as ast from "./ast";
 import * as lex from "./lexer";
 import * as v from "../constants/variableconsts";
 import { lexerPrettyPrinter } from "./lexer";
+import { SnippetTextEdit } from "vscode";
 
 type Token = psec.Token<lex.TokenKind>;
 let index = 0;
@@ -187,7 +188,9 @@ NUML10.setPattern(
 NUML20.setPattern(
   lrec_sc(
     alt(NUML10, NUML0),
-    seq(alt(tok(lex.TokenKind.Mul), tok(lex.TokenKind.Div)), NUML0),
+    seq(
+      alt(tok(lex.TokenKind.Mul), tok(lex.TokenKind.Div)), 
+      alt(NUML10, NUML0)),
     applyBinOp
   )
 );
@@ -245,6 +248,7 @@ const ZXCAST = rule<lex.TokenKind, ast.ASTNode>();
 const ZXCASTTRANSFORMED = rule<lex.TokenKind, ast.ASTNode>();
 const ZXPROPTO = rule<lex.TokenKind, ast.ASTNode>();
 const ZXSTACKCOMPOSE = rule<lex.TokenKind, ast.ASTNode>();
+const ZXSCALE = rule<lex.TokenKind, ast.ASTNode>();
 const ASTNODE = rule<lex.TokenKind, ast.ASTNode>();
 
 function applyConst(args: Token): ast.ASTNode {
@@ -303,6 +307,10 @@ function applyVar(val: Token): ast.ASTNode {
   return { kind: "var", val: val.text } as ast.ASTVar;
 }
 
+function applyVars(val: [Token, Token, Token[]]): ast.ASTNode {
+  return { kind: "var", val: val[0].text + " " + val[1].text + " " + val[2].map(v => v.text).join(" ")} as ast.ASTVar;
+}
+
 function applyFunc(
   args: [Token, ast.Num | ast.ASTNode, (ast.Num | ast.ASTNode)[]]
 ): ast.ASTNode {
@@ -340,11 +348,16 @@ ZXBASETERM.setPattern(
       applyConst
     ),
     apply(tok(lex.TokenKind.Str), applyVar),
+    apply(seq(
+      tok(lex.TokenKind.Str),
+      tok(lex.TokenKind.Str),
+      rep_sc(tok(lex.TokenKind.Str)))
+    , applyVars),
     apply(
       seq(
         tok(lex.TokenKind.Str),
-        alt(NUML40, ASTNODE),
-        rep_sc(alt(NUML40, ASTNODE))
+        alt(NUML0, ZXBASETERM),
+        rep_sc(alt(NUML0, ZXBASETERM))
       ),
       applyFunc
     ),
@@ -435,10 +448,10 @@ function applySpider(args: [Token, ast.Num, ast.Num, ast.Num]): ast.ASTNode {
 
 ZXSTACKCOMPOSE.setPattern(
   lrec_sc(
-    alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED),
+    alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED, ZXSCALE),
     seq(
-      alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)),
-      alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED)
+      alt(tok(lex.TokenKind.Stack), tok(lex.TokenKind.Compose)/* , tok(lex.TokenKind.Plus) */),
+      alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED, ZXSCALE)
     ),
     applyStackCompose
   )
@@ -466,11 +479,42 @@ function applyStackCompose(
         index: incrIndex(),
       } as ast.ASTStack;
     }
+    // case lex.TokenKind.Plus: {
+    //   return {
+    //     kind: "plus",
+    //     left: l,
+    //     right: args[1],
+    //     index: incrIndex(),
+    //   } as ast.ASTPlus;
+    // }
     default: {
       // throw new Error(`Unknown compose: ${args[0].text}`);
       return l;
     }
   }
+}
+
+ZXSCALE.setPattern(
+  apply(
+    seq(
+      NUML40,
+      tok(lex.TokenKind.Scale),
+      alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXCASTTRANSFORMED)
+    ),
+    applyScale
+  )
+);
+
+function applyScale(
+  args: [ast.Num, Token, ast.ASTNode]
+): ast.ASTNode {
+  return {
+    kind: "scale",
+    coefficient: args[0],
+    // width: 0,
+    node: args[2],
+    index: incrIndex(),
+  } as ast.ASTScale
 }
 
 function applyNStack(args: [ast.Num, Token, ast.ASTNode]): ast.ASTNode {
@@ -532,7 +576,7 @@ ZXCAST.setPattern(
       kright(tok(lex.TokenKind.Comma), NUML40),
       kmid(
         tok(lex.TokenKind.Cast3Colon),
-        alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXSTACKCOMPOSE, ZXCAST),
+        alt(ZXBASETRANSFORMED, ZXNSTACKTRANSFORMED, ZXSTACKCOMPOSE, ZXSCALE, ZXCAST),
         tok(lex.TokenKind.Cast$)
       )
     ),
@@ -565,7 +609,8 @@ ZXPROPTO.setPattern(
         ZXBASETRANSFORMED,
         ZXNSTACKTRANSFORMED,
         ZXSTACKCOMPOSE,
-        ZXCASTTRANSFORMED
+        ZXCASTTRANSFORMED,
+        ZXSCALE
       ),
       tok(lex.TokenKind.PropTo),
       psec.opt(
@@ -578,7 +623,8 @@ ZXPROPTO.setPattern(
         ZXBASETRANSFORMED,
         ZXNSTACKTRANSFORMED,
         ZXSTACKCOMPOSE,
-        ZXCASTTRANSFORMED
+        ZXCASTTRANSFORMED,
+        ZXSCALE
       )
     ),
     applyPropTo
@@ -629,7 +675,7 @@ function applyPropTo(
       specialization = "=";
     } else if ((raw_specialization as ast.Num).kind !== undefined) {
       // if kind is anything but the eq tok type then we know it's a number
-      specialization = "[" + (raw_specialization as ast.Num).val + "]";
+      specialization = "[" + (raw_specialization as ast.Num).expr + "]";
     }
   }
   return {
@@ -646,7 +692,8 @@ ASTNODE.setPattern(
     ZXBASETRANSFORMED,
     ZXNSTACKTRANSFORMED,
     ZXSTACKCOMPOSE,
-    ZXCASTTRANSFORMED
+    ZXCASTTRANSFORMED,
+    ZXSCALE
   )
 );
 

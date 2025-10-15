@@ -2,7 +2,7 @@
   "name": "vizx",
   "displayName": "ZXViz",
   "description": "Visualizer for the ZX calculus",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": "https://github.com/inQWIRE/ViZX/",
   "publisher": "inQWIRE",
   "engines": {
@@ -24,6 +24,10 @@
       {
         "command": "vizx.render",
         "title": "ZXViz: Render expressions with ZXViz"
+      },
+      {
+        "command": "vizx.lex",
+        "title": "ZXViz: Lex expression with ZXViz"
       },
       {
         "command": "vizx.lspRender",
@@ -88,6 +92,8 @@
     "deep-object-diff": "^1.1.9",
     "esbuild": "0.16.00",
     "esbuild-plugin-copy": "^2.0.2",
+    "n": "^10.2.0",
+    "stable": "^0.1.8",
     "typescript-parsec": "^0.3.2"
   }
 }

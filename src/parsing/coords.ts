@@ -1,11 +1,14 @@
 import * as ast from "./ast";
-import { NUMBER_KINDS } from "../constants/consts";
+import { NUMBER_KINDS, SCALE_OP } from "../constants/consts";
 import {
   FUNC_ARG_SIZE,
   CAST_SIZE,
   PAD_SIZE,
+  PROPTO_SIZE
 } from "../constants/variableconsts";
 import { quad, coord } from "../constants/types";
+import { mainModule } from "process";
+import { createContext } from "vm";
 
 export function findCenter(q: quad): coord {
   return {
@@ -82,6 +85,28 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       bound.tr.x -= PAD_SIZE;
       bound.tr.y += PAD_SIZE;
       bound.bl.x += PAD_SIZE + FUNC_ARG_SIZE;
+      bound.bl.y -= PAD_SIZE;
+      bound.br.x -= PAD_SIZE;
+      bound.br.y -= PAD_SIZE;
+      node_.node = addCoords(node_.node, bound);
+      return node_;
+    }
+    case "scale": {
+      let node_ = <ast.ASTScale>node;
+      node_.boundary = makeAtCenter(
+        findCenter(boundary),
+        node.hor_len!,
+        node.ver_len!
+      );
+      let size = Math.max(0.3 * PROPTO_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
+                  FUNC_ARG_SIZE);
+      
+      let bound: quad = JSON.parse(JSON.stringify(boundary));
+      bound.tl.x += PAD_SIZE + size;
+      bound.tl.y += PAD_SIZE;
+      bound.tr.x -= PAD_SIZE;
+      bound.tr.y += PAD_SIZE;
+      bound.bl.x += PAD_SIZE + size;
       bound.bl.y -= PAD_SIZE;
       bound.br.x -= PAD_SIZE;
       bound.br.y -= PAD_SIZE;
