@@ -26,6 +26,11 @@ export function changeScale(scale: number) {
 export let CANVAS_WIDTH = 100;
 export let CANVAS_HEIGHT = 100;
 
+export let LHS_CANVAS_WIDTH = 100;
+export let LHS_CANVAS_HEIGHT = 100;
+export let RHS_CANVAS_WIDTH = 100;
+export let RHS_CANVAS_HEIGHT = 100;
+
 // SCALE = size of base square, ideally do not go below 100 or it'll be too small
 export let SCALE: number;
 export let LINE_WIDTH: number;
@@ -92,6 +97,17 @@ export function setCanvasWidthHeight(wh: [number, number]) {
     },
   };
 }
+
+export function setLHSCanvasWidthHeight(wh: [number, number]) {
+  LHS_CANVAS_WIDTH = wh[0] + 2 * PAD_SIZE;
+  LHS_CANVAS_HEIGHT = wh[1] + 2 * PAD_SIZE;
+}
+
+export function setRHSCanvasWidthHeight(wh: [number, number]) {
+  RHS_CANVAS_WIDTH = wh[0] + 2 * PAD_SIZE;
+  RHS_CANVAS_HEIGHT = wh[1] + 2 * PAD_SIZE;
+}
+
 
 export let COLOR_DICT: string[] = ["#FFFFFF"];
 // export let COLOR_DICT : string[] = [

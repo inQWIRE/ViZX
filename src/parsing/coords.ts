@@ -70,7 +70,7 @@ export function makeAtCenter(
   };
 }
 
-export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
+export function addCoords(node: ast.ASTNode, boundary: quad, preboxed:Boolean = false): ast.ASTNode {
   switch (node.kind) {
     case "transform": {
       let node_ = <ast.ASTTransform>node;
@@ -88,7 +88,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       bound.bl.y -= PAD_SIZE;
       bound.br.x -= PAD_SIZE;
       bound.br.y -= PAD_SIZE;
-      node_.node = addCoords(node_.node, bound);
+      node_.node = addCoords(node_.node, bound, true);
       return node_;
     }
     case "scale": {
@@ -110,7 +110,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       bound.bl.y -= PAD_SIZE;
       bound.br.x -= PAD_SIZE;
       bound.br.y -= PAD_SIZE;
-      node_.node = addCoords(node_.node, bound);
+      node_.node = addCoords(node_.node, bound, true);
       return node_;
     }
     case "const": {
@@ -155,41 +155,42 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
         node.ver_len!
       );
       // console.log("stack node bound: ", node_.boundary);
+      let ADJ_SIZE = preboxed ? 0 : PAD_SIZE;
       let l_bound = {
         tl: {
-          x: node_.boundary.tl.x + PAD_SIZE,
-          y: node_.boundary.tl.y + PAD_SIZE,
+          x: node_.boundary.tl.x + ADJ_SIZE,
+          y: node_.boundary.tl.y + ADJ_SIZE,
         },
         tr: {
-          x: node_.boundary.tr.x - PAD_SIZE,
-          y: node_.boundary.tr.y + PAD_SIZE,
+          x: node_.boundary.tr.x - ADJ_SIZE,
+          y: node_.boundary.tr.y + ADJ_SIZE,
         },
         bl: {
-          x: node_.boundary.tl.x + PAD_SIZE,
-          y: node_.boundary.tl.y + l_ver + PAD_SIZE,
+          x: node_.boundary.tl.x + ADJ_SIZE,
+          y: node_.boundary.tl.y + l_ver + ADJ_SIZE,
         },
         br: {
-          x: node_.boundary.tr.x - PAD_SIZE,
-          y: node_.boundary.tr.y + l_ver + PAD_SIZE,
+          x: node_.boundary.tr.x - ADJ_SIZE,
+          y: node_.boundary.tr.y + l_ver + ADJ_SIZE,
         },
       } as quad;
       // console.log("l_bound: ", l_bound);
       let r_bound = {
         bl: {
-          x: node_.boundary.bl.x + PAD_SIZE,
-          y: node_.boundary.bl.y - PAD_SIZE,
+          x: node_.boundary.bl.x + ADJ_SIZE,
+          y: node_.boundary.bl.y - ADJ_SIZE,
         },
         br: {
-          x: node_.boundary.br.x - PAD_SIZE,
-          y: node_.boundary.br.y - PAD_SIZE,
+          x: node_.boundary.br.x - ADJ_SIZE,
+          y: node_.boundary.br.y - ADJ_SIZE,
         },
         tl: {
-          x: node_.boundary.tl.x + PAD_SIZE,
-          y: node_.boundary.bl.y - r_ver - PAD_SIZE,
+          x: node_.boundary.tl.x + ADJ_SIZE,
+          y: node_.boundary.bl.y - r_ver - ADJ_SIZE,
         },
         tr: {
-          x: node_.boundary.tr.x - PAD_SIZE,
-          y: node_.boundary.br.y - r_ver - PAD_SIZE,
+          x: node_.boundary.tr.x - ADJ_SIZE,
+          y: node_.boundary.br.y - r_ver - ADJ_SIZE,
         },
       } as quad;
       // console.log("r_bound: ", r_bound);
@@ -206,41 +207,42 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
         node.hor_len!,
         node.ver_len!
       );
+      let ADJ_SIZE = preboxed ? 0 : PAD_SIZE;
       let l_bound = {
         tl: {
-          x: node_.boundary.tl.x + PAD_SIZE,
-          y: node_.boundary.tl.y + PAD_SIZE,
+          x: node_.boundary.tl.x + ADJ_SIZE,
+          y: node_.boundary.tl.y + ADJ_SIZE,
         },
         tr: {
-          x: node_.boundary.tl.x + l_hor + PAD_SIZE,
-          y: node_.boundary.tl.y + PAD_SIZE,
+          x: node_.boundary.tl.x + l_hor + ADJ_SIZE,
+          y: node_.boundary.tl.y + ADJ_SIZE,
         },
         bl: {
-          x: node_.boundary.bl.x + PAD_SIZE,
-          y: node_.boundary.bl.y - PAD_SIZE,
+          x: node_.boundary.bl.x + ADJ_SIZE,
+          y: node_.boundary.bl.y - ADJ_SIZE,
         },
         br: {
-          x: node_.boundary.tl.x + l_hor + PAD_SIZE,
-          y: node_.boundary.bl.y - PAD_SIZE,
+          x: node_.boundary.tl.x + l_hor + ADJ_SIZE,
+          y: node_.boundary.bl.y - ADJ_SIZE,
         },
       } as quad;
       // console.log("l_bound: ", l_bound);
       let r_bound = {
         tl: {
-          x: node_.boundary.tr.x - r_hor - PAD_SIZE,
-          y: node_.boundary.tr.y + PAD_SIZE,
+          x: node_.boundary.tr.x - r_hor - ADJ_SIZE,
+          y: node_.boundary.tr.y + ADJ_SIZE,
         },
         tr: {
-          x: node_.boundary.tr.x - PAD_SIZE,
-          y: node_.boundary.tr.y + PAD_SIZE,
+          x: node_.boundary.tr.x - ADJ_SIZE,
+          y: node_.boundary.tr.y + ADJ_SIZE,
         },
         bl: {
-          x: node_.boundary.br.x - r_hor - PAD_SIZE,
-          y: node_.boundary.bl.y - PAD_SIZE,
+          x: node_.boundary.br.x - r_hor - ADJ_SIZE,
+          y: node_.boundary.bl.y - ADJ_SIZE,
         },
         br: {
-          x: node_.boundary.br.x - PAD_SIZE,
-          y: node_.boundary.br.y - PAD_SIZE,
+          x: node_.boundary.br.x - ADJ_SIZE,
+          y: node_.boundary.br.y - ADJ_SIZE,
         },
       } as quad;
       // console.log("r_bound: ", r_bound);
@@ -334,7 +336,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
       bound.bl.y -= PAD_SIZE;
       bound.br.x -= CAST_SIZE;
       bound.br.y -= PAD_SIZE;
-      node_.node = addCoords(node_.node, bound);
+      node_.node = addCoords(node_.node, bound, true);
       return node_;
     }
     case "function": {
@@ -417,8 +419,8 @@ export function addCoords(node: ast.ASTNode, boundary: quad): ast.ASTNode {
           y: node_.boundary.br.y - PAD_SIZE,
         },
       } as quad;
-      node_.l = addCoords(node_.l, l_bound);
-      node_.r = addCoords(node_.r, r_bound);
+      node_.l = addCoords(node_.l, l_bound, true);
+      node_.r = addCoords(node_.r, r_bound, true);
       return node_;
     }
     default: {

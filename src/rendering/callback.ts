@@ -181,7 +181,7 @@ export function render(
   const strippedQualifiers = qualifiers.slice(0, -1); // Remove trailing comma since it looks weird
   openWebview = panel;
   panel.webview.html = getCanvasHtml(panel, context);
-  panel.webview.onDidReceiveMessage((msg) => console.log(msg));
+  panel.webview.onDidReceiveMessage((msg) => console.log(msg)); // TODO: display the qualifiers
   panel.webview.postMessage({ command: JSON.stringify(node), qualifiers: strippedQualifiers });
 }
 

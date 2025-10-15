@@ -324,6 +324,17 @@ function applyFunc(
   } as ast.ASTFunc;
 }
 
+function applyFuncNum(
+  args: [Token, ast.Num, ast.Num[]]
+): ast.ASTNode {
+  args[2].unshift(args[1]);
+  const new_args = <[ast.Num]>args[2];
+  return {
+    kind: "var",
+    val: args[0].text + " " + args[1].expr + " " + 
+      args[2].map(v => v.expr).join(" ")} as ast.ASTVar;
+}
+
 function applyNWire(arg: ast.Num): ast.ASTNode {
   return { kind: "nwire", n: arg } as ast.ASTNWire;
 }
@@ -353,6 +364,14 @@ ZXBASETERM.setPattern(
       tok(lex.TokenKind.Str),
       rep_sc(tok(lex.TokenKind.Str)))
     , applyVars),
+    apply(
+      seq(
+        tok(lex.TokenKind.Str),
+        NUML0,
+        rep_sc(NUML0)
+      ),
+      applyFuncNum
+    ),
     apply(
       seq(
         tok(lex.TokenKind.Str),

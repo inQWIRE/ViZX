@@ -33,10 +33,16 @@ export function getCanvasHtml(
       <script>var exports = {};</script>
       <script defer type="text/javascript" nonce="${nonce}" src="${scriptUri}""></script>  </head>
   <body>
-       <button id="download-button-png">Download PNG</button>
+      <button id="download-button-png">Download PNG</button>
+      <button id="download-button-png-lhs">Download PNG (LHS)</button>
+      <button id="download-button-png-rhs">Download PNG (RHS)</button>
+      <button id="toggle-lhs">Show LHS</button>
+      <button id="toggle-rhs">Show RHS</button>
       <!--<button id="download-button-svg">Download SVG</button>-->
-       <p id="qualifiers"></p>
-       <canvas id="canvas" style="max-height: 400px; width: auto;"></canvas>
+      <p id="qualifiers"></p>
+      <canvas id="canvas" style="max-height: 400px; width: auto;"></canvas>
+      <canvas id="lhscanvas" style="display: none; max-height: 400px; width: auto;"></canvas>
+      <canvas id="rhscanvas" style="display: none; max-height: 400px; width: auto;"></canvas>
   </body>
   </html>
 `;
