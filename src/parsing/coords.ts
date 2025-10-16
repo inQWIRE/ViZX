@@ -98,7 +98,7 @@ export function addCoords(node: ast.ASTNode, boundary: quad, preboxed:Boolean = 
         node.hor_len!,
         node.ver_len!
       );
-      let size = Math.max(0.3 * PROPTO_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
+      let size = Math.max(0.2 * CAST_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
                   FUNC_ARG_SIZE);
       
       let bound: quad = JSON.parse(JSON.stringify(boundary));

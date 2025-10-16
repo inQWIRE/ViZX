@@ -155,7 +155,7 @@ export function addSizes(node: ast.ASTNode, preboxed:Boolean=false): ast.ASTNode
       let snode = addSizes(node_.node, true);
       if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
         node.hor_len += snode.hor_len + 
-          Math.max(0.3 * PROPTO_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
+          Math.max(0.2 * CAST_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
             FUNC_ARG_SIZE);
         node.ver_len += snode.ver_len + 2 * PAD_SIZE;
       }
@@ -315,16 +315,16 @@ export function addSizes(node: ast.ASTNode, preboxed:Boolean=false): ast.ASTNode
           node.hor_len +=
             sleft.hor_len +
             sright.hor_len +
-            PROPTO_SIZE +
-            0.3 * PROPTO_SIZE * node_.specialization.length +
+            2 * PROPTO_SIZE +
+            0.2 * CAST_SIZE * node_.specialization.length +
             4 * PAD_SIZE;
         }
         else {
           node.hor_len +=
             sleft.hor_len +
             sright.hor_len +
-            1.5 * PROPTO_SIZE +
-            1.5 * PROPTO_SIZE * node_.specialization.length +
+            1.0 * PROPTO_SIZE +
+            1.0 * CAST_SIZE * node_.specialization.length +
             4 * PAD_SIZE;
         }
       } else {

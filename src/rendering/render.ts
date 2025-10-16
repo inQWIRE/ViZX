@@ -27,6 +27,7 @@ import {
   setCanvasWidthHeight,
   boundary,
   PROPTO_SIZE,
+  CAST_SIZE,
   FUNC_ARG_SIZE,
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
@@ -39,6 +40,7 @@ import {
   LARGE_TEXT,
   MONOSPACE_FONT,
   MEDIUM_TEXT,
+  MEDIUM_LARGE_TEXT,
   SMALL_TEXT,
   ARIAL_FONT,
   REALLY_SMALL_TEXT,
@@ -174,7 +176,7 @@ function drawTransformNode(ctx:CanvasRenderingContext2D, node: ast.ASTNode) {
 function drawScaleNode(ctx:CanvasRenderingContext2D, node: ast.ASTNode) {
   let scale = <ast.ASTScale>node;
   let display_text = scale.coefficient.expr + " " + SCALE_OP;
-  let max_width = Math.max(0.3 * PROPTO_SIZE * display_text.length + PAD_SIZE, FUNC_ARG_SIZE);
+  let max_width = Math.max(0.2 * CAST_SIZE * display_text.length + PAD_SIZE, FUNC_ARG_SIZE);
   let label_bound = JSON.parse(JSON.stringify(scale.boundary!));
   label_bound.tr.x = label_bound.tl.x + max_width;
   label_bound.br.x = label_bound.bl.x + max_width;
@@ -389,7 +391,7 @@ function drawCastNode(ctx:CanvasRenderingContext2D, node: ast.ASTNode) {
   ctx.translate(cast.node.boundary!.tr.x + TEXT_PAD_SIZE, rc.y);
   max_width = undefined;
   if (cast.m.expr.length > 2) {
-    ctx.rotate(-Math.PI / 2);
+    ctx.rotate(Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
   text_format(ctx, "cast_out_background", cast.m.expr);
@@ -511,7 +513,7 @@ function drawBaseNode(ctx:CanvasRenderingContext2D, node: ast.ASTNode) {
   ctx.translate(right.x - TEXT_PAD_SIZE, right.y);
   max_width = undefined;
   if (outputs.length > 2) {
-    ctx.rotate(-Math.PI / 2);
+    ctx.rotate(Math.PI / 2);
     max_width = node.ver_len! - 2 * TEXT_PAD_SIZE;
   }
   // text_format("spider_in_out_background", outputs);
@@ -706,7 +708,7 @@ function text_format(ctx:CanvasRenderingContext2D, loc: string, text: string) {
       break;
     }
     case "propto": {
-      ctx.font = LARGE_TEXT.concat(" ").concat(ARIAL_FONT);
+      ctx.font = MEDIUM_LARGE_TEXT.concat(" ").concat(ARIAL_FONT);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = black;

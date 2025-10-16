@@ -3,7 +3,7 @@ export function changeScale(scale: number) {
   LINE_WIDTH = scale / 200;
   BASE_SIZE = 1 * scale;
   PAD_SIZE = 0.1 * scale;
-  PROPTO_SIZE = 0.2 * scale;
+  PROPTO_SIZE = 0.1 * scale;
   CAST_SIZE = 0.3 * scale;
   TEXT_PAD_SIZE = 0.08 * scale;
   DOTS_PAD_SIZE = 0.1 * scale;
@@ -11,6 +11,7 @@ export function changeScale(scale: number) {
   REALLY_SMALL_TEXT = (scale / 15).toString().concat("px");
   SMALL_TEXT = (scale / 10).toString().concat("px");
   MEDIUM_TEXT = (scale / 7).toString().concat("px");
+  MEDIUM_LARGE_TEXT = (scale / 4).toString().concat("px");
   LARGE_TEXT = (scale / 2).toString().concat("px");
   MONOSPACE_FONT = "Monospace";
   ARIAL_FONT = "Arial";
@@ -44,6 +45,7 @@ export let FUNC_ARG_SIZE: number;
 export let REALLY_SMALL_TEXT: string;
 export let SMALL_TEXT: string;
 export let MEDIUM_TEXT: string;
+export let MEDIUM_LARGE_TEXT: string;
 export let LARGE_TEXT: string;
 export let MONOSPACE_FONT: string;
 export let ARIAL_FONT: string;
