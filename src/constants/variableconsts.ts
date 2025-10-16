@@ -99,13 +99,13 @@ export function setCanvasWidthHeight(wh: [number, number]) {
 }
 
 export function setLHSCanvasWidthHeight(wh: [number, number]) {
-  LHS_CANVAS_WIDTH = wh[0] + 2 * PAD_SIZE;
-  LHS_CANVAS_HEIGHT = wh[1] + 2 * PAD_SIZE;
+  LHS_CANVAS_WIDTH = wh[0] + 2 * HOR_PAD;
+  LHS_CANVAS_HEIGHT = wh[1] + 2 * VER_PAD;
 }
 
 export function setRHSCanvasWidthHeight(wh: [number, number]) {
-  RHS_CANVAS_WIDTH = wh[0] + 2 * PAD_SIZE;
-  RHS_CANVAS_HEIGHT = wh[1] + 2 * PAD_SIZE;
+  RHS_CANVAS_WIDTH = wh[0] + 2 * HOR_PAD;
+  RHS_CANVAS_HEIGHT = wh[1] + 2 * VER_PAD;
 }
 
 

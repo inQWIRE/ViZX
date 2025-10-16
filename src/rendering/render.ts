@@ -849,14 +849,14 @@ function render(this: Window, msg: MessageEvent<any>) {
   switch (node.kind) {
     case "propto": {
       let node_ = <ast.ASTPropTo>node;
-      draw(lhsctx, node_.l);
+      draw(lhsctx, node_.l, true);
       let rhs_boundary = makeAtCenter(
         {x: rhscanvas.width / 2, y: rhscanvas.height / 2},
         node_.r.hor_len!,
         node_.r.ver_len!,
       )
       addCoords(node_.r, rhs_boundary, true)
-      draw(rhsctx, node_.r);
+      draw(rhsctx, node_.r, true);
       break;
     }
   }
