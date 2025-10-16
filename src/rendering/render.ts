@@ -374,7 +374,7 @@ function drawCastNode(ctx:CanvasRenderingContext2D, node: ast.ASTNode) {
   let lc = findLeftCenter(cast.boundary!);
   let rc = findRightCenter(cast.boundary!);
   ctx.save();
-  ctx.translate(cast.node.boundary!.tl.x - TEXT_PAD_SIZE, lc.y);
+  ctx.translate(cast.node.boundary!.tl.x - CAST_SIZE + 0.5 * TEXT_PAD_SIZE, lc.y);
   let max_width: undefined | number = undefined;
   if (cast.n.expr.length > 2) {
     ctx.rotate(Math.PI / 2);
@@ -388,7 +388,7 @@ function drawCastNode(ctx:CanvasRenderingContext2D, node: ast.ASTNode) {
   ctx.restore();
   ctx.save();
 
-  ctx.translate(cast.node.boundary!.tr.x + TEXT_PAD_SIZE, rc.y);
+  ctx.translate(cast.node.boundary!.tr.x + CAST_SIZE - 0.5 * TEXT_PAD_SIZE, rc.y);
   max_width = undefined;
   if (cast.m.expr.length > 2) {
     ctx.rotate(Math.PI / 2);
