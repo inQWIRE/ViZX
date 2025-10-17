@@ -1,4 +1,4 @@
-# ViZX: A Visualizer for the ZX Calculus
+# ZXViz : A Visualizer for the ZX Calculus
 
 Install [here](https://marketplace.visualstudio.com/items?itemName=inQWIRE.vizx).
 
@@ -9,9 +9,25 @@ To render automatically, use command `Activate ZXViz automatic rendering`. To st
 
 Requires [coq-lsp](https://github.com/ejgallego/coq-lsp/) `0.1.7` for automatic rendering. Syntax of valid terms = valid ZX diagrams in [VyZX](https://github.com/inQWIRE/VyZX). See [src/CoreData/ZXCore](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/ZXCore.v) for the base definitions, and [src/CoreData/Proportional](https://github.com/inQWIRE/VyZX/blob/main/src/CoreData/Proportional.v) for proportionality definitions.
 
+## Build
+
+- Install [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) if you do not have it already.
+- Install vsce using command `npm install -g @vscode/vsce`
+- in the source directory for this project, run `npm i`.
+- run `vsce package`.
+- on running `ls`, you should be able to see `vizx-*.*.*.vsix`.
+- If the `code` command is functioning:
+  -  run `code --install-extension vizx-*.*.*.vsix`.
+  - in the same terminal, run `code .`.
+- If the `code` command is not functioning:
+  - launch an instance of [VSCode](https://code.visualstudio.com/download).
+  - Navigate to View > Extensions > ... > Install from VSIX.
+  - Locate the `vizx-*.*.*.vsix` file you just created and select it.
+- You should now be able to view `ZXViz` as an extension in the extensions tab, and use it in the required fashion.
+
 ## Extension Settings
 
-This extension contributes the following settings:
+This extension contributes the following commands:
 
 - `vizx.render`: render a valid ZX diagram via manual input.
 - `vizx.scaleUp`: increase the scale of the generated diagram by 10%.
