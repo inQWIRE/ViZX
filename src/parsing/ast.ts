@@ -87,6 +87,21 @@ export interface ASTCompose extends ASTNode {
   index: number;
 }
 
+// export interface ASTPlus extends ASTNode {
+//   kind: "plus";
+//   left: ASTNode;
+//   right: ASTNode;
+//   index: number;
+// }
+
+export interface ASTScale extends ASTNode {
+  kind: "scale";
+  coefficient: Num;
+  // width: number;
+  node: ASTNode;
+  index: number;
+}
+
 export interface ASTNStack extends ASTNode {
   kind: "nstack";
   n: Num;

@@ -3,7 +3,7 @@ export function changeScale(scale: number) {
   LINE_WIDTH = scale / 200;
   BASE_SIZE = 1 * scale;
   PAD_SIZE = 0.1 * scale;
-  PROPTO_SIZE = 0.2 * scale;
+  PROPTO_SIZE = 0.1 * scale;
   CAST_SIZE = 0.3 * scale;
   TEXT_PAD_SIZE = 0.08 * scale;
   DOTS_PAD_SIZE = 0.1 * scale;
@@ -11,6 +11,7 @@ export function changeScale(scale: number) {
   REALLY_SMALL_TEXT = (scale / 15).toString().concat("px");
   SMALL_TEXT = (scale / 10).toString().concat("px");
   MEDIUM_TEXT = (scale / 7).toString().concat("px");
+  MEDIUM_LARGE_TEXT = (scale / 4).toString().concat("px");
   LARGE_TEXT = (scale / 2).toString().concat("px");
   MONOSPACE_FONT = "Monospace";
   ARIAL_FONT = "Arial";
@@ -26,6 +27,11 @@ export function changeScale(scale: number) {
 export let CANVAS_WIDTH = 100;
 export let CANVAS_HEIGHT = 100;
 
+export let LHS_CANVAS_WIDTH = 100;
+export let LHS_CANVAS_HEIGHT = 100;
+export let RHS_CANVAS_WIDTH = 100;
+export let RHS_CANVAS_HEIGHT = 100;
+
 // SCALE = size of base square, ideally do not go below 100 or it'll be too small
 export let SCALE: number;
 export let LINE_WIDTH: number;
@@ -39,6 +45,7 @@ export let FUNC_ARG_SIZE: number;
 export let REALLY_SMALL_TEXT: string;
 export let SMALL_TEXT: string;
 export let MEDIUM_TEXT: string;
+export let MEDIUM_LARGE_TEXT: string;
 export let LARGE_TEXT: string;
 export let MONOSPACE_FONT: string;
 export let ARIAL_FONT: string;
@@ -92,6 +99,17 @@ export function setCanvasWidthHeight(wh: [number, number]) {
     },
   };
 }
+
+export function setLHSCanvasWidthHeight(wh: [number, number]) {
+  LHS_CANVAS_WIDTH = wh[0] + 2 * HOR_PAD;
+  LHS_CANVAS_HEIGHT = wh[1] + 2 * VER_PAD;
+}
+
+export function setRHSCanvasWidthHeight(wh: [number, number]) {
+  RHS_CANVAS_WIDTH = wh[0] + 2 * HOR_PAD;
+  RHS_CANVAS_HEIGHT = wh[1] + 2 * VER_PAD;
+}
+
 
 export let COLOR_DICT: string[] = ["#FFFFFF"];
 // export let COLOR_DICT : string[] = [

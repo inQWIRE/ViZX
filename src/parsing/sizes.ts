@@ -1,5 +1,5 @@
 import * as ast from "./ast";
-import { NUMBER_KINDS } from "../constants/consts";
+import { N_STACK_1_OP, NUMBER_KINDS } from "../constants/consts";
 import {
   HOR_PAD,
   VER_PAD,
@@ -11,15 +11,15 @@ import {
   SCALE,
 } from "../constants/variableconsts";
 
-export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
+export function addSizesHappyRobot(node: ast.ASTNode, preboxed:Boolean=false): ast.ASTNode {
   switch (node.kind) {
     case "compose": {
       let node_ = <ast.ASTCompose>node;
       if (node_.ver_len === undefined || node_.hor_len === undefined) {
         throw new Error(`length undefined in second sizing\n`);
       }
-      let desired_hor = node_.hor_len - 3 * PAD_SIZE;
-      let desired_ver = node_.ver_len - 2 * PAD_SIZE;
+      let desired_hor = node_.hor_len - (preboxed ? 1 : 3) * PAD_SIZE;
+      let desired_ver = node_.ver_len - (preboxed ? 0 : 2) * PAD_SIZE;
       let sleft = JSON.parse(JSON.stringify(node_.left));
       let sright = JSON.parse(JSON.stringify(node_.right));
       node_.left.hor_len = Number(
@@ -43,13 +43,43 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
       node = node_;
       break;
     }
+    // case "plus": {
+    //   let node_ = <ast.ASTPlus>node;
+    //   if (node_.ver_len === undefined || node_.hor_len === undefined) {
+    //     throw new Error(`length undefined in second sizing\n`);
+    //   }
+    //   let desired_hor = node_.hor_len - 3 * PAD_SIZE;
+    //   let desired_ver = node_.ver_len - 2 * PAD_SIZE;
+    //   let sleft = JSON.parse(JSON.stringify(node_.left));
+    //   let sright = JSON.parse(JSON.stringify(node_.right));
+    //   node_.left.hor_len = Number(
+    //     (
+    //       (sleft.hor_len! /
+    //         Number((sleft.hor_len! + sright.hor_len!).toFixed(0))) *
+    //       desired_hor
+    //     ).toFixed(0)
+    //   );
+    //   node_.right.hor_len = Number(
+    //     (
+    //       (sright.hor_len! /
+    //         Number((sleft.hor_len! + sright.hor_len!).toFixed(0))) *
+    //       desired_hor
+    //     ).toFixed(0)
+    //   );
+    //   node_.left.ver_len = desired_ver;
+    //   node_.right.ver_len = desired_ver;
+    //   node_.left = addSizesHappyRobot(node_.left);
+    //   node_.right = addSizesHappyRobot(node_.right);
+    //   node = node_;
+    //   break;
+    // }
     case "stack": {
       let node_ = <ast.ASTStack>node;
       if (node_.ver_len === undefined || node_.hor_len === undefined) {
         throw new Error(`length undefined in second sizing\n`);
       }
-      let desired_hor = node_.hor_len - 2 * PAD_SIZE;
-      let desired_ver = node_.ver_len - 3 * PAD_SIZE;
+      let desired_hor = node_.hor_len - (preboxed ? 0 : 2) * PAD_SIZE;
+      let desired_ver = node_.ver_len - (preboxed ? 1 : 3) * PAD_SIZE;
       let sleft = JSON.parse(JSON.stringify(node_.left));
       let sright = JSON.parse(JSON.stringify(node_.right));
       node_.left.hor_len = desired_hor;
@@ -106,16 +136,27 @@ export function addSizesHappyRobot(node: ast.ASTNode): ast.ASTNode {
   // console.log("happy robot! ", node);
   return node;
 }
-export function addSizes(node: ast.ASTNode): ast.ASTNode {
+export function addSizes(node: ast.ASTNode, preboxed:Boolean=false): ast.ASTNode {
   node.hor_len = 0;
   node.ver_len = 0;
   switch (node.kind) {
     case "transform": {
       let node_ = <ast.ASTTransform>node;
-      let snode = addSizes(node_.node);
+      let snode = addSizes(node_.node, true);
       if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
         node.hor_len += snode.hor_len + FUNC_ARG_SIZE;
         +2 * PAD_SIZE;
+        node.ver_len += snode.ver_len + 2 * PAD_SIZE;
+      }
+      break;
+    }
+    case "scale": {
+      let node_ = <ast.ASTScale>node;
+      let snode = addSizes(node_.node, true);
+      if (snode.hor_len !== undefined && snode.ver_len !== undefined) {
+        node.hor_len += snode.hor_len + 
+          Math.max(0.2 * CAST_SIZE * (node_.coefficient.expr.length + 3) + PAD_SIZE,
+            FUNC_ARG_SIZE);
         node.ver_len += snode.ver_len + 2 * PAD_SIZE;
       }
       break;
@@ -177,6 +218,27 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
       }
       break;
     }
+    // case "plus": {
+    //   let node_ = <ast.ASTPlus>node;
+    //   let sleft = addSizes(node_.left);
+    //   let sright = addSizes(node_.right);
+    //   if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
+    //     node.ver_len += Math.max(sleft.ver_len, sright.ver_len) + 2 * PAD_SIZE;
+    //   } else {
+    //     throw new Error(
+    //       `Could not size children of ${node} as plus node: horizontal len`
+    //     );
+    //   }
+    //   if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
+    //     node.hor_len +=
+    //       sleft.hor_len + sright.hor_len + PAD_SIZE + 4 * PAD_SIZE;
+    //   } else {
+    //     throw new Error(
+    //       `Could not size children of ${node} as plus node: vertical len`
+    //     );
+    //   }
+    //   break;
+    // }
     case "nstack": {
       let node_ = <ast.ASTNStack>node;
       node_.node = addSizes(node_.node);
@@ -207,7 +269,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     }
     case "cast": {
       let node_ = <ast.ASTCast>node;
-      let inner_node = addSizes(node_.node);
+      let inner_node = addSizes(node_.node, true);
       if (
         inner_node.ver_len !== undefined &&
         inner_node.hor_len !== undefined
@@ -239,8 +301,8 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     }
     case "propto": {
       let node_ = <ast.ASTPropTo>node;
-      let sleft = addSizes(node_.l);
-      let sright = addSizes(node_.r);
+      let sleft = addSizes(node_.l, true);
+      let sright = addSizes(node_.r, true);
       if (sleft.ver_len !== undefined && sright.ver_len !== undefined) {
         node.ver_len += Math.max(sleft.ver_len, sright.ver_len) + 2 * PAD_SIZE;
       } else {
@@ -249,12 +311,22 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
         );
       }
       if (sleft.hor_len !== undefined && sright.hor_len !== undefined) {
-        node.hor_len +=
-          sleft.hor_len +
-          sright.hor_len +
-          PROPTO_SIZE +
-          0.3 * PROPTO_SIZE * node_.specialization.length +
-          4 * PAD_SIZE;
+        if (node_.specialization.length > 1) {
+          node.hor_len +=
+            sleft.hor_len +
+            sright.hor_len +
+            2 * PROPTO_SIZE +
+            0.2 * CAST_SIZE * node_.specialization.length +
+            4 * PAD_SIZE;
+        }
+        else {
+          node.hor_len +=
+            sleft.hor_len +
+            sright.hor_len +
+            1.0 * PROPTO_SIZE +
+            1.0 * CAST_SIZE * node_.specialization.length +
+            4 * PAD_SIZE;
+        }
       } else {
         throw new Error(
           `Could not size children of ${node} as propto node: vertical len`
@@ -281,7 +353,7 @@ export function addSizes(node: ast.ASTNode): ast.ASTNode {
     }
   }
   // console.log("before happy robot: ", node);
-  node = addSizesHappyRobot(node);
+  node = addSizesHappyRobot(node, preboxed);
   // console.log("after happy robot: ", node);
   return node;
 }

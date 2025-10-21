@@ -37,6 +37,8 @@ export enum TokenKind {
   NStack,
   NStack1,
   Compose,
+  // Plus,
+  Scale,
 
   PropTo,
   Eq,
@@ -71,7 +73,7 @@ export const lexer = buildLexer([
   [true, /^=/g, TokenKind.Eq],
   [true, /^PI/g, TokenKind.PI],
 
-  [true, /^[A-WYa-zΑ-Ωα-ω][A-Za-zΑ-Ωα-ω0-9'_]*/g, TokenKind.Str],
+  [true, /^[A-WYa-zΑ-Ωα-ω◁▷][A-Za-zΑ-Ωα-ω0-9'_]*/g, TokenKind.Str],
   [true, /^\,/g, TokenKind.Comma],
 
   [true, new RegExp(`\^[${c.ADD_OP}]`, "g"), TokenKind.Add],
@@ -98,11 +100,27 @@ export const lexer = buildLexer([
   [true, new RegExp(`\^[${c.N_STACK_OP}]`, "g"), TokenKind.NStack],
   [true, new RegExp(`\^[${c.N_STACK_1_OP}]`, "g"), TokenKind.NStack1],
   [true, new RegExp(`\^[${c.COMPOSE_OP}]`, "g"), TokenKind.Compose],
+  // [true, new RegExp(`\^[\.\+]`, "g"), TokenKind.Plus],
+  [true, /^\.\*/g, TokenKind.Scale],
 
   [true, new RegExp(`\^[${c.PROP_TO}]`, "g"), TokenKind.PropTo],
 
   [false, /^\s+/g, TokenKind.Space],
+  [false, /^%[A-Za-z_]+/g, TokenKind.Space], // Idnore scope keys
+  // [true, /^./g, TokenKind.Str],
+
 ]);
+
+export function lexerPrettyPrinter_string(expr: string) : string {
+  let lx = lexer.parse(expr);
+  let printlx = "";
+  while (lx) {
+    printlx += TokenKind[lx.kind] + ", ";
+    lx = lx?.next;
+  }
+  return printlx
+}
+
 
 export function lexerPrettyPrinter(expr: string) {
   let lx = lexer.parse(expr);

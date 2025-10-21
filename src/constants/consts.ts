@@ -10,6 +10,9 @@ export const COMPOSE_OP = "⟷"; //\longleftrightarrow
 export const STACK_OP = "↕"; // \updownarrow
 export const N_STACK_1_OP = "↑";
 
+export const SCALE_OP = ".*";
+// export const ZX_PLUS_OP = ".+";
+
 export const PROP_TO = "∝";
 export const EQ = "=";
 export const CAP = "⊂";
