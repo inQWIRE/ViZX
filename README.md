@@ -19,3 +19,4 @@ This extension contributes the following settings:
 - `vizx.lspRender`: to communicate with coq-lsp for automatic rendering. should not be used manually.
 - `vizx.activateRendering`: activates automatic rendering of goal state.
 - `vizx.deactivateRendering`: deactivates automatic rendering of goal state.
+- `vizx.lex`: debug tool to lex term without rendering
